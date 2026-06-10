@@ -9,7 +9,7 @@ public class JoystickMove : MonoBehaviour,
 {
     [Header("References")]
     [SerializeField] private Image circleAreaMove;
-    [SerializeField] private Button moveButton;
+    [SerializeField] private Image moveB;
 
     private RectTransform circleRect;
     private RectTransform moveRect;
@@ -23,18 +23,19 @@ public class JoystickMove : MonoBehaviour,
     private void Awake()
     {
         circleRect = circleAreaMove.rectTransform;
-        moveRect = moveButton.GetComponent<RectTransform>();
+        moveRect = moveB.rectTransform;
 
         startPosition = moveRect.anchoredPosition;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        Debug.Log("Pointer Down");
+
         isDragging = true;
 
         UpdateJoystick(eventData);
     }
-
     public void OnDrag(PointerEventData eventData)
     {
         UpdateJoystick(eventData);

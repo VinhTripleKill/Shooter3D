@@ -24,6 +24,8 @@ public class PlayerWeapon : MonoBehaviour
     private int currentShotCount;
     private bool isHoldingAttack;
     private bool isReloading;
+    [Header("Aim Visual")]
+    [SerializeField] private GunRayDebug gunRayDebug;
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
     private Coroutine reloadCoroutine;
@@ -109,20 +111,20 @@ public class PlayerWeapon : MonoBehaviour
 
     private void Update()
     {
+        if (hasGun && gunRayDebug != null)
+            gunRayDebug.UpdateAimLines();
+
         if (isHoldingAttack)
         {
             if (useAutoAim)
-            {
                 AimNearestEnemy();
-            }
             else
-            {
                 ManualAim();
-            }
 
             TryShoot();
         }
     }
+    
     private void ManualAim()
     {
         if (manualAimDirection.sqrMagnitude < 0.01f)
@@ -224,34 +226,150 @@ public class PlayerWeapon : MonoBehaviour
     private void Shoot()
     {
         GunData gunData = currentGunVisual.gunData;
+
+        if (gunData.fireType ==
+            GunData.GunFireType.Raycast)
+        {
+            ShootRaycast(gunData);
+        }
+        else
+        {
+            ShootProjectile(gunData);
+        }
+
+        if (gunData.recoilForce > 0)
+        {
+            CharacterController cc =
+                GetComponent<CharacterController>();
+
+            cc.Move(
+                -transform.forward *
+                gunData.recoilForce);
+        }
+    }
+    private void ShootProjectile(
+    GunData gunData)
+    {
+        Transform firePoint =
+            currentGunVisual.GetFirePoint();
+
+        int pelletCount =
+            gunData.pelletCount;
+
+        float angleStep =
+            gunData.angleBetweenBullets;
+
+        float startAngle =
+            -(angleStep * (pelletCount - 1)) / 2f;
+
+        for (int i = 0; i < pelletCount; i++)
+        {
+            float currentAngle =
+                startAngle + angleStep * i;
+
+            Quaternion fixedSpread =
+                Quaternion.Euler(
+                    0,
+                    currentAngle,
+                    0);
+
+            Quaternion randomSpread =
+                Quaternion.Euler(
+                    Random.Range(
+                        -gunData.randomSpreadX,
+                        gunData.randomSpreadX),
+                    Random.Range(
+                        -gunData.randomSpreadY,
+                        gunData.randomSpreadY),
+                    Random.Range(
+                        -gunData.randomSpreadZ,
+                        gunData.randomSpreadZ));
+
+            Quaternion finalRotation =
+                firePoint.rotation *
+                fixedSpread *
+                randomSpread;
+
+            GameObject bulletObj =
+                Instantiate(
+                    gunData.bulletPrefab,
+                    firePoint.position,
+                    finalRotation);
+
+            Bullet bullet =
+                bulletObj.GetComponent<Bullet>();
+
+            bullet.Initialize(
+                finalRotation * Vector3.forward,
+                gunData.bulletSpeed,
+                gunData.bulletLifeTime,
+                gunData.damage);
+        }
+    }
+    private void ShootRaycast(GunData gunData)
+    {
         Transform firePoint = currentGunVisual.GetFirePoint();
+
         int pelletCount = gunData.pelletCount;
         float angleStep = gunData.angleBetweenBullets;
         float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
 
         for (int i = 0; i < pelletCount; i++)
         {
-            float currentAngle = startAngle + (angleStep * i);
-            Quaternion fixedSpread = Quaternion.Euler(0, currentAngle, 0);
-            Quaternion randomSpread = Quaternion.Euler(
-                Random.Range(-gunData.randomSpreadX, gunData.randomSpreadX),
-                Random.Range(-gunData.randomSpreadY, gunData.randomSpreadY),
-                Random.Range(-gunData.randomSpreadZ, gunData.randomSpreadZ)
-            );
+            float currentAngle = startAngle + angleStep * i;
 
-            Quaternion finalRotation = firePoint.rotation * fixedSpread * randomSpread;
+            Quaternion spread =
+                Quaternion.Euler(
+                    Random.Range(-gunData.randomSpreadX, gunData.randomSpreadX),
+                    Random.Range(-gunData.randomSpreadY, gunData.randomSpreadY),
+                    Random.Range(-gunData.randomSpreadZ, gunData.randomSpreadZ)
+                );
 
-            GameObject bulletObj = Instantiate(gunData.bulletPrefab, firePoint.position, finalRotation);
-            Bullet bullet = bulletObj.GetComponent<Bullet>();
-            bullet.Initialize(finalRotation * Vector3.forward, gunData.bulletSpeed, gunData.bulletLifeTime, gunData.damage);
+            Vector3 direction =
+                (firePoint.rotation *
+                 Quaternion.Euler(0, currentAngle, 0) *
+                 spread) * Vector3.forward;
+
+            Vector3 startPos = firePoint.position;
+            Vector3 endPos;
+
+            RaycastHit hit;
+
+            if (Physics.SphereCast(
+        startPos,
+        gunData.hitRadius,
+        direction,
+        out hit,
+        gunData.raycastDistance,
+        gunData.hitMask, QueryTriggerInteraction.Ignore
+        ))
+            {
+                endPos = hit.point;
+
+                Debug.Log($"Hit: {hit.collider.name}");
+
+                // Damage ở đây
+            }
+            else
+            {
+                endPos = startPos + direction * gunData.raycastDistance;
+            }
+
+            SpawnTrail(startPos, endPos, gunData);
         }
+    }
+    private void SpawnTrail(Vector3 start, Vector3 end, GunData gunData)
+    {
+        GameObject trailObj =
+            Instantiate(gunData.bulletPrefab, start, Quaternion.identity);
 
-        // Recoil
-        if (gunData.recoilForce > 0)
-        {
-            CharacterController cc = GetComponent<CharacterController>();
-            cc.Move(-transform.forward * gunData.recoilForce);
-        }
+        BulletTrail trail =
+            trailObj.GetComponent<BulletTrail>();
+
+        float travelTime =
+            Vector3.Distance(start, end) / gunData.bulletSpeed;
+
+        trail.Initialize(start, end, gunData.bulletSpeed);
     }
 
     public void EquipGun(GameObject gunPrefab)
@@ -269,20 +387,23 @@ public class PlayerWeapon : MonoBehaviour
         currentGun.transform.localRotation = Quaternion.identity;
 
         currentGunVisual = currentGun.GetComponent<GunVisual>();
+
+        // Khởi tạo Aim Debug
+        if (gunRayDebug != null)
+        {
+            gunRayDebug.Initialize(currentGunVisual.gunData, currentGunVisual.GetFirePoint());
+        }
+
         currentShotCount = currentGunVisual.gunData.maxCountShot;
         isReloading = false;
         hasGun = true;
-        currentShotCount = currentGunVisual.gunData.maxCountShot;
 
-        gameplayUI?.UpdateAmmoBar(
-            currentShotCount,
-            currentGunVisual.gunData.maxCountShot);
+        gameplayUI?.UpdateAmmoBar(currentShotCount, currentGunVisual.gunData.maxCountShot);
         playerAnim.SetHoldGun(true);
         gameplayUI?.StopReloadVisual();
     }
-
-
-
+   
+   
     private IEnumerator ReloadRoutine()
     {
         if (isReloading)
@@ -345,8 +466,10 @@ public class PlayerWeapon : MonoBehaviour
         currentGunVisual = null;
         hasGun = false;
 
-        gameplayUI?.ResetAmmoBar();
+        if (gunRayDebug != null)
+            gunRayDebug.Cleanup();
 
+        gameplayUI?.ResetAmmoBar();
         playerAnim.SetHoldGun(false);
     }
     private void CancelReload()

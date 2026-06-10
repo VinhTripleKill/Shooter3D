@@ -13,13 +13,22 @@ MonoBehaviour:
   m_Name: SniperGold
   m_EditorClassIdentifier: Assembly-CSharp::GunData
   gunName: Sniper
+  fireType: 0
+  raycastDistance: 20
+  hitRadius: 0.5
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 72
+  showRay: 1
   gunVisualPrefab: {fileID: 3547316800252406819, guid: b1e2d6fb63fc0da43903990567542334, type: 3}
   gunItemPrefab: {fileID: 4387299326062068396, guid: 2d9e5ca7233ff85428c445f473efeb9c, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 9c9a41f02d459be40a28d1b5b6526939, type: 3}
   damage: 0
   timeBetweenShots: 1
-  bulletSpeed: 25
+  bulletSpeed: 60
   bulletLifeTime: 3
+  maxCountShot: 5
+  timeReload: 2
   pelletCount: 1
   angleBetweenBullets: 0
   randomSpreadX: 0

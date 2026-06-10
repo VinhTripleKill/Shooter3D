@@ -10,8 +10,7 @@ public class JoystickAttack : MonoBehaviour,
     [Header("References")]
     [SerializeField] private Image circleAreaATK;
     [SerializeField] private Image circleInnerAttackArea;
-    [SerializeField] private Button attackB;
-
+    [SerializeField] private Image attackB;
     [Header("Player")]
     [SerializeField] private PlayerWeapon playerWeapon;
 
@@ -37,8 +36,7 @@ public class JoystickAttack : MonoBehaviour,
     {
         circleRect = circleAreaATK.rectTransform;
         innerRect = circleInnerAttackArea.rectTransform;
-        attackRect = attackB.GetComponent<RectTransform>();
-
+        attackRect = attackB.rectTransform;
         startPosition = attackRect.anchoredPosition;
 
         currentZone = AttackZone.Inner;

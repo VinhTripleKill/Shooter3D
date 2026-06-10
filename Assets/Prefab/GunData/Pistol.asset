@@ -13,12 +13,19 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: Assembly-CSharp::GunData
   gunName: Pistol
+  fireType: 0
+  raycastDistance: 10
+  hitRadius: 0.5
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 72
+  showRay: 1
   gunVisualPrefab: {fileID: 7153347977920189024, guid: 10768f782e442f243b1e01577dfdeb94, type: 3}
   gunItemPrefab: {fileID: 8074242924553788827, guid: c3a5bc32cb69f284f80afff8501c7aa9, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 9c9a41f02d459be40a28d1b5b6526939, type: 3}
   damage: 0
   timeBetweenShots: 0.5
-  bulletSpeed: 10
+  bulletSpeed: 20
   bulletLifeTime: 1
   maxCountShot: 10
   timeReload: 2

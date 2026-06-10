@@ -5,7 +5,22 @@ public class GunData : ScriptableObject
 {
     [Header("Info")]
     public string gunName;
+    public enum GunFireType
+{
+    Raycast,
+    Projectile
+}
 
+[Header("Fire Type")]
+public GunFireType fireType;
+    [Header("Raycast")]
+    public float raycastDistance = 100f;
+    [Tooltip("Bán kính hit của SphereCast")]
+    public float hitRadius = 0.5f;
+    [Tooltip("Các layer có thể bị trúng đạn")]
+    public LayerMask hitMask;
+    [Header("Debug")]
+    public bool showRay = true;
     [Header("Visual")]
     public GameObject gunVisualPrefab;
     [Header("World Item")]
