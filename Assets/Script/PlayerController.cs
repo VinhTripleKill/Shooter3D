@@ -13,14 +13,18 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 5f;
     public float sprintSpeed = 3f;
+    [Header("Sprint Effect")]
+    [SerializeField]
+    private ParticleSystem sprintEffect;
     public float gravity = -20f;
-
+    [SerializeField]
+    private float rotationSpeed = 10f;
     [Header("Sprint Energy")]
     public float maxSprintEnergy = 100f;
     public float sprintConsumption = 5f;
     public float sprintRecoveryWalk = 5f;
     public float sprintRecoveryIdle = 10f;
-
+    private bool wasSprinting;
     private float currentSprintEnergy;
     private bool sprintLocked;
     private float sprintLockTimer;
@@ -78,8 +82,24 @@ public class PlayerController : MonoBehaviour
         UpdateSprintLock();
         HandleSprintEnergy();
         Move();
-    }
 
+        UpdateSprintEffect();
+    }
+    private void UpdateSprintEffect()
+    {
+        bool isSprintingNow = IsSprinting();
+
+        if (isSprintingNow && !wasSprinting)
+        {
+            sprintEffect?.Play();
+        }
+        else if (!isSprintingNow && wasSprinting)
+        {
+            sprintEffect?.Stop();
+        }
+
+        wasSprinting = isSprintingNow;
+    }
     private void ReadMovementInput()
     {
         Vector2 keyboardInput =
@@ -168,7 +188,16 @@ public class PlayerController : MonoBehaviour
 
         // Xoay hướng
         if (move != Vector3.zero)
-            transform.forward = move;
+        {
+            Quaternion targetRotation =
+                Quaternion.LookRotation(move);
+
+            transform.rotation =
+                Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    rotationSpeed * Time.deltaTime);
+        }
 
         // Animation
         float animSpeed = 0f;

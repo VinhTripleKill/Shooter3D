@@ -67,6 +67,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   gunVisualPrefab: {fileID: 7153347977920189024, guid: 10768f782e442f243b1e01577dfdeb94, type: 3}
+  currentAmmo: -1
+  isReloading: 0
 --- !u!54 &269202741600016055
 Rigidbody:
   m_ObjectHideFlags: 0

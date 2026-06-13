@@ -8,12 +8,14 @@ public class Bullet : MonoBehaviour
 
     private Vector3 moveDirection;
 
+    private LayerMask hitMask;
+
     public void Initialize(
         Vector3 dir,
         float bulletSpeed,
         float bulletLifeTime,
-        float bulletDamage
-    )
+        float bulletDamage,
+        LayerMask bulletHitMask)
     {
         moveDirection = dir.normalized;
 
@@ -21,16 +23,22 @@ public class Bullet : MonoBehaviour
         lifeTime = bulletLifeTime;
         damage = bulletDamage;
 
+        hitMask = bulletHitMask;
+
         Destroy(gameObject, lifeTime);
     }
 
     private void Update()
     {
-        transform.position += moveDirection * speed * Time.deltaTime;
+        transform.position +=
+            moveDirection * speed * Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(gameObject);
+        if (((1 << other.gameObject.layer) & hitMask) != 0)
+        {
+            Destroy(gameObject);
+        }
     }
 }

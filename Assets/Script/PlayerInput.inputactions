@@ -18,7 +18,7 @@
                 {
                     "name": "Attack",
                     "type": "Button",
-                    "id": "9fa521f9-8ebf-48fb-b751-21b4e0e70a2c",
+                    "id": "e4dd086b-4602-4114-b0cf-03666a06b69b",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -192,7 +192,7 @@
                 },
                 {
                     "name": "",
-                    "id": "09fa5ca9-d796-4b78-a3fa-f36fbe13d295",
+                    "id": "9cbd0f83-389f-44c2-9884-0822d51e405f",
                     "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",

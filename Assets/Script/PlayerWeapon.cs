@@ -215,6 +215,9 @@ public class PlayerWeapon : MonoBehaviour
 
         Shoot();
         currentShotCount--;
+        currentGun
+    .GetComponent<GunRuntimeData>()
+    .currentAmmo = currentShotCount;
         gameplayUI?.UpdateAmmoBar(
     currentShotCount,
     gunData.maxCountShot);
@@ -300,10 +303,11 @@ public class PlayerWeapon : MonoBehaviour
                 bulletObj.GetComponent<Bullet>();
 
             bullet.Initialize(
-                finalRotation * Vector3.forward,
-                gunData.bulletSpeed,
-                gunData.bulletLifeTime,
-                gunData.damage);
+     finalRotation * Vector3.forward,
+     gunData.bulletSpeed,
+     gunData.bulletLifeTime,
+     gunData.damage,
+     gunData.hitMask);
         }
     }
     private void ShootRaycast(GunData gunData)
@@ -372,13 +376,16 @@ public class PlayerWeapon : MonoBehaviour
         trail.Initialize(start, end, gunData.bulletSpeed);
     }
 
-    public void EquipGun(GameObject gunPrefab)
+    public void EquipGun(
+     GameObject gunPrefab,
+     int ammo = -1,
+     bool wasReloading = false)
     {
         CancelReload();
         if (currentGun != null)
         {
             GunData oldGunData = currentGunVisual.gunData;
-            SpawnDroppedGun(oldGunData);
+            SpawnDroppedGun(oldGunData, currentShotCount, isReloading);
             Destroy(currentGun);
         }
 
@@ -387,14 +394,40 @@ public class PlayerWeapon : MonoBehaviour
         currentGun.transform.localRotation = Quaternion.identity;
 
         currentGunVisual = currentGun.GetComponent<GunVisual>();
+        GunRuntimeData runtime =
+    currentGun.GetComponent<GunRuntimeData>();
 
+        if (runtime == null)
+        {
+            runtime =
+                currentGun.AddComponent<GunRuntimeData>();
+
+            runtime.Initialize(
+                currentGunVisual.gunData);
+        }
         // Khởi tạo Aim Debug
         if (gunRayDebug != null)
         {
             gunRayDebug.Initialize(currentGunVisual.gunData, currentGunVisual.GetFirePoint());
         }
 
-        currentShotCount = currentGunVisual.gunData.maxCountShot;
+        if (ammo < 0)
+        {
+            currentShotCount =
+                currentGunVisual.gunData.maxCountShot;
+
+            runtime.currentAmmo =
+                currentShotCount;
+
+            runtime.isReloading = false;
+        }
+        else
+        {
+            runtime.currentAmmo = ammo;
+            runtime.isReloading = wasReloading;
+
+            currentShotCount = ammo;
+        }
         isReloading = false;
         hasGun = true;
 
@@ -418,7 +451,10 @@ public class PlayerWeapon : MonoBehaviour
         yield return new WaitForSeconds(gunData.timeReload);
 
         currentShotCount = gunData.maxCountShot;
-       
+        currentGun
+     .GetComponent<GunRuntimeData>()
+     .currentAmmo =
+     currentShotCount;
         isReloading = false;
 
         gameplayUI?.StopReloadVisual();
@@ -458,8 +494,11 @@ public class PlayerWeapon : MonoBehaviour
 
         GunData gunData = currentGunVisual.gunData;
 
-        SpawnDroppedGun(gunData);
 
+        SpawnDroppedGun(
+            gunData,
+            currentShotCount,
+            isReloading);
         Destroy(currentGun);
 
         currentGun = null;
@@ -486,11 +525,18 @@ public class PlayerWeapon : MonoBehaviour
         gameplayUI?.StopReloadVisual();
     }
 
-    private void SpawnDroppedGun(GunData gunData)
+    private void SpawnDroppedGun(
+     GunData gunData,
+     int ammo,
+     bool wasReloading)
     {
         Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
         GameObject droppedGun = Instantiate(gunData.gunItemPrefab, spawnPos, Quaternion.identity);
+        GunPickup pickup =
+    droppedGun.GetComponent<GunPickup>();
 
+        pickup.currentAmmo = ammo;
+        pickup.isReloading = wasReloading;
         Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
         if (rb != null)
         {

@@ -131,6 +131,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GunPickup
   gunVisualPrefab: {fileID: 5572602919809900340, guid: 079f3c88e684cc7479bb5720b927a349, type: 3}
+  currentAmmo: -1
+  isReloading: 0
 --- !u!54 &2515996723927692530
 Rigidbody:
   m_ObjectHideFlags: 0

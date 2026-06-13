@@ -121,13 +121,16 @@ public class JoystickAttack : MonoBehaviour,
 
         if (newZone == currentZone)
         {
-            if (playerWeapon != null)
+            if (newZone == currentZone)
             {
-                playerWeapon.SetManualAimDirection(
-                    InputDirection);
-            }
+                if (currentZone == AttackZone.Outer)
+                {
+                    playerWeapon.SetManualAimDirection(
+                        InputDirection);
+                }
 
-            return;
+                return;
+            }
         }
 
         currentZone = newZone;

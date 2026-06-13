@@ -19,7 +19,7 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 72
-  showRay: 1
+  showRay: 0
   gunVisualPrefab: {fileID: 5513453165033166812, guid: c6ab4dece44495c4dbb8c3967647fd64, type: 3}
   gunItemPrefab: {fileID: 6136311237187020477, guid: 80360a89cde7733449eb1dd81f7b7384, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 9c9a41f02d459be40a28d1b5b6526939, type: 3}

@@ -1,20 +1,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class Enemy : MonoBehaviour
 {
     public static List<Enemy> AllEnemies =
         new List<Enemy>();
 
-    [Header("Circle Move")]
+    [Header("Movement")]
     [SerializeField]
-    private float radius = 3f;
+    private float moveSpeed = 3f;
 
     [SerializeField]
-    private float rotateSpeed = 60f;
+    private float gravity = -20f;
 
-    private Vector3 centerPoint;
-    private float currentAngle;
+    [Header("Timing")]
+    [SerializeField]
+    private float idleTime = 5f;
+
+    [SerializeField]
+    private float moveTime = 3f;
+
+    private CharacterController controller;
+
+    private float verticalVelocity;
+
+    private float stateTimer;
+
+    private MoveState currentState;
+
+    private enum MoveState
+    {
+        IdleBeforeForward,
+        MoveForward,
+        IdleBeforeBackward,
+        MoveBackward
+    }
 
     private void OnEnable()
     {
@@ -26,30 +47,111 @@ public class Enemy : MonoBehaviour
         AllEnemies.Remove(this);
     }
 
+    private void Awake()
+    {
+        controller =
+            GetComponent<CharacterController>();
+    }
+
     private void Start()
     {
-        centerPoint = transform.position;
+        currentState =
+            MoveState.IdleBeforeForward;
 
-        currentAngle =
-            Random.Range(0f, 360f);
+        stateTimer = idleTime;
     }
 
     private void Update()
     {
-        currentAngle +=
-            rotateSpeed * Time.deltaTime;
+        UpdateStateMachine();
 
-        float rad =
-            currentAngle * Mathf.Deg2Rad;
+        ApplyGravity();
+    }
 
-        Vector3 offset =
-            new Vector3(
-                Mathf.Cos(rad),
-                0f,
-                Mathf.Sin(rad))
-            * radius;
+    private void UpdateStateMachine()
+    {
+        stateTimer -= Time.deltaTime;
 
-        transform.position =
-            centerPoint + offset;
+        Vector3 moveDirection =
+            Vector3.zero;
+
+        switch (currentState)
+        {
+            case MoveState.IdleBeforeForward:
+
+                if (stateTimer <= 0f)
+                {
+                    currentState =
+                        MoveState.MoveForward;
+
+                    stateTimer = moveTime;
+                }
+
+                break;
+
+            case MoveState.MoveForward:
+
+                moveDirection =
+                    transform.forward;
+
+                if (stateTimer <= 0f)
+                {
+                    currentState =
+                        MoveState.IdleBeforeBackward;
+
+                    stateTimer = idleTime;
+                }
+
+                break;
+
+            case MoveState.IdleBeforeBackward:
+
+                if (stateTimer <= 0f)
+                {
+                    currentState =
+                        MoveState.MoveBackward;
+
+                    stateTimer = moveTime;
+                }
+
+                break;
+
+            case MoveState.MoveBackward:
+
+                moveDirection =
+                    -transform.forward;
+
+                if (stateTimer <= 0f)
+                {
+                    currentState =
+                        MoveState.IdleBeforeForward;
+
+                    stateTimer = idleTime;
+                }
+
+                break;
+        }
+
+        controller.Move(
+            moveDirection *
+            moveSpeed *
+            Time.deltaTime);
+    }
+
+    private void ApplyGravity()
+    {
+        if (controller.isGrounded &&
+            verticalVelocity < 0f)
+        {
+            verticalVelocity = -2f;
+        }
+
+        verticalVelocity +=
+            gravity * Time.deltaTime;
+
+        controller.Move(
+            Vector3.up *
+            verticalVelocity *
+            Time.deltaTime);
     }
 }

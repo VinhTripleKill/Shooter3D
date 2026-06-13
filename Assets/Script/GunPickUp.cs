@@ -4,9 +4,18 @@ public class GunPickup : MonoBehaviour
 {
     public GameObject gunVisualPrefab;
 
-    public void Pickup(PlayerWeapon playerWeapon)   // ← đổi thành PlayerWeapon
+    [Tooltip("-1 = Full Ammo lần đầu")]
+    public int currentAmmo = -1;
+
+    public bool isReloading;
+
+    public void Pickup(PlayerWeapon playerWeapon)
     {
-        playerWeapon.EquipGun(gunVisualPrefab);
+        playerWeapon.EquipGun(
+            gunVisualPrefab,
+            currentAmmo,
+            isReloading);
+
         Destroy(gameObject);
     }
 }
