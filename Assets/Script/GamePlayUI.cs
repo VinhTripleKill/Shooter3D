@@ -13,25 +13,37 @@ public class GamePlayUI : MonoBehaviour
     [SerializeField] private Image ammoI;
     [SerializeField] private Button reloadButton;
     [SerializeField] private float reloadRotateSpeed = 360f;
-
+    [Header("Pick Up")]
+    [SerializeField] private Button pickUp;
     private bool isReloading;
 
     private void Awake()
     {
         sprintLock.gameObject.SetActive(false);
+        pickUp.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (!isReloading)
-            return;
+        if (!isReloading) return;
 
-        ammoI.rectTransform.Rotate(
-            0f,
-            0f,
-            -reloadRotateSpeed * Time.deltaTime);
+        ammoI.rectTransform.Rotate( 0f,0f,-reloadRotateSpeed * Time.deltaTime);
     }
 
+    public void ShowPickUp()
+    {
+        pickUp.gameObject.SetActive(true);
+    }
+
+    public void HidePickUp()
+    {
+        pickUp.gameObject.SetActive(false);
+    }
+
+    public Button GetPickUpButton()
+    {
+        return pickUp;
+    }
     public void StartReloadVisual()
     {
         isReloading = true;
@@ -41,21 +53,15 @@ public class GamePlayUI : MonoBehaviour
     {
         isReloading = false;
 
-        ammoI.rectTransform.localEulerAngles =
-            Vector3.zero;
+        ammoI.rectTransform.localEulerAngles = Vector3.zero;
     }
 
-    public void UpdateSprintBar(
-        float currentSprint,
-        float maxSprint)
+    public void UpdateSprintBar( float currentSprint,float maxSprint)
     {
-        sprintBar.fillAmount =
-            currentSprint / maxSprint;
+        sprintBar.fillAmount =currentSprint / maxSprint;
     }
 
-    public void UpdateAmmoBar(
-        int currentAmmo,
-        int maxAmmo)
+    public void UpdateAmmoBar(int currentAmmo, int maxAmmo)
     {
         if (maxAmmo <= 0)
         {
@@ -63,8 +69,7 @@ public class GamePlayUI : MonoBehaviour
             return;
         }
 
-        statusAmmo.fillAmount =
-            (float)currentAmmo / maxAmmo;
+        statusAmmo.fillAmount = (float)currentAmmo / maxAmmo;
     }
 
     public void ResetAmmoBar()

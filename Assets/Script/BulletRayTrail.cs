@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BulletTrail : MonoBehaviour
+public class BulletRayTrail : MonoBehaviour
 {
     private Vector3 startPos;
     private Vector3 endPos;

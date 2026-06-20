@@ -8,8 +8,8 @@ public class JoystickAttack : MonoBehaviour,
     IPointerUpHandler
 {
     [Header("References")]
-    [SerializeField] private Image circleAreaATK;
-    [SerializeField] private Image circleInnerAttackArea;
+    [SerializeField] private Image OuterArea;
+    [SerializeField] private Image InnerArea;
     [SerializeField] private Image attackB;
     [Header("Player")]
     [SerializeField] private PlayerWeapon playerWeapon;
@@ -34,8 +34,8 @@ public class JoystickAttack : MonoBehaviour,
 
     private void Awake()
     {
-        circleRect = circleAreaATK.rectTransform;
-        innerRect = circleInnerAttackArea.rectTransform;
+        circleRect = OuterArea.rectTransform;
+        innerRect = InnerArea.rectTransform;
         attackRect = attackB.rectTransform;
         startPosition = attackRect.anchoredPosition;
 
@@ -100,7 +100,7 @@ public class JoystickAttack : MonoBehaviour,
             clampedPosition.normalized;
         if (playerWeapon != null)
         {
-            playerWeapon.SetManualAimDirection(
+            playerWeapon.SetJoystickManualAim(
                 InputDirection);
         }
         CheckZone(clampedPosition);
@@ -108,8 +108,7 @@ public class JoystickAttack : MonoBehaviour,
 
     private void CheckZone(Vector2 currentPos)
     {
-        float distance =
-            currentPos.magnitude;
+        float distance = currentPos.magnitude;
 
         float innerRadius =
             innerRect.rect.width * 0.5f;
@@ -119,34 +118,23 @@ public class JoystickAttack : MonoBehaviour,
             ? AttackZone.Inner
             : AttackZone.Outer;
 
-        if (newZone == currentZone)
-        {
-            if (newZone == currentZone)
-            {
-                if (currentZone == AttackZone.Outer)
-                {
-                    playerWeapon.SetManualAimDirection(
-                        InputDirection);
-                }
-
-                return;
-            }
-        }
-
         currentZone = newZone;
 
-        if (playerWeapon != null)
+        if (playerWeapon == null)
+            return;
+
+        if (currentZone == AttackZone.Inner)
         {
-            bool autoAim =
-                currentZone == AttackZone.Inner;
-
-            playerWeapon.SetAutoAim(autoAim);
+            playerWeapon.SetAutoAim(true);
         }
+        else
+        {
+            playerWeapon.SetAutoAim(false);
 
-        Debug.Log(
-            $"[{Time.time:F2}] Attack Zone Changed -> {currentZone}");
+            playerWeapon.SetJoystickManualAim(
+                InputDirection);
+        }
     }
-
     public bool IsDragging()
     {
         return isDragging;

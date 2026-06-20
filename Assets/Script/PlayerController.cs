@@ -209,9 +209,15 @@ public class PlayerController : MonoBehaviour
 
     private bool IsSprinting()
     {
-        return isSprintOn && moveInput != Vector2.zero && currentSprintEnergy > 0f;
+        return controller.isGrounded &&
+               IsMoving() &&
+               isSprintOn &&
+               currentSprintEnergy > 0f;
     }
-
+    private bool IsMoving()
+    {
+        return moveInput.sqrMagnitude > 0.01f;
+    }
     // Public để PlayerWeapon truy cập
     public bool IsSprintingPublic() => IsSprinting();
 }

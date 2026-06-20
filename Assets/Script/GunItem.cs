@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -11,10 +12,11 @@ public class GunItem : MonoBehaviour
     public LayerMask groundMask;
     [Header("Rotation")]
     public float rotateSpeed = 50f;
-
+    private int defaultLayer;
     private Rigidbody rb;
     private SphereCollider sphereCollider;
-
+    private Dictionary<Transform, int> originalLayers =
+    new Dictionary<Transform, int>();
     private Vector3 startPos;
 
     private bool isGrounded = false;
@@ -23,8 +25,28 @@ public class GunItem : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         sphereCollider = GetComponent<SphereCollider>();
-    }
 
+        foreach (Transform child in GetComponentsInChildren<Transform>(true))
+        {
+            originalLayers.Add(child, child.gameObject.layer);
+        }
+    }
+    public void SetCanPickUp(bool value)
+    {
+        int pickupLayer =
+            LayerMask.NameToLayer("CanPickUp");
+
+        foreach (var pair in originalLayers)
+        {
+            if (pair.Key == null)
+                continue;
+
+            pair.Key.gameObject.layer =
+                value ?
+                pickupLayer :
+                pair.Value;
+        }
+    }
     private void Update()
     {
         if (!isGrounded) return;

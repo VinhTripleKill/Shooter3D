@@ -1,6 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class PlayerWeapon : MonoBehaviour
 {
@@ -8,7 +9,8 @@ public class PlayerWeapon : MonoBehaviour
     private PlayerAnim playerAnim;
     [SerializeField]
     private float autoAimRange = 15f;
-    private InputAction attackAction;
+    private InputAction attackAutoAction;
+    private InputAction attackManualAction;
     private InputAction reloadAction;
     private InputAction dropAction;
     private InputAction interactionAction;
@@ -24,6 +26,10 @@ public class PlayerWeapon : MonoBehaviour
     private int currentShotCount;
     private bool isHoldingAttack;
     private bool isReloading;
+    private Transform currentTarget;
+    private bool useMouseAim;
+    private List<GunPickup> gunsInRange = new();
+    private GunPickup currentTargetGun;
     [Header("Aim Visual")]
     [SerializeField] private GunRayDebug gunRayDebug;
     [Header("UI")]
@@ -36,13 +42,17 @@ public class PlayerWeapon : MonoBehaviour
 
         var playerInput = GetComponent<PlayerInput>();
 
-        attackAction = playerInput.actions["Attack"];
+        attackAutoAction = playerInput.actions["AttackAuto"];
+        attackManualAction = playerInput.actions["AttackManual"];
         reloadAction = playerInput.actions["Reload"];
         dropAction = playerInput.actions["Drop"];
         interactionAction = playerInput.actions["Interaction"];
         gameplayUI?.ResetAmmoBar();
         if (gameplayUI != null)
+        {
             gameplayUI.GetReloadButton().onClick.AddListener(OnReloadButtonClicked);
+            gameplayUI.GetPickUpButton().onClick.AddListener(OnPickUpButtonClicked);
+        }
     }
 
     public bool HasGun()
@@ -68,7 +78,10 @@ public class PlayerWeapon : MonoBehaviour
     private void OnDestroy()
     {
         if (gameplayUI != null)
+        {
             gameplayUI.GetReloadButton().onClick.RemoveListener(OnReloadButtonClicked);
+            gameplayUI.GetPickUpButton().onClick.RemoveListener(OnPickUpButtonClicked);
+        }
     }
     private void OnReloadButtonClicked()
     {
@@ -93,8 +106,12 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void OnEnable()
     {
-        attackAction.started += AttackStarted;
-        attackAction.canceled += AttackCanceled;
+        attackAutoAction.started += AttackAutoStarted;
+        attackAutoAction.canceled += AttackCanceled;
+
+        attackManualAction.started += AttackManualStarted;
+        attackManualAction.canceled += AttackCanceled;
+
         reloadAction.performed += ReloadPerformed;
         dropAction.performed += DropPerformed;
         interactionAction.performed += InteractionPerformed;
@@ -102,17 +119,47 @@ public class PlayerWeapon : MonoBehaviour
 
     private void OnDisable()
     {
-        attackAction.started -= AttackStarted;
-        attackAction.canceled -= AttackCanceled;
+        attackManualAction.started -= AttackManualStarted;
+        attackManualAction.canceled -= AttackCanceled;
+        attackAutoAction.started -= AttackAutoStarted;
+        attackAutoAction.canceled -= AttackCanceled;
         reloadAction.performed -= ReloadPerformed;
         dropAction.performed -= DropPerformed;
         interactionAction.performed -= InteractionPerformed;
+    }
+    private void AttackAutoStarted(InputAction.CallbackContext ctx)
+    {
+        useAutoAim = true;
+        isHoldingAttack = true;
+    }
+
+    private void AttackManualStarted(
+        InputAction.CallbackContext ctx)
+    {
+        useAutoAim = false;
+        useMouseAim = true;
+
+        isHoldingAttack = true;
+    }
+    public void SetJoystickManualAim(
+    Vector2 direction)
+    {
+        useAutoAim = false;
+        useMouseAim = false;
+
+        manualAimDirection =
+            direction.normalized;
     }
 
     private void Update()
     {
         if (hasGun && gunRayDebug != null)
             gunRayDebug.UpdateAimLines();
+
+        if (!useAutoAim && useMouseAim)
+        {
+            UpdateMouseAimDirection();
+        }
 
         if (isHoldingAttack)
         {
@@ -123,8 +170,44 @@ public class PlayerWeapon : MonoBehaviour
 
             TryShoot();
         }
+        UpdatePickupTarget();
     }
-    
+    private void UpdateMouseAimDirection()
+    {
+        Camera cam = Camera.main;
+
+        if (cam == null)
+            return;
+
+        Vector2 mousePos =
+            Mouse.current.position.ReadValue();
+
+        Ray ray =
+            cam.ScreenPointToRay(mousePos);
+
+        Plane groundPlane =
+            new Plane(Vector3.up, Vector3.zero);
+
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            Vector3 hitPoint =
+                ray.GetPoint(distance);
+
+            Vector3 direction =
+                hitPoint - transform.position;
+
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                manualAimDirection =
+                    new Vector2(
+                        direction.x,
+                        direction.z);
+            }
+        }
+    }
+
     private void ManualAim()
     {
         if (manualAimDirection.sqrMagnitude < 0.01f)
@@ -141,14 +224,14 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void AimNearestEnemy()
     {
-        Transform target =
+        currentTarget =
             GetNearestEnemy();
 
-        if (target == null)
+        if (currentTarget == null)
             return;
 
         Vector3 direction =
-            target.position -
+            currentTarget.position -
             transform.position;
 
         direction.y = 0f;
@@ -159,15 +242,58 @@ public class PlayerWeapon : MonoBehaviour
         transform.forward =
             direction.normalized;
     }
+    private void UpdatePickupTarget()
+    {
+        GunPickup bestGun = null;
+        float bestScore = Mathf.Infinity;
 
+        foreach (GunPickup gun in gunsInRange)
+        {
+            if (gun == null)
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    gun.transform.position);
+
+            if (distance < bestScore)
+            {
+                bestScore = distance;
+                bestGun = gun;
+            }
+        }
+
+        if (bestGun == currentTargetGun)
+            return;
+
+        // bỏ highlight khẩu cũ
+        if (currentTargetGun != null)
+            currentTargetGun.GetComponent<GunItem>()
+                ?.SetCanPickUp(false);
+
+        currentTargetGun = bestGun;
+        nearbyGun = bestGun;
+
+        // bật highlight khẩu mới
+        if (currentTargetGun != null)
+        {
+            currentTargetGun.GetComponent<GunItem>()
+                ?.SetCanPickUp(true);
+
+            gameplayUI?.ShowPickUp();
+        }
+        else
+        {
+            gameplayUI?.HidePickUp();
+        }
+    }
     private Transform GetNearestEnemy()
     {
-        Transform nearestEnemy = null;
+        Transform nearest = null;
+        float nearestDistance = Mathf.Infinity;
 
-        float nearestDistance =
-            Mathf.Infinity;
-
-        foreach (Enemy enemy in Enemy.AllEnemies)
+        foreach (BaseEnemy enemy in BaseEnemy.AllEnemies)
         {
             if (enemy == null)
                 continue;
@@ -183,14 +309,33 @@ public class PlayerWeapon : MonoBehaviour
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;
-                nearestEnemy =
-                    enemy.transform;
+                nearest = enemy.transform;
             }
         }
 
-        return nearestEnemy;
-    }
+        // Target Training
+        foreach (TargetTraining target in TargetTraining.AllTargets)
+        {
+            if (target == null)
+                continue;
 
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    target.transform.position);
+
+            if (distance > autoAimRange)
+                continue;
+
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearest = target.transform;
+            }
+        }
+
+        return nearest;
+    }
     private void TryShoot()
     {
         if (!hasGun) return;
@@ -201,17 +346,17 @@ public class PlayerWeapon : MonoBehaviour
 
         if (Time.time < nextShotTime) return; // cần khai báo nextShotTime
 
-            if (currentShotCount <= 0)
+        if (currentShotCount <= 0)
+        {
+            if (!isReloading)
             {
-                if (!isReloading)
-                {
-                    reloadCoroutine =
-                        StartCoroutine(ReloadRoutine());
-                }
-
-                return;
+                reloadCoroutine =
+                    StartCoroutine(ReloadRoutine());
             }
-        
+
+            return;
+        }
+
 
         Shoot();
         currentShotCount--;
@@ -299,15 +444,15 @@ public class PlayerWeapon : MonoBehaviour
                     firePoint.position,
                     finalRotation);
 
-            Bullet bullet =
-                bulletObj.GetComponent<Bullet>();
-
+            BulletProjecTile bullet =
+                bulletObj.GetComponent<BulletProjecTile>();
             bullet.Initialize(
-     finalRotation * Vector3.forward,
-     gunData.bulletSpeed,
-     gunData.bulletLifeTime,
-     gunData.damage,
-     gunData.hitMask);
+                finalRotation * Vector3.forward,
+                gunData.bulletSpeed,
+                gunData.bulletLifeTime,
+                gunData.damage,
+                gunData.hitMask,
+                currentTarget);
         }
     }
     private void ShootRaycast(GunData gunData)
@@ -340,19 +485,25 @@ public class PlayerWeapon : MonoBehaviour
             RaycastHit hit;
 
             if (Physics.SphereCast(
-        startPos,
-        gunData.hitRadius,
-        direction,
-        out hit,
-        gunData.raycastDistance,
-        gunData.hitMask, QueryTriggerInteraction.Ignore
-        ))
+         startPos,
+         gunData.hitRadius,
+         direction,
+         out hit,
+         gunData.raycastDistance,
+         gunData.hitMask,
+         QueryTriggerInteraction.Ignore))
             {
                 endPos = hit.point;
 
                 Debug.Log($"Hit: {hit.collider.name}");
 
-                // Damage ở đây
+                IDamageable damageable =
+      hit.collider.GetComponentInParent<IDamageable>();
+
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(gunData.damage);
+                }
             }
             else
             {
@@ -367,8 +518,8 @@ public class PlayerWeapon : MonoBehaviour
         GameObject trailObj =
             Instantiate(gunData.bulletPrefab, start, Quaternion.identity);
 
-        BulletTrail trail =
-            trailObj.GetComponent<BulletTrail>();
+        BulletRayTrail trail =
+            trailObj.GetComponent<BulletRayTrail>();
 
         float travelTime =
             Vector3.Distance(start, end) / gunData.bulletSpeed;
@@ -435,8 +586,8 @@ public class PlayerWeapon : MonoBehaviour
         playerAnim.SetHoldGun(true);
         gameplayUI?.StopReloadVisual();
     }
-   
-   
+
+
     private IEnumerator ReloadRoutine()
     {
         if (isReloading)
@@ -464,13 +615,17 @@ public class PlayerWeapon : MonoBehaviour
             gunData.maxCountShot);
     }
 
-    private void AttackStarted(InputAction.CallbackContext ctx) => isHoldingAttack = true;
     private void AttackCanceled(InputAction.CallbackContext ctx) => isHoldingAttack = false;
 
     private void InteractionPerformed(InputAction.CallbackContext ctx)
     {
-        if (nearbyGun != null)
-            nearbyGun.Pickup(this);   // Truyền PlayerWeapon thay vì PlayerController
+        if (nearbyGun == null)
+            return;
+
+        nearbyGun.Pickup(this);
+
+        nearbyGun = null;
+        gameplayUI?.HidePickUp();
     }
 
     private void DropPerformed(InputAction.CallbackContext ctx) => DropGun();
@@ -544,16 +699,52 @@ public class PlayerWeapon : MonoBehaviour
             rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
         }
     }
+    private void OnPickUpButtonClicked()
+    {
+        if (nearbyGun == null)
+            return;
+
+        nearbyGun.Pickup(this);
+
+        nearbyGun = null;
+        gameplayUI?.HidePickUp();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out GunPickup gun))
-            nearbyGun = gun;
+        {
+            if (!gunsInRange.Contains(gun))
+            {
+                gunsInRange.Add(gun);
+            }
+            gameplayUI?.ShowPickUp();
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out GunPickup gun) && nearbyGun == gun)
-            nearbyGun = null;
+        if (other.TryGetComponent(out GunPickup gun))
+        {
+            gunsInRange.Remove(gun);
+
+            if (currentTargetGun == gun)
+            {
+                gun.GetComponent<GunItem>()?.SetCanPickUp(false);
+
+                currentTargetGun = null;
+                nearbyGun = null;
+
+                gameplayUI?.HidePickUp();
+            }
+        }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.TryGetComponent(out GunPickup gun))
+        {
+            nearbyGun = gun;
+            gameplayUI?.ShowPickUp();
+        }
     }
 }
