@@ -1,139 +1,144 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class TargetTraining : MonoBehaviour
+public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
 {
     public static List<TargetTraining> AllTargets =
-        new List<TargetTraining>();
+        new();
 
-    [SerializeField]
-    private float moveSpeed = 3f;
-
-    [SerializeField]
-    private float idleTime = 5f;
-
-    [SerializeField]
-    private float moveTime = 3f;
-
-    private Rigidbody rb;
-
-    private float stateTimer;
-
-    private enum MoveState
+    public enum TargetMode
     {
-        IdleBeforeForward,
-        MoveForward,
-        IdleBeforeBackward,
-        MoveBackward
+        Dummy,
+        Move
     }
 
-    private MoveState currentState;
+    [Header("Mode")]
+    [SerializeField] private TargetMode targetMode;
+
+    [Header("HP")]
+    [SerializeField] private float maxHp = 50f;
+
+    [SerializeField]private float currentHp;
+
+    [Header("Move")]
+    [SerializeField] private Transform posA;
+
+    [SerializeField] private Transform posB;
+
+    [SerializeField] private float speedMove = 10f;
+
+    [SerializeField] private float timeStop = 2f;
+
+    private Transform currentTargetPos;
+
+    private float stopTimer;
+
+    private bool isWaiting;
 
     private void OnEnable()
     {
         AllTargets.Add(this);
+
+        AutoAimManager.Register(this);
     }
 
     private void OnDisable()
     {
         AllTargets.Remove(this);
+
+        AutoAimManager.Unregister(this);
     }
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-
-        rb.constraints =
-            RigidbodyConstraints.FreezeRotation;
+        currentHp = maxHp;
     }
 
     private void Start()
     {
-        currentState =
-            MoveState.IdleBeforeForward;
+        if (posA == null || posB == null)
+            return;
 
-        stateTimer =
-            idleTime;
+        // Bắt đầu ở giữa A và B
+        transform.position =
+            (posA.position + posB.position) * 0.5f;
+
+        // Đi tới A trước
+        currentTargetPos = posA;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        UpdateStateMachine();
-    }
-
-    private void UpdateStateMachine()
-    {
-        stateTimer -= Time.fixedDeltaTime;
-
-        Vector3 moveDirection =
-            Vector3.zero;
-
-        switch (currentState)
+        if (targetMode == TargetMode.Move)
         {
-            case MoveState.IdleBeforeForward:
+            UpdateMoveMode();
+        }
+    }
 
-                if (stateTimer <= 0)
-                {
-                    currentState =
-                        MoveState.MoveForward;
+    private void UpdateMoveMode()
+    {
+        if (posA == null || posB == null)
+            return;
 
-                    stateTimer =
-                        moveTime;
-                }
+        if (isWaiting)
+        {
+            stopTimer -= Time.deltaTime;
 
-                break;
+            if (stopTimer <= 0)
+            {
+                isWaiting = false;
 
-            case MoveState.MoveForward:
+                currentTargetPos =
+                    currentTargetPos == posA ?
+                    posB :
+                    posA;
+            }
 
-                moveDirection =
-                    transform.forward;
-
-                if (stateTimer <= 0)
-                {
-                    currentState =
-                        MoveState.IdleBeforeBackward;
-
-                    stateTimer =
-                        idleTime;
-                }
-
-                break;
-
-            case MoveState.IdleBeforeBackward:
-
-                if (stateTimer <= 0)
-                {
-                    currentState =
-                        MoveState.MoveBackward;
-
-                    stateTimer =
-                        moveTime;
-                }
-
-                break;
-
-            case MoveState.MoveBackward:
-
-                moveDirection =
-                    -transform.forward;
-
-                if (stateTimer <= 0)
-                {
-                    currentState =
-                        MoveState.IdleBeforeForward;
-
-                    stateTimer =
-                        idleTime;
-                }
-
-                break;
+            return;
         }
 
-        rb.MovePosition(
-            rb.position +
-            moveDirection *
-            moveSpeed *
-            Time.fixedDeltaTime);
+        transform.position =
+            Vector3.MoveTowards(
+                transform.position,
+                currentTargetPos.position,
+                speedMove * Time.deltaTime);
+
+        if (Vector3.Distance(
+            transform.position,
+            currentTargetPos.position) < 0.01f)
+        {
+            transform.position =
+                currentTargetPos.position;
+
+            isWaiting = true;
+            stopTimer = timeStop;
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHp -= damage;
+        Debug.Log($"Target took {damage} damage. Current HP: {currentHp}");
+        if (currentHp <= 0)
+        {
+            Debug.Log("Target die");
+            currentHp = maxHp;
+
+            // Có thể thêm effect hoặc reset ở đây
+        }
+    }
+    public Transform GetTargetTransform()
+    {
+        return transform;
+    }
+
+    public float GetCurrentHp()
+    {
+        return currentHp;
+    }
+
+    public float GetMaxHp()
+    {
+        return maxHp;
     }
 }

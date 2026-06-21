@@ -291,38 +291,25 @@ public class PlayerWeapon : MonoBehaviour
     private Transform GetNearestEnemy()
     {
         Transform nearest = null;
-        float nearestDistance = Mathf.Infinity;
 
-        foreach (BaseEnemy enemy in BaseEnemy.AllEnemies)
-        {
-            if (enemy == null)
-                continue;
+        float nearestDistance =
+            Mathf.Infinity;
 
-            float distance =
-                Vector3.Distance(
-                    transform.position,
-                    enemy.transform.position);
-
-            if (distance > autoAimRange)
-                continue;
-
-            if (distance < nearestDistance)
-            {
-                nearestDistance = distance;
-                nearest = enemy.transform;
-            }
-        }
-
-        // Target Training
-        foreach (TargetTraining target in TargetTraining.AllTargets)
+        foreach (IAutoAimTarget target in AutoAimManager.Targets)
         {
             if (target == null)
                 continue;
 
+            Transform targetTransform =
+                target.GetTargetTransform();
+
+            if (targetTransform == null)
+                continue;
+
             float distance =
                 Vector3.Distance(
                     transform.position,
-                    target.transform.position);
+                    targetTransform.position);
 
             if (distance > autoAimRange)
                 continue;
@@ -330,7 +317,7 @@ public class PlayerWeapon : MonoBehaviour
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;
-                nearest = target.transform;
+                nearest = targetTransform;
             }
         }
 
@@ -710,6 +697,7 @@ public class PlayerWeapon : MonoBehaviour
         gameplayUI?.HidePickUp();
     }
 
+    #region TriggerByGunItem
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out GunPickup gun))
@@ -747,4 +735,5 @@ public class PlayerWeapon : MonoBehaviour
             gameplayUI?.ShowPickUp();
         }
     }
+    #endregion
 }

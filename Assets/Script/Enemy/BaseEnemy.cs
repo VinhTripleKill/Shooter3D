@@ -3,7 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public abstract class BaseEnemy :
-    MonoBehaviour, IDamageable
+    MonoBehaviour, IDamageable, IAutoAimTarget
 {
     public static List<BaseEnemy> AllEnemies =
         new List<BaseEnemy>();
@@ -29,12 +29,16 @@ public abstract class BaseEnemy :
     protected virtual void OnEnable()
     {
         AllEnemies.Add(this);
-    }
 
+        AutoAimManager.Register(this);
+    }
     protected virtual void OnDisable()
     {
         AllEnemies.Remove(this);
+
+        AutoAimManager.Unregister(this);
     }
+
 
     protected virtual void Awake()
     {
@@ -125,5 +129,9 @@ public abstract class BaseEnemy :
     public float GetMaxHp()
     {
         return maxHp;
+    }
+    public virtual Transform GetTargetTransform()
+    {
+        return transform;
     }
 }
