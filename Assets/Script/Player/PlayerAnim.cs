@@ -16,4 +16,12 @@ public class PlayerAnim : MonoBehaviour
             value ? 1f : 0f
         );
     }
+
+    public void PlayDead()
+    {
+        animator.SetTrigger("isDead");
+
+        // tắt layer cầm súng
+        SetHoldGun(false);
+    }
 }

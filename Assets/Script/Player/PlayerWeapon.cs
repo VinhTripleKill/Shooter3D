@@ -90,6 +90,8 @@ public class PlayerWeapon : MonoBehaviour
 
     private void ManualReload()
     {
+        if (playerController.IsDead())
+            return;
         if (!hasGun || isReloading)
             return;
 
@@ -102,6 +104,8 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void ReloadPerformed(InputAction.CallbackContext ctx)
     {
+        if (playerController.IsDead())
+            return;
         ManualReload();
     }
     private void OnEnable()
@@ -153,6 +157,9 @@ public class PlayerWeapon : MonoBehaviour
 
     private void Update()
     {
+        if (playerController.IsDead())
+            return;
+
         if (hasGun && gunRayDebug != null)
             gunRayDebug.UpdateAimLines();
 
@@ -325,9 +332,13 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void TryShoot()
     {
+        if (playerController.IsDead())
+            return;
+
         if (!hasGun) return;
         if (playerController.IsSprintingPublic()) return;
         if (isReloading) return;
+
 
         GunData gunData = currentGunVisual.gunData;
 
@@ -606,6 +617,8 @@ public class PlayerWeapon : MonoBehaviour
 
     private void InteractionPerformed(InputAction.CallbackContext ctx)
     {
+        if (playerController.IsDead())
+            return;
         if (nearbyGun == null)
             return;
 
@@ -615,8 +628,13 @@ public class PlayerWeapon : MonoBehaviour
         gameplayUI?.HidePickUp();
     }
 
-    private void DropPerformed(InputAction.CallbackContext ctx) => DropGun();
+    private void DropPerformed(InputAction.CallbackContext ctx)
+    {
+        if (playerController.IsDead())
+            return;
 
+        DropGun();
+    }
     private void DropGun()
     {
         CancelReload();

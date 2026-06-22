@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : BasePlayer
 {
     private PlayerInput playerInput;
     private InputAction moveAction;
@@ -11,53 +10,44 @@ public class PlayerController : MonoBehaviour
     [Header("Mobile")]
     [SerializeField] private JoystickMove joystickMove;
     [Header("Movement")]
-    public float moveSpeed = 5f;
     public float sprintSpeed = 3f;
     [Header("Sprint Effect")]
     [SerializeField]
     private ParticleSystem sprintEffect;
-    public float gravity = -20f;
     [SerializeField]
     private float rotationSpeed = 10f;
     [Header("Sprint Energy")]
-    public float maxSprintEnergy = 100f;
     public float sprintConsumption = 5f;
     public float sprintRecoveryWalk = 5f;
     public float sprintRecoveryIdle = 10f;
     private bool wasSprinting;
-    private float currentSprintEnergy;
     private bool sprintLocked;
     private float sprintLockTimer;
     [SerializeField] private float sprintLockDuration = 5f;
-
+    private float testTimer;
     private bool isSprintOn = true;
     private Vector2 moveInput;
-    private Vector3 velocity;
-
-    private CharacterController controller;
     private PlayerAnim playerAnim;
-
+    private bool canMove = true;
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
 
     // Reference đến script weapon
     public PlayerWeapon playerWeapon;
 
-    private void Awake()
+    protected override void Awake()
     {
-        controller = GetComponent<CharacterController>();
+        base.Awake();
+
         playerAnim = GetComponent<PlayerAnim>();
         playerInput = GetComponent<PlayerInput>();
 
-        // Input cơ bản
         moveAction = playerInput.actions["Move"];
         sprintAction = playerInput.actions["Sprint"];
 
-        currentSprintEnergy = maxSprintEnergy;
         gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
         gameplayUI.GetSprintButton().onClick.AddListener(ToggleSprint);
 
-        // Lấy hoặc thêm PlayerWeapon
         if (playerWeapon == null)
             playerWeapon = GetComponent<PlayerWeapon>();
 
@@ -77,11 +67,24 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (isDead)
+            return;
         ReadMovementInput();
 
         UpdateSprintLock();
         HandleSprintEnergy();
+
         Move();
+
+        ApplyGravity(); // từ BaseCharacter
+
+        testTimer += Time.deltaTime;
+
+        if (testTimer >= 1f)
+        {
+            testTimer = 0f;
+            TakeDamage(5);
+        }
 
         UpdateSprintEffect();
     }
@@ -170,6 +173,8 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
+        if (!canMove)
+            return;
         Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
         float currentSpeed = moveSpeed;
 
@@ -178,13 +183,6 @@ public class PlayerController : MonoBehaviour
             currentSpeed += sprintSpeed;
 
         controller.Move(move * currentSpeed * Time.deltaTime);
-
-        // Gravity
-        if (controller.isGrounded && velocity.y < 0)
-            velocity.y = -2f;
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
 
         // Xoay hướng
         if (move != Vector3.zero)
@@ -217,6 +215,14 @@ public class PlayerController : MonoBehaviour
     private bool IsMoving()
     {
         return moveInput.sqrMagnitude > 0.01f;
+    }
+    protected override void Die()
+    {
+        Debug.Log("Player has die");
+
+        canMove = false;
+
+        playerAnim.PlayDead();
     }
     // Public để PlayerWeapon truy cập
     public bool IsSprintingPublic() => IsSprinting();

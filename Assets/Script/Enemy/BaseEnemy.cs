@@ -3,29 +3,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public abstract class BaseEnemy :
-    MonoBehaviour, IDamageable, IAutoAimTarget
+    BaseCharacter, IAutoAimTarget
 {
-    public static List<BaseEnemy> AllEnemies =
-        new List<BaseEnemy>();
-
-    [Header("HP")]
-    [SerializeField]
-    protected float maxHp = 100f;
-
-    protected float currentHp;
-
-    [Header("Movement")]
-    [SerializeField]
-    protected float moveSpeed = 3f;
-
-    [SerializeField]
-    protected float gravity = -20f;
-
-    protected CharacterController controller;
     protected Transform player;
-
-    protected float verticalVelocity;
-
+    public static List<BaseEnemy> AllEnemies { get; private set; } = new List<BaseEnemy>();
     protected virtual void OnEnable()
     {
         AllEnemies.Add(this);
@@ -39,20 +20,10 @@ public abstract class BaseEnemy :
         AutoAimManager.Unregister(this);
     }
 
-
-    protected virtual void Awake()
+    protected override void Start()
     {
-        currentHp = maxHp;
-
-        controller =
-            GetComponent<CharacterController>();
-    }
-
-    protected virtual void Start()
-    {
-        player =
-            GameObject.FindGameObjectWithTag("Player")
-            ?.transform;
+        player = GameObject.FindGameObjectWithTag("Player")
+                           ?.transform;
     }
 
     protected virtual void Update()
@@ -71,65 +42,20 @@ public abstract class BaseEnemy :
         if (player == null)
             return;
 
-        Vector3 direction =
-            player.position - transform.position;
+        Vector3 dir = player.position - transform.position;
+        dir.y = 0;
 
-        direction.y = 0;
-
-        if (direction.sqrMagnitude < 0.01f)
+        if (dir.sqrMagnitude < 0.01f)
             return;
 
-        transform.forward =
-            direction.normalized;
+        transform.forward = dir.normalized;
 
         controller.Move(
-            direction.normalized *
+            dir.normalized *
             moveSpeed *
             Time.deltaTime);
     }
 
-    protected virtual void ApplyGravity()
-    {
-        if (controller.isGrounded &&
-            verticalVelocity < 0)
-        {
-            verticalVelocity = -2f;
-        }
-
-        verticalVelocity +=
-            gravity * Time.deltaTime;
-
-        controller.Move(
-            Vector3.up *
-            verticalVelocity *
-            Time.deltaTime);
-    }
-
-    public virtual void TakeDamage(float damage)
-    {
-        currentHp -= damage;
-
-        if (currentHp <= 0)
-        {
-            currentHp = 0;
-            Die();
-        }
-    }
-
-    protected virtual void Die()
-    {
-        Destroy(gameObject);
-    }
-
-    public float GetCurrentHp()
-    {
-        return currentHp;
-    }
-
-    public float GetMaxHp()
-    {
-        return maxHp;
-    }
     public virtual Transform GetTargetTransform()
     {
         return transform;
