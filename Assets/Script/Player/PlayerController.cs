@@ -83,7 +83,7 @@ public class PlayerController : BasePlayer
         if (testTimer >= 1f)
         {
             testTimer = 0f;
-            TakeDamage(5);
+            TakeDamage(2);
         }
 
         UpdateSprintEffect();

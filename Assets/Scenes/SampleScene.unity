@@ -1824,6 +1824,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7134394785105016132, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5151492872390713093, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5069531478518834764, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -5017971254852617305, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0
@@ -1848,6 +1860,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: character-keeper
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1492312403021943278, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0
@@ -1856,13 +1872,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3250163066507786643, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4314722597813798244, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 735ded79afc521a41a5e2f2bf7af866a, type: 2}
+    - target: {fileID: 5788240856288092216, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7604367576434143486, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8303906797054990637, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8891244130364874969, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1875,6 +1903,10 @@ PrefabInstance:
     - target: {fileID: 8891244130364874969, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8908311948669537042, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3426,7 +3458,7 @@ GameObject:
   - component: {fileID: 930178170}
   - component: {fileID: 930178171}
   - component: {fileID: 930178172}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4872,6 +4904,7 @@ GameObject:
   - component: {fileID: 1468812353}
   - component: {fileID: 1468812352}
   - component: {fileID: 1468812354}
+  - component: {fileID: 1468812355}
   m_Layer: 7
   m_Name: Zombie
   m_TagString: Untagged
@@ -4935,6 +4968,23 @@ MonoBehaviour:
   maxHp: 100
   moveSpeed: 3
   gravity: -20
+  detectionRange: 5
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!114 &1468812355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468812350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 271931dcbe6d3494bbcde50c078104af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnim
+  animator: {fileID: 925156180}
 --- !u!1 &1471959467
 GameObject:
   m_ObjectHideFlags: 0

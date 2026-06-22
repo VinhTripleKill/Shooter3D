@@ -59,7 +59,7 @@ public abstract class BaseCharacter :
 
     protected virtual void Die()
     {
-        Destroy(gameObject);
+        isDead = true;
     }
 
     public float GetCurrentHp() => currentHp;
