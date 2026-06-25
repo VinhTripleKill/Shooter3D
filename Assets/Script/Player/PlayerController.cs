@@ -47,12 +47,14 @@ public class PlayerController : BasePlayer
 
         gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
         gameplayUI.GetSprintButton().onClick.AddListener(ToggleSprint);
-
+        gameplayUI.UpdateHpBar(currentHp, maxHp);
+        gameplayUI.UpdateManaBar(currentMana, maxMana);
         if (playerWeapon == null)
             playerWeapon = GetComponent<PlayerWeapon>();
-
+        OnHpChanged += gameplayUI.UpdateHpBar;
         if (playerWeapon == null)
             playerWeapon = gameObject.AddComponent<PlayerWeapon>();
+
     }
 
     private void OnEnable()
@@ -83,10 +85,17 @@ public class PlayerController : BasePlayer
         if (testTimer >= 1f)
         {
             testTimer = 0f;
-            TakeDamage(2);
+            TakeDamage(0);
+           
         }
 
         UpdateSprintEffect();
+    }
+    public override void TakeDamage(float damage)
+    {
+        base.TakeDamage(damage);
+
+        gameplayUI.UpdateHpBar(currentHp, maxHp);
     }
     private void UpdateSprintEffect()
     {
@@ -216,10 +225,14 @@ public class PlayerController : BasePlayer
     {
         return moveInput.sqrMagnitude > 0.01f;
     }
+    private void OnDestroy()
+    {
+        OnHpChanged -= gameplayUI.UpdateHpBar;
+    }
     protected override void Die()
     {
         Debug.Log("Player has die");
-
+        gameplayUI.UpdateHpBar(currentHp, maxHp);
         canMove = false;
 
         playerAnim.PlayDead();

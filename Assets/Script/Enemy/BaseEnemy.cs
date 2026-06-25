@@ -1,34 +1,211 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-[RequireComponent(typeof(CharacterController))]
 public abstract class BaseEnemy :
     BaseCharacter, IAutoAimTarget
 {
+
+    public enum EnemyState
+    {
+        Idle,
+        Chase,
+        Attack,
+        Dead
+    }
+    [Header("Detect")]
+    [SerializeField]
+    protected float detectRange = 15f;
+
+    [SerializeField]
+    protected float atkRange = 1f;
+
+    [SerializeField]
+    protected float atkDamage = 10f;
+
+    [SerializeField]
+    protected float atkCD = 2f;
+    [SerializeField]
+    protected float atkTimeAnim= 2f;
+
+
+    protected float nextAttackTime;
+
+    protected EnemyState currentState;
+
     protected Transform player;
-    public static List<BaseEnemy> AllEnemies { get; private set; } = new List<BaseEnemy>();
-    [Header("Detection")]
-    [SerializeField]
-    protected float detectionRange = 30f;
+    bool isAttacking;
 
-    [SerializeField]
-    protected LayerMask playerLayer;
-
-    protected bool hasDetectedPlayer;
     protected EnemyAnim enemyAnim;
+    protected NavMeshAgent agent;
+
+    public static List<BaseEnemy> AllEnemies { get; }
+        = new List<BaseEnemy>();
 
     protected override void Awake()
     {
         base.Awake();
 
-        enemyAnim = GetComponent<EnemyAnim>();
+        enemyAnim = GetComponentInChildren<EnemyAnim>();
+        agent = GetComponent<NavMeshAgent>();
     }
+    void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        enemyAnim.OnAttackHit += DealDamage;
+    }
+    protected virtual void Update()
+    {
+        if (isDead)
+            return;
+
+        if (player == null)
+            return;
+
+        BaseCharacter playerCharacter =
+            player.GetComponent<BaseCharacter>();
+
+        if (playerCharacter == null || playerCharacter.IsDead())
+        {
+            currentState = EnemyState.Idle;
+
+            if (agent.isOnNavMesh)
+                agent.ResetPath();
+
+            enemyAnim.SetSpeed(0);
+
+            return;
+        }
+
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                player.position);
+
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+
+                enemyAnim.SetSpeed(0);
+
+                if (distance <= detectRange)
+                    currentState = EnemyState.Chase;
+
+                break;
+
+            case EnemyState.Chase:
+
+                UpdateChase(distance);
+
+                break;
+
+            case EnemyState.Attack:
+
+                UpdateAttack(distance);
+
+                break;
+        }
+    }
+    protected virtual void UpdateChase(float distance)
+    {
+        if (distance > detectRange)
+        {
+            currentState = EnemyState.Idle;
+
+            if (agent.isOnNavMesh)
+                agent.ResetPath();
+
+            enemyAnim.SetSpeed(0);
+
+            return;
+        }
+
+        if (distance <= atkRange)
+        {
+            currentState = EnemyState.Attack;
+            return;
+        }
+
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
+
+            enemyAnim.SetSpeed(agent.velocity.magnitude);
+        }
+    }
+
+    protected virtual void UpdateAttack(float distance)
+    {
+        // player chạy ra khỏi vùng attack
+        if (distance > atkRange)
+        {
+            currentState = EnemyState.Chase;
+
+            return;
+        }
+
+        // đứng yên khi đánh
+        if (agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+        }
+
+        enemyAnim.SetSpeed(0);
+
+
+        // xoay mặt nhìn player
+        Vector3 lookPos = player.position;
+        lookPos.y = transform.position.y;
+
+        transform.LookAt(lookPos);
+
+        if (!isAttacking)
+        {
+            StartCoroutine(AttackRoutine());
+        }
+    }
+    private IEnumerator AttackRoutine()
+    {
+        isAttacking = true;
+
+        enemyAnim.PlayAttack();
+
+        // đợi animation attack chạy xong
+        yield return new WaitForSeconds(atkTimeAnim);
+
+        // đợi thêm cooldown
+        yield return new WaitForSeconds(atkCD);
+
+        isAttacking = false;
+    }
+    protected virtual void DealDamage()
+    {
+        if (player == null)
+            return;
+
+        if (Vector3.Distance(
+            transform.position,
+            player.position) > atkRange)
+            return;
+
+        IDamageable damageable =
+            player.GetComponent<IDamageable>();
+
+        damageable?.TakeDamage(
+            atkDamage);
+    }
+
     protected virtual void OnEnable()
     {
         AllEnemies.Add(this);
 
         AutoAimManager.Register(this);
     }
+
     protected virtual void OnDisable()
     {
         AllEnemies.Remove(this);
@@ -36,109 +213,41 @@ public abstract class BaseEnemy :
         AutoAimManager.Unregister(this);
     }
 
-    protected override void Start()
-    {
-        player = GameObject.FindGameObjectWithTag("Player")
-                           ?.transform;
-    }
-
-    protected virtual void DetectPlayer()
-    {
-        if (isDead)
-        {
-            hasDetectedPlayer = false;
-            return;
-        }
-
-        Collider[] hits =
-            Physics.OverlapSphere(
-                transform.position,
-                detectionRange,
-                playerLayer);
-
-        hasDetectedPlayer = hits.Length > 0;
-    }
-    protected virtual void Update()
-    {
-        if (isDead)
-            return;
-
-        DetectPlayer();
-        Move();
-        ApplyGravity();
-    }
-
-    protected virtual void Move()
-    {
-        FollowPlayer();
-    }
-
-    protected virtual void FollowPlayer()
-    {
-        if (player == null)
-            return;
-
-        if (!hasDetectedPlayer)
-        {
-            enemyAnim?.SetWalk(false);
-            return;
-        }
-
-        Vector3 dir = player.position - transform.position;
-        dir.y = 0;
-
-        if (dir.sqrMagnitude < 0.01f)
-        {
-            enemyAnim?.SetWalk(false);
-            return;
-        }
-
-        enemyAnim?.SetWalk(true);
-
-        transform.forward = dir.normalized;
-
-        controller.Move(
-            dir.normalized *
-            moveSpeed *
-            Time.deltaTime);
-    }
 
     public virtual Transform GetTargetTransform()
     {
         return transform;
     }
+
     protected override void Die()
     {
         base.Die();
 
-        enemyAnim?.SetWalk(false);
+        StopAllCoroutines();
 
-        // remove khỏi auto aim ngay lập tức
+        isAttacking = false;
+
+        currentState = EnemyState.Dead;
+
+        enemyAnim.OnAttackHit -= DealDamage;
+
         AutoAimManager.Unregister(this);
         AllEnemies.Remove(this);
 
-        // stop movement
-        enabled = false;
-        controller.enabled = false;
-
-        if (enemyAnim != null)
+        if (agent != null)
         {
-            enemyAnim.PlayDead(() =>
-            {
-                Destroy(gameObject);
-            });
+            if (agent.isOnNavMesh)
+                agent.ResetPath();
+
+            agent.isStopped = true;
+            agent.enabled = false;
         }
-        else
+
+        enemyAnim.SetSpeed(0);
+
+        enemyAnim.PlayDead(() =>
         {
             Destroy(gameObject);
-        }
-    }
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-
-        Gizmos.DrawWireSphere(
-            transform.position,
-            detectionRange);
+        });
     }
 }

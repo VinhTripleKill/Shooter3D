@@ -1,13 +1,24 @@
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
-
 public class GamePlayUI : MonoBehaviour
 {
     [Header("Sprint")]
     [SerializeField] private Image sprintBar;
     [SerializeField] private Button sprintButton;
     [SerializeField] private Image sprintLock;
-
+    [Header("Ultimate")]
+    [SerializeField] private Image ultimateBar;
+    [SerializeField] private Button ultimateButton;
+    [Header("Skill")]
+    [SerializeField] private Button skillButton;
+    [SerializeField] private Image skillCD;
+    [SerializeField] private TextMeshProUGUI skillCount;
+    [Header("Mana")]
+    [SerializeField] private Image manaBar;
+    [Header("HpBar")]
+    [SerializeField] private Image hpBar;
+    [SerializeField] private TextMeshProUGUI hpText;
     [Header("Ammo")]
     [SerializeField] private Image statusAmmo;
     [SerializeField] private Image ammoI;
@@ -29,7 +40,17 @@ public class GamePlayUI : MonoBehaviour
 
         ammoI.rectTransform.Rotate( 0f,0f,-reloadRotateSpeed * Time.deltaTime);
     }
+    public void UpdateHpBar(float currentHp, float maxHp)
+    {
+        hpBar.fillAmount = currentHp / maxHp;
 
+        hpText.text = $"{Mathf.CeilToInt(currentHp)}/{Mathf.CeilToInt(maxHp)}";
+    }
+
+    public void UpdateManaBar(float currentMana, float maxMana)
+    {
+        manaBar.fillAmount = currentMana / maxMana;
+    }
     public void ShowPickUp()
     {
         pickUp.gameObject.SetActive(true);

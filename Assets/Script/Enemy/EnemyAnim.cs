@@ -1,29 +1,47 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class EnemyAnim : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    [SerializeField]
+    private Animator animator;
 
-    public void SetWalk(bool value)
+    public event Action OnAttackHit;
+
+    public void SetSpeed(float speed)
     {
-        animator.SetBool("isWalk", value);
+        animator.SetFloat(
+            "SpeedMagnitude",
+            speed);
     }
 
-    public void PlayDead(System.Action onFinished)
+    public void PlayAttack()
     {
-        animator.SetTrigger("isDead");
-
-        StartCoroutine(WaitDeathAnim(onFinished));
+        animator.SetTrigger(
+            "isAttack");
     }
 
-    private IEnumerator WaitDeathAnim(System.Action onFinished)
+    public void PlayDead(Action onFinished)
     {
-        // thời gian fallback nếu animation không có event
-        float waitTime = 2f;
+        animator.SetTrigger(
+            "isDead");
 
-        yield return new WaitForSeconds(waitTime);
+        StartCoroutine(
+            WaitDeathAnim(onFinished));
+    }
+
+    private IEnumerator WaitDeathAnim(
+        Action onFinished)
+    {
+        yield return new WaitForSeconds(2f);
 
         onFinished?.Invoke();
+    }
+
+    // gọi từ Animation Event
+    public void AttackHitEvent()
+    {
+        OnAttackHit?.Invoke();
     }
 }
