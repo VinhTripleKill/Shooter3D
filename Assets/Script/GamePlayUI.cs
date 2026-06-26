@@ -37,7 +37,7 @@ public class GamePlayUI : MonoBehaviour
     private void Update()
     {
         if (!isReloading) return;
-
+      
         ammoI.rectTransform.Rotate( 0f,0f,-reloadRotateSpeed * Time.deltaTime);
     }
     public void UpdateHpBar(float currentHp, float maxHp)
@@ -46,7 +46,10 @@ public class GamePlayUI : MonoBehaviour
 
         hpText.text = $"{Mathf.CeilToInt(currentHp)}/{Mathf.CeilToInt(maxHp)}";
     }
-
+    public Button GetUltimateButton()
+    {
+        return ultimateButton;
+    }
     public void UpdateManaBar(float currentMana, float maxMana)
     {
         manaBar.fillAmount = currentMana / maxMana;

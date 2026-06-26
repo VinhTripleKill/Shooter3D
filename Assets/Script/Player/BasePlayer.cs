@@ -16,7 +16,7 @@ public abstract class BasePlayer : BaseCharacter
     [Header("Mana")]
     [SerializeField]
     protected float maxMana = 100;
-
+    public System.Action<float, float> OnManaChanged;
     protected float currentMana;
 
     [Header("Sprint")]
@@ -33,6 +33,7 @@ public abstract class BasePlayer : BaseCharacter
 
         currentMana = maxMana;
         currentSprintEnergy = maxSprintEnergy;
+        OnManaChanged?.Invoke(currentMana, maxMana);
     }
 
     protected virtual void ApplyGravity()
@@ -46,5 +47,25 @@ public abstract class BasePlayer : BaseCharacter
             Vector3.up *
             verticalVelocity *
             Time.deltaTime);
+    }
+    public float GetCurrentMana()
+    {
+        return currentMana;
+    }
+
+    public float GetMaxMana()
+    {
+        return maxMana;
+    }
+    public bool ConsumeMana(float mana)
+    {
+        if (currentMana < mana)
+            return false;
+
+        currentMana -= mana;
+
+        OnManaChanged?.Invoke(currentMana, maxMana);
+
+        return true;
     }
 }

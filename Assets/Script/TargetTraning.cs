@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
+public class TargetTraining : BaseCharacter, IAutoAimTarget
 {
     public static List<TargetTraining> AllTargets =
         new();
@@ -14,12 +14,6 @@ public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
 
     [Header("Mode")]
     [SerializeField] private TargetMode targetMode;
-
-    [Header("HP")]
-    [SerializeField] private float maxHp = 50f;
-
-    [SerializeField]private float currentHp;
-
     [Header("Move")]
     [SerializeField] private Transform posA;
 
@@ -34,7 +28,8 @@ public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
     private float stopTimer;
 
     private bool isWaiting;
-
+    [Header("Revive")]
+    [SerializeField] private bool canRevived = false;
     private void OnEnable()
     {
         AllTargets.Add(this);
@@ -49,9 +44,9 @@ public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
         AutoAimManager.Unregister(this);
     }
 
-    private void Awake()
+    protected override void Awake()
     {
-        currentHp = maxHp;
+        base.Awake();
     }
 
     private void Start()
@@ -115,30 +110,31 @@ public class TargetTraining : MonoBehaviour, IDamageable, IAutoAimTarget
         }
     }
 
-    public void TakeDamage(float damage)
+    public override void TakeDamage(float damage)
     {
-        currentHp -= damage;
-        Debug.Log($"Target took {damage} damage. Current HP: {currentHp}");
-        if (currentHp <= 0)
-        {
-            Debug.Log("Target die");
-            currentHp = maxHp;
+        base.TakeDamage(damage);
 
-            // Có thể thêm effect hoặc reset ở đây
-        }
+        Debug.Log($"Target took {damage} damage. Current HP: {currentHp}");
     }
     public Transform GetTargetTransform()
     {
         return transform;
     }
 
-    public float GetCurrentHp()
+    protected override void Die()
     {
-        return currentHp;
-    }
+        Debug.Log("Target Die");
 
-    public float GetMaxHp()
-    {
-        return maxHp;
+        if (!canRevived)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // Hồi sinh ngay
+        currentHp = maxHp;
+        isDead = false;
+
+        OnHpChanged?.Invoke(currentHp, maxHp);
     }
 }

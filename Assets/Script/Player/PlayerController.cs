@@ -38,7 +38,8 @@ public class PlayerController : BasePlayer
     protected override void Awake()
     {
         base.Awake();
-
+        OnHpChanged += gameplayUI.UpdateHpBar;
+        OnManaChanged += gameplayUI.UpdateManaBar;
         playerAnim = GetComponent<PlayerAnim>();
         playerInput = GetComponent<PlayerInput>();
 
@@ -51,12 +52,15 @@ public class PlayerController : BasePlayer
         gameplayUI.UpdateManaBar(currentMana, maxMana);
         if (playerWeapon == null)
             playerWeapon = GetComponent<PlayerWeapon>();
-        OnHpChanged += gameplayUI.UpdateHpBar;
         if (playerWeapon == null)
             playerWeapon = gameObject.AddComponent<PlayerWeapon>();
 
     }
-
+    private void OnDestroy()
+    {
+        OnHpChanged -= gameplayUI.UpdateHpBar;
+        OnManaChanged -= gameplayUI.UpdateManaBar;
+    }
     private void OnEnable()
     {
         sprintAction.performed += SprintPerformed;
@@ -90,12 +94,6 @@ public class PlayerController : BasePlayer
         }
 
         UpdateSprintEffect();
-    }
-    public override void TakeDamage(float damage)
-    {
-        base.TakeDamage(damage);
-
-        gameplayUI.UpdateHpBar(currentHp, maxHp);
     }
     private void UpdateSprintEffect()
     {
@@ -225,14 +223,11 @@ public class PlayerController : BasePlayer
     {
         return moveInput.sqrMagnitude > 0.01f;
     }
-    private void OnDestroy()
-    {
-        OnHpChanged -= gameplayUI.UpdateHpBar;
-    }
+
     protected override void Die()
     {
         Debug.Log("Player has die");
-        gameplayUI.UpdateHpBar(currentHp, maxHp);
+        
         canMove = false;
 
         playerAnim.PlayDead();
