@@ -7,19 +7,17 @@ public class PlayerWeapon : MonoBehaviour
 {
     private PlayerController playerController;
     private PlayerAnim playerAnim;
-    [SerializeField]
-    private float autoAimRange = 15f;
+
+    [SerializeField] private float autoAimRange = 15f;
+
     private InputAction attackAutoAction;
     private InputAction attackManualAction;
     private InputAction reloadAction;
-    private InputAction dropAction;
-    private InputAction interactionAction;
 
     [Header("Gun")]
     public Transform gunHolder;
     private GunVisual currentGunVisual;
     private GameObject currentGun;
-    private GunPickup nearbyGun;
     private bool hasGun = false;
     private bool useAutoAim = true;
     private Vector2 manualAimDirection;
@@ -28,145 +26,110 @@ public class PlayerWeapon : MonoBehaviour
     private bool isReloading;
     private Transform currentTarget;
     private bool useMouseAim;
-    private List<GunPickup> gunsInRange = new();
-    private GunPickup currentTargetGun;
+
     [Header("Aim Visual")]
     [SerializeField] private GunRayDebug gunRayDebug;
+
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
+
     private Coroutine reloadCoroutine;
+    private float nextShotTime;
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         playerAnim = GetComponent<PlayerAnim>();
 
         var playerInput = GetComponent<PlayerInput>();
-
         attackAutoAction = playerInput.actions["AttackAuto"];
         attackManualAction = playerInput.actions["AttackManual"];
         reloadAction = playerInput.actions["Reload"];
-        dropAction = playerInput.actions["Drop"];
-        interactionAction = playerInput.actions["Interaction"];
+
         gameplayUI?.ResetAmmoBar();
         if (gameplayUI != null)
         {
             gameplayUI.GetReloadButton().onClick.AddListener(OnReloadButtonClicked);
-            gameplayUI.GetPickUpButton().onClick.AddListener(OnPickUpButtonClicked);
         }
     }
 
-    public bool HasGun()
-    {
-        return hasGun;
-    }
+    public bool HasGun() => hasGun;
 
-    public void SetAttackState(bool value)
-    {
-        isHoldingAttack = value;
-    }
-
-    public void SetAutoAim(bool value)
-    {
-        useAutoAim = value;
-    }
-
-    public void SetManualAimDirection(Vector2 direction)
-    {
-        manualAimDirection = direction;
-    }
+    public void SetAttackState(bool value) => isHoldingAttack = value;
+    public void SetAutoAim(bool value) => useAutoAim = value;
+    public void SetManualAimDirection(Vector2 direction) => manualAimDirection = direction;
+    private void AttackCanceled(InputAction.CallbackContext ctx) => isHoldingAttack = false;
 
     private void OnDestroy()
     {
         if (gameplayUI != null)
-        {
             gameplayUI.GetReloadButton().onClick.RemoveListener(OnReloadButtonClicked);
-            gameplayUI.GetPickUpButton().onClick.RemoveListener(OnPickUpButtonClicked);
-        }
     }
-    private void OnReloadButtonClicked()
-    {
-        ManualReload();
-    }
+
+    private void OnReloadButtonClicked() => ManualReload();
 
     private void ManualReload()
     {
-        if (playerController.IsDead())
-            return;
-        if (!hasGun || isReloading)
-            return;
+        if (playerController.IsDead() || !hasGun || isReloading) return;
 
         GunData gunData = currentGunVisual.gunData;
-
-        if (currentShotCount >= gunData.maxCountShot)
-            return;
+        if (currentShotCount >= gunData.maxCountShot) return;
 
         reloadCoroutine = StartCoroutine(ReloadRoutine());
     }
+
     private void ReloadPerformed(InputAction.CallbackContext ctx)
     {
-        if (playerController.IsDead())
-            return;
-        ManualReload();
+        if (!playerController.IsDead()) ManualReload();
     }
+
     private void OnEnable()
     {
         attackAutoAction.started += AttackAutoStarted;
         attackAutoAction.canceled += AttackCanceled;
-
         attackManualAction.started += AttackManualStarted;
         attackManualAction.canceled += AttackCanceled;
-
         reloadAction.performed += ReloadPerformed;
-        dropAction.performed += DropPerformed;
-        interactionAction.performed += InteractionPerformed;
     }
 
     private void OnDisable()
     {
-        attackManualAction.started -= AttackManualStarted;
-        attackManualAction.canceled -= AttackCanceled;
         attackAutoAction.started -= AttackAutoStarted;
         attackAutoAction.canceled -= AttackCanceled;
+        attackManualAction.started -= AttackManualStarted;
+        attackManualAction.canceled -= AttackCanceled;
         reloadAction.performed -= ReloadPerformed;
-        dropAction.performed -= DropPerformed;
-        interactionAction.performed -= InteractionPerformed;
     }
+
     private void AttackAutoStarted(InputAction.CallbackContext ctx)
     {
         useAutoAim = true;
         isHoldingAttack = true;
     }
 
-    private void AttackManualStarted(
-        InputAction.CallbackContext ctx)
+    private void AttackManualStarted(InputAction.CallbackContext ctx)
     {
         useAutoAim = false;
         useMouseAim = true;
-
         isHoldingAttack = true;
     }
-    public void SetJoystickManualAim(
-    Vector2 direction)
+
+    public void SetJoystickManualAim(Vector2 direction)
     {
         useAutoAim = false;
         useMouseAim = false;
-
-        manualAimDirection =
-            direction.normalized;
+        manualAimDirection = direction.normalized;
     }
 
     private void Update()
     {
-        if (playerController.IsDead())
-            return;
+        if (playerController.IsDead()) return;
 
         if (hasGun && gunRayDebug != null)
             gunRayDebug.UpdateAimLines();
 
         if (!useAutoAim && useMouseAim)
-        {
             UpdateMouseAimDirection();
-        }
 
         if (isHoldingAttack)
         {
@@ -177,7 +140,6 @@ public class PlayerWeapon : MonoBehaviour
 
             TryShoot();
         }
-        UpdatePickupTarget();
     }
     private void UpdateMouseAimDirection()
     {
@@ -232,109 +194,14 @@ public class PlayerWeapon : MonoBehaviour
     private void AimNearestEnemy()
     {
         currentTarget =
-            GetNearestEnemy();
-
-        if (currentTarget == null)
-            return;
-
-        Vector3 direction =
-            currentTarget.position -
-            transform.position;
-
-        direction.y = 0f;
-
-        if (direction.sqrMagnitude < 0.01f)
-            return;
-
-        transform.forward =
-            direction.normalized;
+            CombatTargetFinder.RotateToNearestTarget(
+                transform,
+                autoAimRange);
     }
-    private void UpdatePickupTarget()
-    {
-        GunPickup bestGun = null;
-        float bestScore = Mathf.Infinity;
 
-        foreach (GunPickup gun in gunsInRange)
-        {
-            if (gun == null)
-                continue;
-
-            float distance =
-                Vector3.Distance(
-                    transform.position,
-                    gun.transform.position);
-
-            if (distance < bestScore)
-            {
-                bestScore = distance;
-                bestGun = gun;
-            }
-        }
-
-        if (bestGun == currentTargetGun)
-            return;
-
-        // bỏ highlight khẩu cũ
-        if (currentTargetGun != null)
-            currentTargetGun.GetComponent<GunItem>()
-                ?.SetCanPickUp(false);
-
-        currentTargetGun = bestGun;
-        nearbyGun = bestGun;
-
-        // bật highlight khẩu mới
-        if (currentTargetGun != null)
-        {
-            currentTargetGun.GetComponent<GunItem>()
-                ?.SetCanPickUp(true);
-
-            gameplayUI?.ShowPickUp();
-        }
-        else
-        {
-            gameplayUI?.HidePickUp();
-        }
-    }
-    private Transform GetNearestEnemy()
-    {
-        Transform nearest = null;
-
-        float nearestDistance =
-            Mathf.Infinity;
-
-        foreach (IAutoAimTarget target in AutoAimManager.Targets)
-        {
-            if (target == null)
-                continue;
-
-            Transform targetTransform =
-                target.GetTargetTransform();
-
-            if (targetTransform == null)
-                continue;
-
-            float distance =
-                Vector3.Distance(
-                    transform.position,
-                    targetTransform.position);
-
-            if (distance > autoAimRange)
-                continue;
-
-            if (distance < nearestDistance)
-            {
-                nearestDistance = distance;
-                nearest = targetTransform;
-            }
-        }
-
-        return nearest;
-    }
     private void TryShoot()
     {
-        if (playerController.IsDead())
-            return;
-
+        if (playerController.IsDead())return;
         if (!hasGun) return;
         if (playerController.IsSprintingPublic()) return;
         if (isReloading) return;
@@ -355,19 +222,12 @@ public class PlayerWeapon : MonoBehaviour
             return;
         }
 
-
         Shoot();
         currentShotCount--;
-        currentGun
-    .GetComponent<GunRuntimeData>()
-    .currentAmmo = currentShotCount;
-        gameplayUI?.UpdateAmmoBar(
-    currentShotCount,
-    gunData.maxCountShot);
+        currentGun.GetComponent<GunRuntimeData>().currentAmmo = currentShotCount;
+        gameplayUI?.UpdateAmmoBar(currentShotCount,gunData.maxCountShot);
         nextShotTime = Time.time + gunData.timeBetweenShots;
     }
-
-    private float nextShotTime;
 
     private void Shoot()
     {
@@ -525,16 +385,14 @@ public class PlayerWeapon : MonoBehaviour
         trail.Initialize(start, end, gunData.bulletSpeed);
     }
 
-    public void EquipGun(
-     GameObject gunPrefab,
-     int ammo = -1,
-     bool wasReloading = false)
+    public void EquipGun(GameObject gunPrefab, int ammo = -1, bool wasReloading = false)
     {
         CancelReload();
+
         if (currentGun != null)
         {
             GunData oldGunData = currentGunVisual.gunData;
-            SpawnDroppedGun(oldGunData, currentShotCount, isReloading);
+            SpawnDroppedGun(oldGunData, currentShotCount, isReloading);   // ← SỬA Ở ĐÂY
             Destroy(currentGun);
         }
 
@@ -543,45 +401,68 @@ public class PlayerWeapon : MonoBehaviour
         currentGun.transform.localRotation = Quaternion.identity;
 
         currentGunVisual = currentGun.GetComponent<GunVisual>();
-        GunRuntimeData runtime =
-    currentGun.GetComponent<GunRuntimeData>();
 
-        if (runtime == null)
-        {
-            runtime =
-                currentGun.AddComponent<GunRuntimeData>();
+        GunRuntimeData runtime = currentGun.GetComponent<GunRuntimeData>()
+            ?? currentGun.AddComponent<GunRuntimeData>();
+        runtime.Initialize(currentGunVisual.gunData);
 
-            runtime.Initialize(
-                currentGunVisual.gunData);
-        }
-        // Khởi tạo Aim Debug
         if (gunRayDebug != null)
-        {
             gunRayDebug.Initialize(currentGunVisual.gunData, currentGunVisual.GetFirePoint());
-        }
 
-        if (ammo < 0)
-        {
-            currentShotCount =
-                currentGunVisual.gunData.maxCountShot;
+        currentShotCount = (ammo < 0) ? currentGunVisual.gunData.maxCountShot : ammo;
+        runtime.currentAmmo = currentShotCount;
+        runtime.isReloading = wasReloading;
 
-            runtime.currentAmmo =
-                currentShotCount;
-
-            runtime.isReloading = false;
-        }
-        else
-        {
-            runtime.currentAmmo = ammo;
-            runtime.isReloading = wasReloading;
-
-            currentShotCount = ammo;
-        }
         isReloading = false;
         hasGun = true;
 
         gameplayUI?.UpdateAmmoBar(currentShotCount, currentGunVisual.gunData.maxCountShot);
         playerAnim.SetHoldGun(true);
+        gameplayUI?.StopReloadVisual();
+    }
+
+    public void DropGun()
+    {
+        CancelReload();
+        if (!hasGun || currentGun == null) return;
+
+        GunData gunData = currentGunVisual.gunData;
+        SpawnDroppedGun(gunData, currentShotCount, isReloading);   // ← SỬA Ở ĐÂY
+
+        Destroy(currentGun);
+        currentGun = null;
+        currentGunVisual = null;
+        hasGun = false;
+
+        if (gunRayDebug != null) gunRayDebug.Cleanup();
+        gameplayUI?.ResetAmmoBar();
+        playerAnim.SetHoldGun(false);
+    }
+    public void SpawnDroppedGun(GunData gunData, int ammo, bool wasReloading)
+    {
+        Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
+        GameObject droppedGun = Instantiate(gunData.gunItemPrefab, spawnPos, Quaternion.identity);
+        GunPickup pickup = droppedGun.GetComponent<GunPickup>();
+        pickup.currentAmmo = ammo;
+        pickup.isReloading = wasReloading;
+
+        Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            Vector3 throwDir = transform.forward + Vector3.up * 0.7f;
+            rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
+        }
+    }
+
+    private void CancelReload()
+    {
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+        isReloading = false;
+        isHoldingAttack = false;
         gameplayUI?.StopReloadVisual();
     }
 
@@ -613,145 +494,4 @@ public class PlayerWeapon : MonoBehaviour
             gunData.maxCountShot);
     }
 
-    private void AttackCanceled(InputAction.CallbackContext ctx) => isHoldingAttack = false;
-
-    private void InteractionPerformed(InputAction.CallbackContext ctx)
-    {
-        if (playerController.IsDead())
-            return;
-        if (nearbyGun == null)
-            return;
-
-        nearbyGun.Pickup(this);
-
-        nearbyGun = null;
-        gameplayUI?.HidePickUp();
-    }
-
-    private void DropPerformed(InputAction.CallbackContext ctx)
-    {
-        if (playerController.IsDead())
-            return;
-
-        DropGun();
-    }
-    private void DropGun()
-    {
-        CancelReload();
-        if (!hasGun || currentGun == null)
-            return;
-
-        if (reloadCoroutine != null)
-        {
-            StopCoroutine(reloadCoroutine);
-            reloadCoroutine = null;
-        }
-
-        isReloading = false;
-        isHoldingAttack = false;
-
-        gameplayUI?.StopReloadVisual();
-
-        GunData gunData = currentGunVisual.gunData;
-
-
-        SpawnDroppedGun(
-            gunData,
-            currentShotCount,
-            isReloading);
-        Destroy(currentGun);
-
-        currentGun = null;
-        currentGunVisual = null;
-        hasGun = false;
-
-        if (gunRayDebug != null)
-            gunRayDebug.Cleanup();
-
-        gameplayUI?.ResetAmmoBar();
-        playerAnim.SetHoldGun(false);
-    }
-    private void CancelReload()
-    {
-        if (reloadCoroutine != null)
-        {
-            StopCoroutine(reloadCoroutine);
-            reloadCoroutine = null;
-        }
-
-        isReloading = false;
-        isHoldingAttack = false;
-
-        gameplayUI?.StopReloadVisual();
-    }
-
-    private void SpawnDroppedGun(
-     GunData gunData,
-     int ammo,
-     bool wasReloading)
-    {
-        Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
-        GameObject droppedGun = Instantiate(gunData.gunItemPrefab, spawnPos, Quaternion.identity);
-        GunPickup pickup =
-    droppedGun.GetComponent<GunPickup>();
-
-        pickup.currentAmmo = ammo;
-        pickup.isReloading = wasReloading;
-        Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            Vector3 throwDir = transform.forward + Vector3.up * 0.7f;
-            rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
-        }
-    }
-    private void OnPickUpButtonClicked()
-    {
-        if (nearbyGun == null)
-            return;
-
-        nearbyGun.Pickup(this);
-
-        nearbyGun = null;
-        gameplayUI?.HidePickUp();
-    }
-
-    #region TriggerByGunItem
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out GunPickup gun))
-        {
-            if (!gunsInRange.Contains(gun))
-            {
-                gunsInRange.Add(gun);
-            }
-            gameplayUI?.ShowPickUp();
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.TryGetComponent(out GunPickup gun))
-        {
-            gunsInRange.Remove(gun);
-
-            if (currentTargetGun == gun)
-            {
-                gun.GetComponent<GunItem>()?.SetCanPickUp(false);
-
-                currentTargetGun = null;
-                nearbyGun = null;
-
-                gameplayUI?.HidePickUp();
-            }
-        }
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.TryGetComponent(out GunPickup gun))
-        {
-            nearbyGun = gun;
-            gameplayUI?.ShowPickUp();
-        }
-    }
-    #endregion
 }

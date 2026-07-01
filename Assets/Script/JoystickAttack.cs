@@ -42,30 +42,29 @@ public class JoystickAttack : MonoBehaviour,
         currentZone = AttackZone.Inner;
     }
 
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        UpdateJoystick(eventData);
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
         isDragging = true;
 
-        if (playerWeapon != null &&
-            playerWeapon.HasGun())
+        // KHÔNG chỉ set cho gun nữa
+        if (playerWeapon != null && playerWeapon.HasGun())
         {
             playerWeapon.SetAttackState(true);
         }
+        // Melee sẽ được xử lý ở PlayerCombat
 
-        UpdateJoystick(eventData);
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
         UpdateJoystick(eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         isDragging = false;
-
         attackRect.anchoredPosition = startPosition;
-
         InputDirection = Vector2.zero;
 
         if (playerWeapon != null)

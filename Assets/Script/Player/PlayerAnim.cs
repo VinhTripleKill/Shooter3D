@@ -11,17 +11,17 @@ public class PlayerAnim : MonoBehaviour
 
     public void SetHoldGun(bool value)
     {
-        animator.SetLayerWeight(
-            1,
-            value ? 1f : 0f
-        );
+        animator.SetLayerWeight(1, value ? 1f : 0f);
+    }
+
+    public void TriggerAttack()
+    {
+        animator.SetTrigger("isAttack");
     }
 
     public void PlayDead()
     {
         animator.SetTrigger("isDead");
-
-        // tắt layer cầm súng
         SetHoldGun(false);
     }
 }

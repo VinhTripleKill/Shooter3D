@@ -8,7 +8,7 @@ public abstract class BaseCharacter :
     protected float maxHp = 100f;
     public System.Action<float, float> OnHpChanged;
     public System.Action<float> OnTakeDamage;
-    protected float currentHp;
+    public float currentHp;
     protected bool isDead;
     
     public bool IsDead()

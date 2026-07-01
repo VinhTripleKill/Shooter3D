@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public static class AutoAimManager
 {
     public static List<IAutoAimTarget> Targets =

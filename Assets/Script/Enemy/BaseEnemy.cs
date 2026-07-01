@@ -197,6 +197,7 @@ public abstract class BaseEnemy :
 
         damageable?.TakeDamage(
             atkDamage);
+            
     }
 
     protected virtual void OnEnable()

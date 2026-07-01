@@ -100,7 +100,10 @@ public class GamePlayUI : MonoBehaviour
     {
         statusAmmo.fillAmount = 1f;
     }
-
+    public void SetUltimateBar(float value)
+    {
+        ultimateBar.fillAmount = value;
+    }
     public Button GetReloadButton()
     {
         return reloadButton;

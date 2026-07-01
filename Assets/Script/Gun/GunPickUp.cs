@@ -9,9 +9,10 @@ public class GunPickup : MonoBehaviour
 
     public bool isReloading;
 
-    public void Pickup(PlayerWeapon playerWeapon)
+    // SỬA Ở ĐÂY
+    public void Pickup(PlayerInteraction playerInteraction)
     {
-        playerWeapon.EquipGun(
+        playerInteraction.EquipGun(
             gunVisualPrefab,
             currentAmmo,
             isReloading);

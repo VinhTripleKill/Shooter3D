@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48710c2f00548ed4f8d2c0f1ef341da7, type: 3}
+  m_Name: BurnGrenade
+  m_EditorClassIdentifier: Assembly-CSharp::GrenadeSkillData
+  skillName: BurnGrenade
+  icon: {fileID: 21300000, guid: 16d65627c4f862948beec3e8e9a1f2df, type: 3}
+  cooldown: 8
+  maxStack: 2
+  grenadePrefab: {fileID: 8504079749979510124, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
+  explosionPrefab: {fileID: 2195401069695916235, guid: 784b59333981b0f419b9afd90b3dc395, type: 3}
+  explodeDelay: 1
+  throwForce: 10
+  radius: 3
+  damage: 25
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 128
+  effectMask:
+    serializedVersion: 2
+    m_Bits: 128
