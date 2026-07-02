@@ -7052,6 +7052,10 @@ MonoBehaviour:
   manaBar: {fileID: 79892884}
   hpBar: {fileID: 1958714925}
   hpText: {fileID: 2040901030}
+  levelText: {fileID: 210700107}
+  levelBarProgress: {fileID: 1519983086}
+  waveText: {fileID: 1598639781}
+  waveBarProgress: {fileID: 1984067066}
   statusAmmo: {fileID: 1457887389}
   ammoI: {fileID: 844670413}
   reloadButton: {fileID: 720646449}
@@ -21685,6 +21689,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 8641149402784629088, guid: 5c6a64ad7827fb94c957d3339550b957, type: 3}
+      propertyPath: maxHp
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 8861852149474711234, guid: 5c6a64ad7827fb94c957d3339550b957, type: 3}
       propertyPath: m_Name
       value: Zombie

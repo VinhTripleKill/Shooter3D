@@ -39,14 +39,14 @@ public abstract class BaseEnemy :
 
     protected EnemyAnim enemyAnim;
     protected NavMeshAgent agent;
-
+    private Collider[] enemyColliders;
     public static List<BaseEnemy> AllEnemies { get; }
         = new List<BaseEnemy>();
 
     protected override void Awake()
     {
         base.Awake();
-
+        enemyColliders = GetComponentsInChildren<Collider>();
         enemyAnim = GetComponentInChildren<EnemyAnim>();
         agent = GetComponent<NavMeshAgent>();
     }
@@ -199,7 +199,13 @@ public abstract class BaseEnemy :
             atkDamage);
             
     }
-
+    protected virtual void DisableCollision()
+{
+    foreach (Collider col in enemyColliders)
+    {
+        col.enabled = false;
+    }
+}
     protected virtual void OnEnable()
     {
         AllEnemies.Add(this);
@@ -229,7 +235,7 @@ public abstract class BaseEnemy :
         isAttacking = false;
 
         currentState = EnemyState.Dead;
-
+        DisableCollision();
         enemyAnim.OnAttackHit -= DealDamage;
 
         AutoAimManager.Unregister(this);

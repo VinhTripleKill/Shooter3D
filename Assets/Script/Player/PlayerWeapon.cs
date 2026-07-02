@@ -45,7 +45,7 @@ public class PlayerWeapon : MonoBehaviour
         attackAutoAction = playerInput.actions["AttackAuto"];
         attackManualAction = playerInput.actions["AttackManual"];
         reloadAction = playerInput.actions["Reload"];
-
+        BulletProjecTile.OnSuccessfulHit += RecoverManaByProjectileHit;
         gameplayUI?.ResetAmmoBar();
         if (gameplayUI != null)
         {
@@ -64,6 +64,7 @@ public class PlayerWeapon : MonoBehaviour
     {
         if (gameplayUI != null)
             gameplayUI.GetReloadButton().onClick.RemoveListener(OnReloadButtonClicked);
+            BulletProjecTile.OnSuccessfulHit -= RecoverManaByProjectileHit;
     }
 
     private void OnReloadButtonClicked() => ManualReload();
@@ -73,6 +74,7 @@ public class PlayerWeapon : MonoBehaviour
         if (playerController.IsDead() || !hasGun || isReloading) return;
 
         GunData gunData = currentGunVisual.gunData;
+
         if (currentShotCount >= gunData.maxCountShot) return;
 
         reloadCoroutine = StartCoroutine(ReloadRoutine());
@@ -145,58 +147,40 @@ public class PlayerWeapon : MonoBehaviour
     {
         Camera cam = Camera.main;
 
-        if (cam == null)
-            return;
+        if (cam == null) return;
 
-        Vector2 mousePos =
-            Mouse.current.position.ReadValue();
+        Vector2 mousePos = Mouse.current.position.ReadValue();
 
-        Ray ray =
-            cam.ScreenPointToRay(mousePos);
+        Ray ray = cam.ScreenPointToRay(mousePos);
 
-        Plane groundPlane =
-            new Plane(Vector3.up, Vector3.zero);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
         if (groundPlane.Raycast(ray, out float distance))
         {
-            Vector3 hitPoint =
-                ray.GetPoint(distance);
+            Vector3 hitPoint = ray.GetPoint(distance);
 
-            Vector3 direction =
-                hitPoint - transform.position;
+            Vector3 direction = hitPoint - transform.position;
 
             direction.y = 0f;
 
             if (direction.sqrMagnitude > 0.001f)
             {
-                manualAimDirection =
-                    new Vector2(
-                        direction.x,
-                        direction.z);
+                manualAimDirection = new Vector2( direction.x, direction.z);
             }
         }
     }
 
     private void ManualAim()
     {
-        if (manualAimDirection.sqrMagnitude < 0.01f)
-            return;
+        if (manualAimDirection.sqrMagnitude < 0.01f) return;
 
-        Vector3 direction =
-            new Vector3(
-                manualAimDirection.x,
-                0f,
-                manualAimDirection.y);
+        Vector3 direction = new Vector3( manualAimDirection.x, 0f, manualAimDirection.y);
 
-        transform.forward =
-            direction.normalized;
+        transform.forward = direction.normalized;
     }
     private void AimNearestEnemy()
     {
-        currentTarget =
-            CombatTargetFinder.RotateToNearestTarget(
-                transform,
-                autoAimRange);
+        currentTarget = CombatTargetFinder.RotateToNearestTarget( transform, autoAimRange);
     }
 
     private void TryShoot()
@@ -215,8 +199,7 @@ public class PlayerWeapon : MonoBehaviour
         {
             if (!isReloading)
             {
-                reloadCoroutine =
-                    StartCoroutine(ReloadRoutine());
+                reloadCoroutine = StartCoroutine(ReloadRoutine());
             }
 
             return;
@@ -233,8 +216,7 @@ public class PlayerWeapon : MonoBehaviour
     {
         GunData gunData = currentGunVisual.gunData;
 
-        if (gunData.fireType ==
-            GunData.GunFireType.Raycast)
+        if (gunData.fireType == GunData.GunFireType.Raycast)
         {
             ShootRaycast(gunData);
         }
@@ -245,39 +227,26 @@ public class PlayerWeapon : MonoBehaviour
 
         if (gunData.recoilForce > 0)
         {
-            CharacterController cc =
-                GetComponent<CharacterController>();
+            CharacterController cc = GetComponent<CharacterController>();
 
-            cc.Move(
-                -transform.forward *
-                gunData.recoilForce);
+            cc.Move( -transform.forward * gunData.recoilForce);
         }
     }
-    private void ShootProjectile(
-    GunData gunData)
+    private void ShootProjectile( GunData gunData)
     {
-        Transform firePoint =
-            currentGunVisual.GetFirePoint();
+        Transform firePoint = currentGunVisual.GetFirePoint();
 
-        int pelletCount =
-            gunData.pelletCount;
+        int pelletCount = gunData.pelletCount;
 
-        float angleStep =
-            gunData.angleBetweenBullets;
+        float angleStep = gunData.angleBetweenBullets;
 
-        float startAngle =
-            -(angleStep * (pelletCount - 1)) / 2f;
+        float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
 
         for (int i = 0; i < pelletCount; i++)
         {
-            float currentAngle =
-                startAngle + angleStep * i;
+            float currentAngle = startAngle + angleStep * i;
 
-            Quaternion fixedSpread =
-                Quaternion.Euler(
-                    0,
-                    currentAngle,
-                    0);
+            Quaternion fixedSpread = Quaternion.Euler( 0, currentAngle, 0);
 
             Quaternion randomSpread =
                 Quaternion.Euler(
@@ -291,28 +260,37 @@ public class PlayerWeapon : MonoBehaviour
                         -gunData.randomSpreadZ,
                         gunData.randomSpreadZ));
 
-            Quaternion finalRotation =
-                firePoint.rotation *
-                fixedSpread *
-                randomSpread;
+            Quaternion finalRotation = firePoint.rotation * fixedSpread * randomSpread;
 
-            GameObject bulletObj =
-                Instantiate(
-                    gunData.bulletPrefab,
-                    firePoint.position,
-                    finalRotation);
+            GameObject bulletObj = Instantiate( gunData.bulletPrefab, firePoint.position, finalRotation);
 
-            BulletProjecTile bullet =
-                bulletObj.GetComponent<BulletProjecTile>();
+            BulletProjecTile bullet = bulletObj.GetComponent<BulletProjecTile>();
             bullet.Initialize(
                 finalRotation * Vector3.forward,
                 gunData.bulletSpeed,
                 gunData.bulletLifeTime,
                 gunData.damage,
                 gunData.hitMask,
+                gunData.interactionMask,
                 currentTarget);
         }
     }
+
+
+    private void RecoverManaByProjectileHit()
+    {
+         if (!hasGun) return;
+
+         playerController.RecoverMana(currentGunVisual.gunData.manaRecoveryByHit);
+    }
+  private void ProcessRaycastHit(GunData gunData, Collider hitCollider)
+{
+    if (((1 << hitCollider.gameObject.layer) & gunData.interactionMask) == 0)
+        return;
+
+    playerController.RecoverMana(gunData.manaRecoveryByHit);
+}
+
     private void ShootRaycast(GunData gunData)
     {
         Transform firePoint = currentGunVisual.GetFirePoint();
@@ -332,10 +310,7 @@ public class PlayerWeapon : MonoBehaviour
                     Random.Range(-gunData.randomSpreadZ, gunData.randomSpreadZ)
                 );
 
-            Vector3 direction =
-                (firePoint.rotation *
-                 Quaternion.Euler(0, currentAngle, 0) *
-                 spread) * Vector3.forward;
+            Vector3 direction = (firePoint.rotation *Quaternion.Euler(0, currentAngle, 0) * spread) * Vector3.forward;
 
             Vector3 startPos = firePoint.position;
             Vector3 endPos;
@@ -355,13 +330,14 @@ public class PlayerWeapon : MonoBehaviour
 
                 Debug.Log($"Hit: {hit.collider.name}");
 
-                IDamageable damageable =
-      hit.collider.GetComponentInParent<IDamageable>();
+                IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
 
                 if (damageable != null)
                 {
-                    damageable.TakeDamage(gunData.damage);
+                   damageable.TakeDamage(gunData.damage);
+                   ProcessRaycastHit(gunData,hit.collider);
                 }
+
             }
             else
             {
@@ -373,14 +349,11 @@ public class PlayerWeapon : MonoBehaviour
     }
     private void SpawnTrail(Vector3 start, Vector3 end, GunData gunData)
     {
-        GameObject trailObj =
-            Instantiate(gunData.bulletPrefab, start, Quaternion.identity);
+        GameObject trailObj = Instantiate(gunData.bulletPrefab, start, Quaternion.identity);
 
-        BulletRayTrail trail =
-            trailObj.GetComponent<BulletRayTrail>();
+        BulletRayTrail trail = trailObj.GetComponent<BulletRayTrail>();
 
-        float travelTime =
-            Vector3.Distance(start, end) / gunData.bulletSpeed;
+        float travelTime = Vector3.Distance(start, end) / gunData.bulletSpeed;
 
         trail.Initialize(start, end, gunData.bulletSpeed);
     }
@@ -402,8 +375,7 @@ public class PlayerWeapon : MonoBehaviour
 
         currentGunVisual = currentGun.GetComponent<GunVisual>();
 
-        GunRuntimeData runtime = currentGun.GetComponent<GunRuntimeData>()
-            ?? currentGun.AddComponent<GunRuntimeData>();
+        GunRuntimeData runtime = currentGun.GetComponent<GunRuntimeData>() ?? currentGun.AddComponent<GunRuntimeData>();
         runtime.Initialize(currentGunVisual.gunData);
 
         if (gunRayDebug != null)
@@ -481,17 +453,12 @@ public class PlayerWeapon : MonoBehaviour
         yield return new WaitForSeconds(gunData.timeReload);
 
         currentShotCount = gunData.maxCountShot;
-        currentGun
-     .GetComponent<GunRuntimeData>()
-     .currentAmmo =
-     currentShotCount;
+        currentGun.GetComponent<GunRuntimeData>().currentAmmo =currentShotCount;
         isReloading = false;
 
         gameplayUI?.StopReloadVisual();
 
-        gameplayUI?.UpdateAmmoBar(
-            currentShotCount,
-            gunData.maxCountShot);
+        gameplayUI?.UpdateAmmoBar(currentShotCount,gunData.maxCountShot);
     }
 
 }

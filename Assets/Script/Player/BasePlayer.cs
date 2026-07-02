@@ -68,4 +68,20 @@ public abstract class BasePlayer : BaseCharacter
 
         return true;
     }
+    public void RecoverMana(float mana)
+{
+    if (mana <= 0f)
+        return;
+
+    currentMana += mana;
+
+    currentMana = Mathf.Clamp(
+        currentMana,
+        0,
+        maxMana);
+
+    OnManaChanged?.Invoke(
+        currentMana,
+        maxMana);
+}
 }

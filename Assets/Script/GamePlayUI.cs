@@ -20,6 +20,12 @@ public class GamePlayUI : MonoBehaviour
     [Header("HpBar")]
     [SerializeField] private Image hpBar;
     [SerializeField] private TextMeshProUGUI hpText;
+    [Header("Level")] 
+    [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private Image levelBarProgress;
+    [Header("Wave Enemy")]
+    [SerializeField] private TextMeshProUGUI waveText;
+    [SerializeField] private Image waveBarProgress;
     [Header("Ammo")]
     [SerializeField] private Image statusAmmo;
     [SerializeField] private Image ammoI;
@@ -126,7 +132,7 @@ public class GamePlayUI : MonoBehaviour
     }
 
     public void InitializeSkillUI(Sprite icon, int currentStack, int maxStack)
-{
+    {
     skillIcon.sprite = icon;
 
     UpdateSkillStack(currentStack);
@@ -134,30 +140,30 @@ public class GamePlayUI : MonoBehaviour
     skillCD.gameObject.SetActive(currentStack < maxStack);
 
     skillCD.fillAmount = 0f;
-}
-public void UpdateSkillStack(int currentStack)
-{
-    skillCount.text = currentStack.ToString();
-}
-public void UpdateSkillCooldown(float timer, float cooldown)
-{
-    if (cooldown <= 0f)
-    {
-        skillCD.fillAmount = 0f;
-        return;
     }
-
-    skillCD.fillAmount = 1f - (timer / cooldown);
-}
-public void ShowSkillCooldown(bool show)
-{
-    skillCD.gameObject.SetActive(show);
-
-    if (!show)
-        skillCD.fillAmount = 0f;
-}
-public Button GetSkillButton()
-{
-    return skillButton;
-}
+    public void UpdateSkillStack(int currentStack)
+    {
+        skillCount.text = currentStack.ToString();
+    }
+    public void UpdateSkillCooldown(float timer, float cooldown)
+    {
+        if (cooldown <= 0f)
+        {
+            skillCD.fillAmount = 0f;
+            return;
+        }
+    
+        skillCD.fillAmount = 1f - (timer / cooldown);
+    }
+    public void ShowSkillCooldown(bool show)
+    {
+        skillCD.gameObject.SetActive(show);
+    
+        if (!show)
+            skillCD.fillAmount = 0f;
+    }
+    public Button GetSkillButton()
+    {
+        return skillButton;
+    }
 }

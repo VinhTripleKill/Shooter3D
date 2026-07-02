@@ -19,6 +19,9 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 136
+  interactionMask:
+    serializedVersion: 2
+    m_Bits: 128
   showRay: 0
   gunVisualPrefab: {fileID: 1288899136825821740, guid: 1ac86896bf5920d4099f67d282706389, type: 3}
   gunItemPrefab: {fileID: 7684841745191892969, guid: 1b85f07487a4d9c458d98aa961f23f28, type: 3}
@@ -28,6 +31,7 @@ MonoBehaviour:
   bulletSpeed: 15
   bulletLifeTime: 3
   maxCountShot: 5
+  manaRecoveryByHit: 1
   timeReload: 3
   pelletCount: 5
   angleBetweenBullets: 5

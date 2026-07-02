@@ -48,9 +48,8 @@ public class PlayerUltimate : MonoBehaviour
 
     private void UseUltimate()
     {
-        if (!canUltimate)
-            return;
-
+        if (!canUltimate)return;
+        if (playerController.IsDead()) return;
         if (!playerController.ConsumeMana(manaConsumption))
         {
             Debug.Log("Insufficient mana");

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 public class BulletProjecTile : MonoBehaviour
 {
     public enum BulletType{ bullet, missile }
@@ -9,10 +10,11 @@ public class BulletProjecTile : MonoBehaviour
     private Vector3 moveDirection;
     [SerializeField]
     private float rotateSpeed = 180f;
-
     private Transform target;
     private Rigidbody rb;
     private LayerMask hitMask;
+    public static event Action OnSuccessfulHit;
+    private LayerMask interactionMask;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,6 +25,7 @@ public class BulletProjecTile : MonoBehaviour
         float bulletLifeTime,
         float bulletDamage,
         LayerMask bulletHitMask,
+        LayerMask bulletInteractionMask,
         Transform targetTransform = null)
     {
         moveDirection = dir.normalized;
@@ -32,8 +35,8 @@ public class BulletProjecTile : MonoBehaviour
         damage = bulletDamage;
 
         hitMask = bulletHitMask;
+        interactionMask = bulletInteractionMask;
         target = targetTransform;
-
         Destroy(gameObject, lifeTime);
     }
     private void FixedUpdate()
@@ -53,15 +56,11 @@ public class BulletProjecTile : MonoBehaviour
     {
         if (rb != null)
         {
-            rb.linearVelocity =
-                moveDirection * speed;
+            rb.linearVelocity = moveDirection * speed;
         }
         else
         {
-            transform.position +=
-                moveDirection *
-                speed *
-                Time.fixedDeltaTime;
+            transform.position += moveDirection * speed * Time.fixedDeltaTime;
         }
     }
     private void UpdateMissile()
@@ -69,29 +68,20 @@ public class BulletProjecTile : MonoBehaviour
         if (target == null)
         {
             if (rb != null)
-                rb.linearVelocity =
-                    transform.forward * speed;
+                rb.linearVelocity = transform.forward * speed;
 
             return;
         }
 
-        Vector3 direction =
-            (target.position - transform.position)
-            .normalized;
+        Vector3 direction = (target.position - transform.position) .normalized;
 
-        Quaternion targetRotation =
-            Quaternion.LookRotation(direction);
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        transform.rotation =
-            Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                rotateSpeed * Time.fixedDeltaTime);
+        transform.rotation = Quaternion.RotateTowards( transform.rotation, targetRotation, rotateSpeed * Time.fixedDeltaTime);
 
         if (rb != null)
-        {
-            rb.linearVelocity =
-                transform.forward * speed;
+        { 
+            rb.linearVelocity = transform.forward * speed;
         }
     }
 
@@ -99,17 +89,20 @@ public class BulletProjecTile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (((1 << other.gameObject.layer) & hitMask) == 0)
-            return;
+    if (((1 << other.gameObject.layer) & hitMask) == 0) return;
 
-        IDamageable damageable =
-     other.GetComponentInParent<IDamageable>();
+    IDamageable damageable = other.GetComponentInParent<IDamageable>();
 
-        if (damageable != null)
+    if (damageable != null)
+    {
+        damageable.TakeDamage(damage);
+
+        if (((1 << other.gameObject.layer) & interactionMask) != 0)
         {
-            damageable.TakeDamage(damage);
+            OnSuccessfulHit?.Invoke();
         }
+    }
 
-        Destroy(gameObject);
+    Destroy(gameObject);
     }
 }
