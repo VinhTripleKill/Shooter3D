@@ -18,10 +18,10 @@ MonoBehaviour:
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2
-    m_Bits: 136
+    m_Bits: 648
   interactionMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 640
   showRay: 0
   gunVisualPrefab: {fileID: 5513453165033166812, guid: c6ab4dece44495c4dbb8c3967647fd64, type: 3}
   gunItemPrefab: {fileID: 6136311237187020477, guid: 80360a89cde7733449eb1dd81f7b7384, type: 3}
