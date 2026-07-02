@@ -21,7 +21,7 @@ MonoBehaviour:
     m_Bits: 648
   interactionMask:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 128
   showRay: 0
   gunVisualPrefab: {fileID: 3547316800252406819, guid: b1e2d6fb63fc0da43903990567542334, type: 3}
   gunItemPrefab: {fileID: 4387299326062068396, guid: 2d9e5ca7233ff85428c445f473efeb9c, type: 3}
