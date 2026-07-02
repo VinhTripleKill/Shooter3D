@@ -7045,6 +7045,7 @@ MonoBehaviour:
   sprintLock: {fileID: 126802080}
   ultimateBar: {fileID: 19823933}
   ultimateButton: {fileID: 1608185422}
+  skillIcon: {fileID: 1854241178}
   skillButton: {fileID: 1979923424}
   skillCD: {fileID: 2013024045}
   skillCount: {fileID: 1688351885}
@@ -21438,6 +21439,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 330585545}
     - target: {fileID: 4129186038483614875, guid: fbd475981b9b7cc40b452ad603969ac5, type: 3}
+      propertyPath: gameplayUI
+      value: 
+      objectReference: {fileID: 693972725}
+    - target: {fileID: 4129186038483614875, guid: fbd475981b9b7cc40b452ad603969ac5, type: 3}
       propertyPath: currentSkill
       value: 
       objectReference: {fileID: -7539789986821043711, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
@@ -21486,6 +21491,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 693972725}
     - target: {fileID: 8345705196563250385, guid: fbd475981b9b7cc40b452ad603969ac5, type: 3}
+      propertyPath: gameplayUI
+      value: 
+      objectReference: {fileID: 693972725}
+    - target: {fileID: 8567631370875963491, guid: fbd475981b9b7cc40b452ad603969ac5, type: 3}
       propertyPath: gameplayUI
       value: 
       objectReference: {fileID: 693972725}

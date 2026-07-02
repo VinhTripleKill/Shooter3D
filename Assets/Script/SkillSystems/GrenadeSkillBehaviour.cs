@@ -5,45 +5,46 @@ public class GrenadeSkillBehaviour : SkillBehaviour
     [SerializeField]
     private GrenadeSkillData skillData;
 
-    public override void Execute(PlayerSkill playerSkill)
-    {
-        if (skillData == null)
-            return;
+    public override bool Execute(PlayerSkill playerSkill)
+{
+    if (skillData == null)
+        return false;
 
-        Transform target =
-     CombatTargetFinder.RotateToNearestTarget(
-         playerSkill.transform,
-         playerSkill.targetRange);
+    Transform firePoint =
+        playerSkill.GetFirePoint();
 
-        Transform firePoint =
-            playerSkill.GetFirePoint();
+    Transform target =
+        CombatTargetFinder.RotateToNearestTarget(
+            playerSkill.transform,
+            playerSkill.targetRange);
 
-        GameObject grenade =
-            Instantiate(
-                skillData.grenadePrefab,
-                firePoint.position,
-                Quaternion.identity);
+    Vector3 direction =
+        target != null
+        ? (target.position - firePoint.position).normalized
+        : playerSkill.transform.forward;
 
-        Rigidbody rb =
-            grenade.GetComponent<Rigidbody>();
+    GameObject grenade =
+        Instantiate(
+            skillData.grenadePrefab,
+            firePoint.position,
+            Quaternion.identity);
 
-        if (rb == null)
-            return;
+    Rigidbody rb =
+        grenade.GetComponent<Rigidbody>();
 
-        Vector3 direction =
-            (target.position - firePoint.position).normalized;
+    if (rb == null)
+        return false;
 
-        rb.AddForce(
-            direction * skillData.throwForce,
-            ForceMode.Impulse);
-        GrenadeProjectile projectile =  grenade.GetComponent<GrenadeProjectile>();
+    rb.AddForce(
+        direction * skillData.throwForce,
+        ForceMode.Impulse);
 
-        if (projectile != null)
-        {
-            projectile.Initialize(skillData);
-        }
+    GrenadeProjectile projectile =
+        grenade.GetComponent<GrenadeProjectile>();
 
-    }
+    projectile?.Initialize(skillData);
+    return true;
+}
 
     public float GetCooldown()
     {

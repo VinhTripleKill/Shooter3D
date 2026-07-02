@@ -14,7 +14,7 @@ public class PlayerSkill : MonoBehaviour
     private SkillBehaviour currentSkill;
     public float targetRange = 15f;
     private SkillData currentSkillData;
-
+    public GamePlayUI gameplayUI;
     private float rechargeTimer;
     private int currentStack;
     private void Awake()
@@ -27,17 +27,19 @@ public class PlayerSkill : MonoBehaviour
         skillAction =
             playerInput.actions["Skill"];
     }
-    private void Start()
-    {
-        currentSkillData =
-            ((GrenadeSkillBehaviour)currentSkill).GetSkillData();
+ private void Start()
+{
+    currentSkillData = currentSkill.GetSkillData();
 
-        currentStack =
-            currentSkillData.maxStack;
+    currentStack = currentSkillData.maxStack;
 
-        Debug.Log(
-            $"Skill {currentSkillData.skillName} have {currentStack}");
-    }
+    gameplayUI.InitializeSkillUI(
+        currentSkillData.icon,
+        currentStack,
+        currentSkillData.maxStack);
+
+    
+}
     private void Update()
     {
         RechargeStack();
@@ -46,50 +48,55 @@ public class PlayerSkill : MonoBehaviour
     {
         if (currentStack >= currentSkillData.maxStack)
         {
-            rechargeTimer = 0;
-            return;
+        rechargeTimer = 0;
+
+        gameplayUI.ShowSkillCooldown(false);
+
+        return;
         }
 
         rechargeTimer += Time.deltaTime;
-
+        gameplayUI.UpdateSkillCooldown(rechargeTimer,currentSkillData.cooldown);
         if (rechargeTimer >= currentSkillData.cooldown)
         {
-            rechargeTimer = 0;
-
-            currentStack++;
-
-            Debug.Log(
-                $"Skill {currentSkillData.skillName} have {currentStack}");
+        rechargeTimer = 0;
+        currentStack++;
+        gameplayUI.UpdateSkillStack(currentStack);
+        gameplayUI.ShowSkillCooldown(currentStack < currentSkillData.maxStack);
+        Debug.Log($"Skill {currentSkillData.skillName} have {currentStack}");
         }
     }
 
     private void OnEnable()
     {
         skillAction.performed += SkillPerformed;
+        gameplayUI.GetSkillButton()
+        .onClick.AddListener(UseSkill);
     }
 
     private void OnDisable()
     {
         skillAction.performed -= SkillPerformed;
+        gameplayUI.GetSkillButton()
+            .onClick.RemoveListener(UseSkill);
     }
 
+    private void UseSkill(){ SkillPerformed(default); }
     private void SkillPerformed(InputAction.CallbackContext ctx)
     {
-        if (playerController.IsDead())
-            return;
+        if (playerController.IsDead()) return;
 
-        if (currentSkill == null)
-            return;
+        if (currentSkill == null) return;
 
-        if (currentStack <= 0)
-            return;
+        if (currentStack <= 0) return;
 
-        currentSkill.Execute(this);
-
+        bool success = currentSkill.Execute(this);
+        if (!success) return;
         currentStack--;
-
-        Debug.Log(
-            $"Skill {currentSkillData.skillName} have {currentStack}");
+        gameplayUI.UpdateSkillStack(currentStack);
+        
+        gameplayUI.ShowSkillCooldown(currentStack < currentSkillData.maxStack);
+        Debug.Log($"Skill {currentSkillData.skillName} have {currentStack}");
     }
 
     public Transform GetFirePoint()

@@ -386,6 +386,7 @@ GameObject:
   - component: {fileID: 5122669106469914815}
   - component: {fileID: 2181486247786479044}
   - component: {fileID: 5574972225177332375}
+  - component: {fileID: 8567631370875963491}
   - component: {fileID: 2676728869859338116}
   - component: {fileID: 1775279273797060358}
   - component: {fileID: 8345705196563250385}
@@ -507,6 +508,25 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8567631370875963491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2328074943725962016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb9d3c29ce6c764fa6bb85d87d92b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSprint
+  sprintSpeed: 3
+  sprintEffect: {fileID: 3928507805995534994}
+  sprintLockDuration: 5
+  sprintConsumption: 25
+  sprintRecoveryWalk: 5
+  sprintRecoveryIdle: 10
+  gameplayUI: {fileID: 0}
 --- !u!114 &2676728869859338116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,18 +540,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   maxHp: 100
+  currentHp: 0
   moveSpeed: 5
   gravity: -20
   maxMana: 100
   maxSprintEnergy: 100
   joystickMove: {fileID: 0}
-  sprintSpeed: 3
-  sprintEffect: {fileID: 3928507805995534994}
   rotationSpeed: 10
-  sprintConsumption: 25
-  sprintRecoveryWalk: 5
-  sprintRecoveryIdle: 10
-  sprintLockDuration: 5
   gameplayUI: {fileID: 0}
   playerWeapon: {fileID: 8345705196563250385}
 --- !u!114 &1775279273797060358
@@ -618,8 +633,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkill
   firePoint: {fileID: 6190892275398048827}
-  currentSkill: {fileID: 7897214159764592600, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
+  currentSkill: {fileID: 7192575363007486831, guid: e91af1b8f33bdcc4592a97485876e86a, type: 3}
   targetRange: 15
+  gameplayUI: {fileID: 0}
 --- !u!1 &3668582116975613226
 GameObject:
   m_ObjectHideFlags: 0

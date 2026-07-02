@@ -63,4 +63,19 @@ public static class CombatTargetFinder
 
         return target;
     }
+    public static Vector3 GetAimDirection(
+    Transform owner,
+    Vector3 firePosition,
+    float range)
+{
+    Transform target =
+        RotateToNearestTarget(owner, range);
+
+    if (target != null)
+    {
+        return (target.position - firePosition).normalized;
+    }
+
+    return owner.forward;
+}
 }

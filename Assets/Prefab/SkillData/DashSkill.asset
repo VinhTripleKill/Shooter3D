@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14da4a33c0091ae42b3d74446888e779, type: 3}
+  m_Name: DashSkill
+  m_EditorClassIdentifier: Assembly-CSharp::DashSkillData
+  skillName: Dash Base
+  icon: {fileID: 21300000, guid: 50646e453b63778469ce24a1a52c278d, type: 3}
+  cooldown: 2
+  maxStack: 2
+  timeDash: 0.2
+  speedDash: 30
+  timeNextDash: 0.1

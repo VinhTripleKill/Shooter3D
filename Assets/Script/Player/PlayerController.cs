@@ -1,122 +1,99 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerController : BasePlayer
 {
     private PlayerInput playerInput;
     private InputAction moveAction;
-    private InputAction sprintAction;
+    private PlayerSprint playerSprint;
+
     [Header("Mobile")]
     [SerializeField] private JoystickMove joystickMove;
+
     [Header("Movement")]
-    public float sprintSpeed = 3f;
-    [Header("Sprint Effect")]
-    [SerializeField]
-    private ParticleSystem sprintEffect;
-    [SerializeField]
-    private float rotationSpeed = 10f;
-    [Header("Sprint Energy")]
-    public float sprintConsumption = 5f;
-    public float sprintRecoveryWalk = 5f;
-    public float sprintRecoveryIdle = 10f;
-    private bool wasSprinting;
-    private bool sprintLocked;
-    private float sprintLockTimer;
-    [SerializeField] private float sprintLockDuration = 5f;
-    private float testTimer;
-    private bool isSprintOn = true;
-    private Vector2 moveInput;
-    private PlayerAnim playerAnim;
-    private bool canMove = true;
+    [SerializeField] private float rotationSpeed = 10f;
+
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
 
-    // Reference đến script weapon
     public PlayerWeapon playerWeapon;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        OnHpChanged += gameplayUI.UpdateHpBar;
-        OnManaChanged += gameplayUI.UpdateManaBar;
-        playerAnim = GetComponent<PlayerAnim>();
-        playerInput = GetComponent<PlayerInput>();
+    private Vector2 moveInput;
+    private PlayerAnim playerAnim;
+    private bool canMove = true;
+    private bool canDash = true;
+    private bool isDashing;
+    private float dashLockTimer;
 
-        moveAction = playerInput.actions["Move"];
-        sprintAction = playerInput.actions["Sprint"];
+protected override void Awake()
+{
+    base.Awake();
 
-        gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
-        gameplayUI.GetSprintButton().onClick.AddListener(ToggleSprint);
-        gameplayUI.UpdateHpBar(currentHp, maxHp);
-        gameplayUI.UpdateManaBar(currentMana, maxMana);
-        if (playerWeapon == null)
-            playerWeapon = GetComponent<PlayerWeapon>();
-        if (playerWeapon == null)
-            playerWeapon = gameObject.AddComponent<PlayerWeapon>();
+    playerAnim = GetComponent<PlayerAnim>();
+    playerInput = GetComponent<PlayerInput>();
+    playerSprint = GetComponent<PlayerSprint>();
 
-    }
+    moveAction = playerInput.actions["Move"];
+
+    // === QUAN TRỌNG: Đăng ký sự kiện UI ===
+    OnHpChanged += gameplayUI.UpdateHpBar;
+    OnManaChanged += gameplayUI.UpdateManaBar;
+
+    // Khởi tạo Sprint
+    if (playerSprint != null)
+    playerSprint.Initialize(playerInput.actions["Sprint"]);
+    // Cập nhật UI ban đầu
+    gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
+    gameplayUI.UpdateHpBar(currentHp, maxHp);
+    gameplayUI.UpdateManaBar(currentMana, maxMana);
+
+    if (playerWeapon == null)
+        playerWeapon = GetComponent<PlayerWeapon>();
+    if (playerWeapon == null)
+        playerWeapon = gameObject.AddComponent<PlayerWeapon>();
+}
+
     private void OnDestroy()
     {
         OnHpChanged -= gameplayUI.UpdateHpBar;
         OnManaChanged -= gameplayUI.UpdateManaBar;
     }
+
     private void OnEnable()
     {
-        sprintAction.performed += SprintPerformed;
+        playerSprint?.OnEnableSprint();
     }
 
     private void OnDisable()
     {
-        sprintAction.performed -= SprintPerformed;
+        playerSprint?.OnDisableSprint();
     }
 
     private void Update()
     {
-        if (isDead)
-            return;
+        if (isDead) return;
+
         ReadMovementInput();
-
-        UpdateSprintLock();
-        HandleSprintEnergy();
-
         Move();
+        ApplyGravity();
 
-        ApplyGravity(); // từ BaseCharacter
+        
 
-        testTimer += Time.deltaTime;
-
-        if (testTimer >= 1f)
+        if (!canDash)
         {
-            testTimer = 0f;
-            TakeDamage(0);
-           
+            dashLockTimer -= Time.deltaTime;
+            if (dashLockTimer <= 0)
+                canDash = true;
         }
-
-        UpdateSprintEffect();
     }
-    private void UpdateSprintEffect()
-    {
-        bool isSprintingNow = IsSprinting();
 
-        if (isSprintingNow && !wasSprinting)
-        {
-            sprintEffect?.Play();
-        }
-        else if (!isSprintingNow && wasSprinting)
-        {
-            sprintEffect?.Stop();
-        }
-
-        wasSprinting = isSprintingNow;
-    }
     private void ReadMovementInput()
     {
-        Vector2 keyboardInput =
-            moveAction.ReadValue<Vector2>();
+        Vector2 keyboardInput = moveAction.ReadValue<Vector2>();
 
-        if (joystickMove != null &&
-            joystickMove.IsDragging())
+        if (joystickMove != null && joystickMove.IsDragging())
         {
             moveInput = joystickMove.MoveDirection;
         }
@@ -126,82 +103,28 @@ public class PlayerController : BasePlayer
         }
     }
 
-    public void ToggleSprint()
-    {
-        if (sprintLocked) return;
-        isSprintOn = !isSprintOn;
-        Debug.Log($"Sprint: {(isSprintOn ? "On" : "Off")}");
-    }
-
-    private void SprintPerformed(InputAction.CallbackContext ctx)
-    {
-        ToggleSprint();
-    }
-
-    private void HandleSprintEnergy()
-    {
-        bool isMoving = moveInput != Vector2.zero;
-        bool isActuallySprinting = isSprintOn && isMoving && currentSprintEnergy > 0f;
-
-        if (isActuallySprinting)
-            currentSprintEnergy -= sprintConsumption * Time.deltaTime;
-        else if (isMoving)
-            currentSprintEnergy += sprintRecoveryWalk * Time.deltaTime;
-        else
-            currentSprintEnergy += sprintRecoveryIdle * Time.deltaTime;
-
-        currentSprintEnergy = Mathf.Clamp(currentSprintEnergy, 0f, maxSprintEnergy);
-
-        if (!sprintLocked && currentSprintEnergy <= 0f)
-            SprintOutOfEnergy();
-
-        gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
-    }
-
-    private void SprintOutOfEnergy()
-    {
-        sprintLocked = true;
-        sprintLockTimer = sprintLockDuration;
-        isSprintOn = false;
-        gameplayUI.ShowSprintLock();
-    }
-
-    private void UpdateSprintLock()
-    {
-        if (!sprintLocked) return;
-
-        sprintLockTimer -= Time.deltaTime;
-        if (sprintLockTimer <= 0f)
-        {
-            sprintLocked = false;
-            gameplayUI.HideSprintLock();
-        }
-    }
-
     private void Move()
     {
-        if (!canMove)
-            return;
+        if (!canMove) return;
+
         Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
         float currentSpeed = moveSpeed;
 
-        bool canSprint = isSprintOn && move != Vector3.zero && currentSprintEnergy > 0f;
+        // === SPRINT LOGIC ===
+        bool canSprint = playerSprint != null && 
+                        playerSprint.CanSprint() && 
+                        move != Vector3.zero;
+
         if (canSprint)
-            currentSpeed += sprintSpeed;
+            currentSpeed += playerSprint.GetSprintSpeedBonus();
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
         // Xoay hướng
         if (move != Vector3.zero)
         {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(move);
-
-            transform.rotation =
-                Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    rotationSpeed * Time.deltaTime);
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
         // Animation
@@ -212,26 +135,72 @@ public class PlayerController : BasePlayer
         playerAnim.SetSpeed(animSpeed);
     }
 
-    private bool IsSprinting()
-    {
-        return controller.isGrounded &&
-               IsMoving() &&
-               isSprintOn &&
-               currentSprintEnergy > 0f;
-    }
-    private bool IsMoving()
+    public bool IsMoving()
     {
         return moveInput.sqrMagnitude > 0.01f;
+    }
+
+    private bool IsSprinting()
+    {
+        return playerSprint?.IsSprinting() ?? false;
     }
 
     protected override void Die()
     {
         Debug.Log("Player has die");
-        
         canMove = false;
-
         playerAnim.PlayDead();
     }
-    // Public để PlayerWeapon truy cập
+
+    // Public APIs
     public bool IsSprintingPublic() => IsSprinting();
+
+    public Vector3 GetMoveDirection()
+    {
+        Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
+        return move.normalized;
+    }
+
+    public void SetCanMove(bool value)
+    {
+        canMove = value;
+    }
+
+    public bool StartDash(float dashTime, float dashSpeed, float nextDashTime)
+    {
+        if (isDashing || !canDash) return false;
+
+        StartCoroutine(DashCoroutine(dashTime, dashSpeed, nextDashTime));
+        return true;
+    }
+
+    private IEnumerator DashCoroutine(float dashTime, float dashSpeed, float nextDashTime)
+    {
+        Vector3 direction = GetMoveDirection();
+        if (direction == Vector3.zero) yield break;
+
+        isDashing = true;
+        canDash = false;
+        canMove = false;
+
+        float timer = 0f;
+        while (timer < dashTime)
+        {
+            controller.Move(direction * dashSpeed * Time.deltaTime);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        canMove = true;
+        isDashing = false;
+
+        yield return new WaitForSeconds(nextDashTime);
+        canDash = true;
+        dashLockTimer = dashTime + nextDashTime;
+    }
+
+    // Expose cho PlayerSprint truy cập
+    public CharacterController Controller => controller;
+    public float CurrentSprintEnergy { get => currentSprintEnergy; set => currentSprintEnergy = value; }
+    public float MaxSprintEnergy => maxSprintEnergy;
 }
