@@ -3,8 +3,7 @@ using UnityEngine;
 
 public class TargetTraining : BaseCharacter, IAutoAimTarget
 {
-    public static List<TargetTraining> AllTargets =
-        new();
+    public static List<TargetTraining> AllTargets = new();
 
     public enum TargetMode
     {
@@ -51,12 +50,10 @@ public class TargetTraining : BaseCharacter, IAutoAimTarget
 
     private void Start()
     {
-        if (posA == null || posB == null)
-            return;
+        if (posA == null || posB == null) return;
 
         // Bắt đầu ở giữa A và B
-        transform.position =
-            (posA.position + posB.position) * 0.5f;
+        transform.position = (posA.position + posB.position) * 0.5f;
 
         // Đi tới A trước
         currentTargetPos = posA;
@@ -72,8 +69,7 @@ public class TargetTraining : BaseCharacter, IAutoAimTarget
 
     private void UpdateMoveMode()
     {
-        if (posA == null || posB == null)
-            return;
+        if (posA == null || posB == null) return;
 
         if (isWaiting)
         {
@@ -83,27 +79,17 @@ public class TargetTraining : BaseCharacter, IAutoAimTarget
             {
                 isWaiting = false;
 
-                currentTargetPos =
-                    currentTargetPos == posA ?
-                    posB :
-                    posA;
+                currentTargetPos = currentTargetPos == posA ? posB : posA;
             }
 
             return;
         }
 
-        transform.position =
-            Vector3.MoveTowards(
-                transform.position,
-                currentTargetPos.position,
-                speedMove * Time.deltaTime);
+        transform.position = Vector3.MoveTowards( transform.position, currentTargetPos.position, speedMove * Time.deltaTime);
 
-        if (Vector3.Distance(
-            transform.position,
-            currentTargetPos.position) < 0.01f)
+        if (Vector3.Distance( transform.position, currentTargetPos.position) < 0.01f)
         {
-            transform.position =
-                currentTargetPos.position;
+            transform.position = currentTargetPos.position;
 
             isWaiting = true;
             stopTimer = timeStop;
@@ -131,7 +117,6 @@ public class TargetTraining : BaseCharacter, IAutoAimTarget
             return;
         }
 
-        // Hồi sinh ngay
         currentHp = maxHp;
         isDead = false;
 

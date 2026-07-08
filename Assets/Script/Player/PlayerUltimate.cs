@@ -7,14 +7,11 @@ public class PlayerUltimate : MonoBehaviour
     private PlayerController playerController;
     private PlayerInput input;
     private InputAction ultimateAction;
-
+    private float currentCooldown;
     [SerializeField] private GamePlayUI gameplayUI;
-
-    [Header("Ultimate Config")]
-    [SerializeField] private float manaConsumption = 20f;
-    [SerializeField] private float healAmount = 10f;
-    [SerializeField] private float ultimateCd = 5f;
-
+    private PlayerCharacter playerCharacter;
+    [SerializeField] private UltimateBehaviour currentUltimate;
+    [SerializeField] private UltimateSocket ultimateSocket;
     private bool canUltimate = true;
     private float cooldownTimer;
     private bool isCooldown;
@@ -27,6 +24,13 @@ public class PlayerUltimate : MonoBehaviour
         ultimateAction = input.actions["Ultimate"];
 
         gameplayUI.SetUltimateBar(1f);
+        playerCharacter = GetComponent<PlayerCharacter>();
+
+        ultimateSocket.SetUltimate( playerCharacter.Data.ultimatePrefab, this);
+
+
+
+        currentUltimate = ultimateSocket.CurrentUltimate;
     }
 
     private void OnEnable()
@@ -47,29 +51,42 @@ public class PlayerUltimate : MonoBehaviour
     }
 
     private void UseUltimate()
+{
+    if (!canUltimate)
+        return;
+
+    if (playerController.IsDead())
+        return;
+
+    if (currentUltimate == null)
+        return;
+
+    UltimateData data = currentUltimate.Data;
+
+    if (!playerController.ConsumeMana(data.manaCost))
     {
-        if (!canUltimate)return;
-        if (playerController.IsDead()) return;
-        if (!playerController.ConsumeMana(manaConsumption))
-        {
-            Debug.Log("Insufficient mana");
-            return;
-        }
-
-        playerController.Heal(healAmount);
-
-        StartCooldown();
+        Debug.Log("Not enough mana");
+        return;
     }
 
-    private void StartCooldown()
-    {
-        canUltimate = false;
-        isCooldown = true;
-        cooldownTimer = ultimateCd;
+    bool success = currentUltimate.Execute();
 
-        // reset bar về 0 khi dùng ultimate
-        gameplayUI.SetUltimateBar(0f);
-    }
+    if (!success)
+        return;
+
+    StartCooldown(data.cooldown);
+}
+
+private void StartCooldown(float cooldown)
+{
+    canUltimate = false;
+    isCooldown = true;
+
+    currentCooldown = cooldown;
+    cooldownTimer = cooldown;
+
+    gameplayUI.SetUltimateBar(0f);
+}
 
     private void Update()
     {
@@ -78,7 +95,7 @@ public class PlayerUltimate : MonoBehaviour
 
         cooldownTimer -= Time.deltaTime;
 
-        float progress = 1f - (cooldownTimer / ultimateCd);
+        float progress = 1 - (cooldownTimer / currentCooldown);
 
         gameplayUI.SetUltimateBar(progress);
 
@@ -90,4 +107,5 @@ public class PlayerUltimate : MonoBehaviour
             gameplayUI.SetUltimateBar(1f);
         }
     }
+    
 }

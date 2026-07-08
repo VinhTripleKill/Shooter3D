@@ -4,49 +4,34 @@ using UnityEngine;
 public abstract class BasePlayer : BaseCharacter
 {
     [Header("Move")]
-    [SerializeField]
-    protected float moveSpeed = 5f;
-
-    [SerializeField]
-    protected float gravity = -20f;
-
+    [SerializeField] protected float gravity = -20f;
+    protected PlayerCharacter playerCharacter;
     protected CharacterController controller;
     protected float verticalVelocity;
-
-    [Header("Mana")]
-    [SerializeField]
-    protected float maxMana = 100;
     public System.Action<float, float> OnManaChanged;
     protected float currentMana;
-
-    [Header("Sprint")]
-    [SerializeField]
-    protected float maxSprintEnergy = 100;
-
     protected float currentSprintEnergy;
 
     protected override void Awake()
     {
         base.Awake();
-
+        
         controller = GetComponent<CharacterController>();
-
-        currentMana = maxMana;
-        currentSprintEnergy = maxSprintEnergy;
-        OnManaChanged?.Invoke(currentMana, maxMana);
+        playerCharacter = GetComponent<PlayerCharacter>();
+        maxHp = playerCharacter.Data.CharacterStats.maxHp;
+        currentHp = maxHp;
+        currentMana = playerCharacter.Data.CharacterStats.maxMana;
+        currentSprintEnergy = playerCharacter.Data.CharacterStats.maxSprint;
+        OnManaChanged?.Invoke(currentMana, playerCharacter.Data.CharacterStats.maxMana);
     }
 
     protected virtual void ApplyGravity()
     {
-        if (controller.isGrounded && verticalVelocity < 0)
-            verticalVelocity = -2f;
+        if (controller.isGrounded && verticalVelocity < 0) verticalVelocity = -2f;
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        controller.Move(
-            Vector3.up *
-            verticalVelocity *
-            Time.deltaTime);
+        controller.Move( Vector3.up * verticalVelocity * Time.deltaTime);
     }
     public float GetCurrentMana()
     {
@@ -55,7 +40,7 @@ public abstract class BasePlayer : BaseCharacter
 
     public float GetMaxMana()
     {
-        return maxMana;
+        return playerCharacter.Data.CharacterStats.maxMana;;
     }
     public bool ConsumeMana(float mana)
     {
@@ -64,24 +49,18 @@ public abstract class BasePlayer : BaseCharacter
 
         currentMana -= mana;
 
-        OnManaChanged?.Invoke(currentMana, maxMana);
+        OnManaChanged?.Invoke(currentMana, playerCharacter.Data.CharacterStats.maxMana);
 
         return true;
     }
     public void RecoverMana(float mana)
 {
-    if (mana <= 0f)
-        return;
+    if (mana <= 0f) return;
 
     currentMana += mana;
 
-    currentMana = Mathf.Clamp(
-        currentMana,
-        0,
-        maxMana);
+    currentMana = Mathf.Clamp( currentMana, 0, playerCharacter.Data.CharacterStats.maxMana);
 
-    OnManaChanged?.Invoke(
-        currentMana,
-        maxMana);
+    OnManaChanged?.Invoke( currentMana, playerCharacter.Data.CharacterStats.maxMana);
 }
 }

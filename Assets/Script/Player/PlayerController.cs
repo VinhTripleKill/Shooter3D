@@ -18,8 +18,8 @@ public class PlayerController : BasePlayer
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
 
-    public PlayerWeapon playerWeapon;
-
+    private PlayerWeapon playerWeapon;
+    private PlayerProgress playerProgress;
     private Vector2 moveInput;
     private PlayerAnim playerAnim;
     private bool canMove = true;
@@ -30,13 +30,19 @@ public class PlayerController : BasePlayer
 protected override void Awake()
 {
     base.Awake();
-
+    playerWeapon = GetComponent<PlayerWeapon>();
     playerAnim = GetComponent<PlayerAnim>();
     playerInput = GetComponent<PlayerInput>();
     playerSprint = GetComponent<PlayerSprint>();
-
+    playerProgress = GetComponent<PlayerProgress>();
     moveAction = playerInput.actions["Move"];
-
+    if (playerProgress != null)
+    {
+        playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
+        playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
+        gameplayUI.UpdateLevelText(playerProgress);
+        gameplayUI.UpdateLevelBar(playerProgress);
+    }
     // === QUAN TRỌNG: Đăng ký sự kiện UI ===
     OnHpChanged += gameplayUI.UpdateHpBar;
     OnManaChanged += gameplayUI.UpdateManaBar;
@@ -45,9 +51,9 @@ protected override void Awake()
     if (playerSprint != null)
     playerSprint.Initialize(playerInput.actions["Sprint"]);
     // Cập nhật UI ban đầu
-    gameplayUI.UpdateSprintBar(currentSprintEnergy, maxSprintEnergy);
+    gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
     gameplayUI.UpdateHpBar(currentHp, maxHp);
-    gameplayUI.UpdateManaBar(currentMana, maxMana);
+    gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
 
     if (playerWeapon == null)
         playerWeapon = GetComponent<PlayerWeapon>();
@@ -59,6 +65,11 @@ protected override void Awake()
     {
         OnHpChanged -= gameplayUI.UpdateHpBar;
         OnManaChanged -= gameplayUI.UpdateManaBar;
+        if (playerProgress != null)
+        {
+            playerProgress.OnLevelChanged -= gameplayUI.UpdateLevelText;
+            playerProgress.OnExpChanged -= gameplayUI.UpdateLevelBar;
+        }
     }
 
     private void OnEnable()
@@ -108,7 +119,7 @@ protected override void Awake()
         if (!canMove) return;
 
         Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
-        float currentSpeed = moveSpeed;
+        float currentSpeed = playerCharacter.Data.CharacterStats.moveSpeed;
 
         // === SPRINT LOGIC ===
         bool canSprint = playerSprint != null && 
@@ -202,5 +213,5 @@ protected override void Awake()
     // Expose cho PlayerSprint truy cập
     public CharacterController Controller => controller;
     public float CurrentSprintEnergy { get => currentSprintEnergy; set => currentSprintEnergy = value; }
-    public float MaxSprintEnergy => maxSprintEnergy;
+    public float MaxSprintEnergy => playerCharacter.Data.CharacterStats.maxSprint;
 }

@@ -26,6 +26,8 @@ public class GamePlayUI : MonoBehaviour
     [Header("Wave Enemy")]
     [SerializeField] private TextMeshProUGUI waveText;
     [SerializeField] private Image waveBarProgress;
+    [Header("Coin")]
+    [SerializeField] private TextMeshProUGUI coinText;
     [Header("Ammo")]
     [SerializeField] private Image statusAmmo;
     [SerializeField] private Image ammoI;
@@ -165,5 +167,24 @@ public class GamePlayUI : MonoBehaviour
     public Button GetSkillButton()
     {
         return skillButton;
+    }
+    public void UpdateLevelText(PlayerProgress progress)
+    {
+        levelText.text = progress.CurrentLevel.ToString();
+    }
+    public void UpdateLevelBar(PlayerProgress progress)
+    {
+        if (progress.CurrentLevel >= progress.MaxLevel)
+        {
+            levelBarProgress.fillAmount = 1f;
+            return;
+        }
+        if (progress.CurrentLevel <= 0)
+        {
+            levelBarProgress.fillAmount = 0f;
+            return;
+        }
+    
+        levelBarProgress.fillAmount = (float)progress.CurrentExp / progress.RequiredExp;
     }
 }

@@ -21,11 +21,9 @@ public class PlayerSkill : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
 
-        var playerInput =
-            GetComponent<PlayerInput>();
+        var playerInput = GetComponent<PlayerInput>();
 
-        skillAction =
-            playerInput.actions["Skill"];
+        skillAction = playerInput.actions["Skill"];
     }
  private void Start()
 {
@@ -33,10 +31,7 @@ public class PlayerSkill : MonoBehaviour
 
     currentStack = currentSkillData.maxStack;
 
-    gameplayUI.InitializeSkillUI(
-        currentSkillData.icon,
-        currentStack,
-        currentSkillData.maxStack);
+    gameplayUI.InitializeSkillUI( currentSkillData.icon, currentStack, currentSkillData.maxStack);
 
     
 }
@@ -77,8 +72,7 @@ public class PlayerSkill : MonoBehaviour
     private void OnDisable()
     {
         skillAction.performed -= SkillPerformed;
-        gameplayUI.GetSkillButton()
-            .onClick.RemoveListener(UseSkill);
+        gameplayUI.GetSkillButton().onClick.RemoveListener(UseSkill);
     }
 
     private void UseSkill(){ SkillPerformed(default); }

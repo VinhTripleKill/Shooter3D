@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48710c2f00548ed4f8d2c0f1ef341da7, type: 3}
   m_Name: BurnGrenade
   m_EditorClassIdentifier: Assembly-CSharp::GrenadeSkillData
-  skillName: BurnGrenade
+  skillName: BurnGre
   icon: {fileID: 21300000, guid: 16d65627c4f862948beec3e8e9a1f2df, type: 3}
   cooldown: 8
   maxStack: 2

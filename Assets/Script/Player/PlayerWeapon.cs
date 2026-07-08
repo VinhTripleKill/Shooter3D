@@ -283,13 +283,12 @@ public class PlayerWeapon : MonoBehaviour
 
          playerController.RecoverMana(currentGunVisual.gunData.manaRecoveryByHit);
     }
-  private void ProcessRaycastHit(GunData gunData, Collider hitCollider)
-{
-    if (((1 << hitCollider.gameObject.layer) & gunData.interactionMask) == 0)
-        return;
+    private void ProcessRaycastHit(GunData gunData, Collider hitCollider)
+    {
+    if (((1 << hitCollider.gameObject.layer) & gunData.interactionMask) == 0) return;
 
     playerController.RecoverMana(gunData.manaRecoveryByHit);
-}
+    }
 
     private void ShootRaycast(GunData gunData)
     {

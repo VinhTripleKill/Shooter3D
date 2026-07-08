@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14da4a33c0091ae42b3d74446888e779, type: 3}
   m_Name: DashSkill
   m_EditorClassIdentifier: Assembly-CSharp::DashSkillData
-  skillName: Dash Base
+  skillName: Dash
   icon: {fileID: 21300000, guid: 50646e453b63778469ce24a1a52c278d, type: 3}
   cooldown: 2
   maxStack: 2

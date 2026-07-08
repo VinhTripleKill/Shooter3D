@@ -36,12 +36,18 @@ public abstract class BaseEnemy :
 
     protected Transform player;
     bool isAttacking;
-
+    [Header("Reward")]
+    [SerializeField]
+    protected int expReward = 200;
+    
+    public int GetExpReward()
+    {
+        return expReward;
+    }
     protected EnemyAnim enemyAnim;
     protected NavMeshAgent agent;
     private Collider[] enemyColliders;
-    public static List<BaseEnemy> AllEnemies { get; }
-        = new List<BaseEnemy>();
+    public static List<BaseEnemy> AllEnemies { get; } = new List<BaseEnemy>();
 
     protected override void Awake()
     {
@@ -64,8 +70,7 @@ public abstract class BaseEnemy :
         if (player == null)
             return;
 
-        BaseCharacter playerCharacter =
-            player.GetComponent<BaseCharacter>();
+        BaseCharacter playerCharacter = player.GetComponent<BaseCharacter>();
 
         if (playerCharacter == null || playerCharacter.IsDead())
         {
@@ -79,10 +84,7 @@ public abstract class BaseEnemy :
             return;
         }
 
-        float distance =
-            Vector3.Distance(
-                transform.position,
-                player.position);
+        float distance = Vector3.Distance( transform.position, player.position);
 
         switch (currentState)
         {
@@ -184,19 +186,13 @@ public abstract class BaseEnemy :
     }
     protected virtual void DealDamage()
     {
-        if (player == null)
-            return;
+        if (player == null) return;
 
-        if (Vector3.Distance(
-            transform.position,
-            player.position) > atkRange)
-            return;
+        if (Vector3.Distance( transform.position, player.position) > atkRange) return;
 
-        IDamageable damageable =
-            player.GetComponent<IDamageable>();
+        IDamageable damageable = player.GetComponent<IDamageable>();
 
-        damageable?.TakeDamage(
-            atkDamage);
+        damageable?.TakeDamage(atkDamage);
             
     }
     protected virtual void DisableCollision()
@@ -252,6 +248,13 @@ public abstract class BaseEnemy :
 
         enemyAnim.SetSpeed(0);
 
+        PlayerProgress playerProgress = player.GetComponent<PlayerProgress>();
+
+        if (playerProgress != null)
+        {
+            playerProgress.AddExp(expReward);
+        }
+        
         enemyAnim.PlayDead(() =>
         {
             Destroy(gameObject);

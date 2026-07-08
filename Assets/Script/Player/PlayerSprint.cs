@@ -5,15 +5,14 @@ using System.Collections.Generic;
 public class PlayerSprint : MonoBehaviour
 {
     [Header("Sprint Settings")]
-    public float sprintSpeed = 3f;
     [SerializeField] private ParticleSystem sprintEffect;
     [SerializeField] private float sprintLockDuration = 5f;
-
-    [Header("Sprint Energy")]
     public float sprintConsumption = 5f;
-    public float sprintRecoveryWalk = 5f;
-    public float sprintRecoveryIdle = 10f;
-
+    [Header("Sprint Energy")]
+    [SerializeField] private float sprintSpeed = 3;
+    [SerializeField] private float sprintRecoveryWalk = 5;
+    [SerializeField] private float sprintRecoveryIdle = 10;
+    
     private bool isSprintOn = true;
     private bool sprintLocked;
     private float sprintLockTimer;
