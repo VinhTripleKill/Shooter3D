@@ -15,10 +15,10 @@ MonoBehaviour:
   characterName: Ghost
   icon: {fileID: 21300000, guid: 8d55b5d943e84f74fa197c7ac00021a5, type: 3}
   descriptionCharacter: I bleave i can fly
-  modelPrefab: {fileID: 0}
+  modelPrefab: {fileID: 5982928375049809925, guid: c4991ca9e8278bf469391eef6dab3a90, type: 3}
   CharacterStats:
     maxHp: 50
-    moveSpeed: 8
+    moveSpeed: 5.2
     damage: 5
     maxMana: 100
     maxSprint: 100

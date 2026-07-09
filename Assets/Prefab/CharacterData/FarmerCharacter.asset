@@ -18,7 +18,7 @@ MonoBehaviour:
     must survive day after day using his knowledge of plants. He has researched and
     developed plant species that can be used for combat, as raw materials, and as
     food... Truly diverse.
-  modelPrefab: {fileID: 0}
+  modelPrefab: {fileID: 6685473335534931949, guid: 9a2a1f84dc244f94cafa0e3f05f7f322, type: 3}
   CharacterStats:
     maxHp: 100
     moveSpeed: 5
