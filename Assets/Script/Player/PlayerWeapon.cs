@@ -31,7 +31,7 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private GunRayDebug gunRayDebug;
 
     [Header("UI")]
-    [SerializeField] private GamePlayUI gameplayUI;
+    public GamePlayUI gameplayUI;
 
     private Coroutine reloadCoroutine;
     private float nextShotTime;
@@ -45,14 +45,29 @@ public class PlayerWeapon : MonoBehaviour
         attackAutoAction = playerInput.actions["AttackAuto"];
         attackManualAction = playerInput.actions["AttackManual"];
         reloadAction = playerInput.actions["Reload"];
+
         BulletProjecTile.OnSuccessfulHit += RecoverManaByProjectileHit;
         gameplayUI?.ResetAmmoBar();
+
+        if (gameplayUI != null)
+            gameplayUI.GetReloadButton().onClick.AddListener(OnReloadButtonClicked);
+    }
+
+    // === HÀM MỚI: Được gọi sau khi spawn model ===
+    public void SetGunHolder(Transform newGunHolder)
+    {
+        gunHolder = newGunHolder;
+        Debug.Log("PlayerWeapon: GunHolder đã được cập nhật từ model");
+    }
+    public void SetGameplayUI(GamePlayUI ui)
+    {
+        gameplayUI = ui;
         if (gameplayUI != null)
         {
+            gameplayUI?.ResetAmmoBar();
             gameplayUI.GetReloadButton().onClick.AddListener(OnReloadButtonClicked);
         }
     }
-
     public bool HasGun() => hasGun;
 
     public void SetAttackState(bool value) => isHoldingAttack = value;

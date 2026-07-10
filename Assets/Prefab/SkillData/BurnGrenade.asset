@@ -16,6 +16,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 16d65627c4f862948beec3e8e9a1f2df, type: 3}
   cooldown: 8
   maxStack: 2
+  skillBehaviourPrefab: {fileID: -7539789986821043711, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
   grenadePrefab: {fileID: 8504079749979510124, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 784b59333981b0f419b9afd90b3dc395, type: 3}
   explodeDelay: 1

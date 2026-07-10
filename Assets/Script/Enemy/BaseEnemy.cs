@@ -57,18 +57,25 @@ public abstract class BaseEnemy :
         agent = GetComponent<NavMeshAgent>();
     }
     void Start()
-    {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+{
+    FindPlayer(); // tách riêng
+}
 
-        enemyAnim.OnAttackHit += DealDamage;
+private void FindPlayer()
+{
+    player = GameObject.FindGameObjectWithTag("Player")?.transform;
+}
+
+protected virtual void Update()
+{
+    if (isDead) return;
+
+    if (player == null)
+    {
+        FindPlayer(); // thử tìm lại
+        if (player == null) return;
     }
-    protected virtual void Update()
-    {
-        if (isDead)
-            return;
-
-        if (player == null)
-            return;
+        
 
         BaseCharacter playerCharacter = player.GetComponent<BaseCharacter>();
 

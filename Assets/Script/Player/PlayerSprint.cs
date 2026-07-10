@@ -38,7 +38,15 @@ public class PlayerSprint : MonoBehaviour
             gameplayUI.GetSprintButton().onClick.AddListener(ToggleSprint);
         }
     }
-
+    public void SetGameplayUI(GamePlayUI ui)
+    {
+        gameplayUI = ui;
+        // Khởi tạo button nếu cần
+        if (gameplayUI != null && sprintAction != null)
+        {
+            gameplayUI.GetSprintButton().onClick.AddListener(ToggleSprint);
+        }
+    }
     public void OnEnableSprint()
     {
         if (sprintAction != null)

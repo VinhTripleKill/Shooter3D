@@ -9,6 +9,7 @@ public class GamePlayUI : MonoBehaviour
     [SerializeField] private Image sprintLock;
     [Header("Ultimate")]
     [SerializeField] private Image ultimateBar;
+    [SerializeField] private Image ultimateIcon;
     [SerializeField] private Button ultimateButton;
     [Header("Skill")]
     [SerializeField] private Image skillIcon;
@@ -59,6 +60,13 @@ public class GamePlayUI : MonoBehaviour
     {
         return ultimateButton;
     }
+    // Thêm vào phần Ultimate
+public void SetUltimateIcon(Sprite icon)
+{
+    if (ultimateIcon != null)
+        ultimateIcon.sprite = icon;
+        ultimateBar.sprite = icon;
+}
     public void UpdateManaBar(float currentMana, float maxMana)
     {
         manaBar.fillAmount = currentMana / maxMana;

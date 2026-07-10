@@ -28,39 +28,52 @@ public class PlayerController : BasePlayer
     private float dashLockTimer;
 
 protected override void Awake()
-{
-    base.Awake();
-    playerWeapon = GetComponent<PlayerWeapon>();
-    playerAnim = GetComponent<PlayerAnim>();
-    playerInput = GetComponent<PlayerInput>();
-    playerSprint = GetComponent<PlayerSprint>();
-    playerProgress = GetComponent<PlayerProgress>();
-    moveAction = playerInput.actions["Move"];
-    if (playerProgress != null)
     {
-        playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
-        playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
-        gameplayUI.UpdateLevelText(playerProgress);
-        gameplayUI.UpdateLevelBar(playerProgress);
-    }
-    // === QUAN TRỌNG: Đăng ký sự kiện UI ===
-    OnHpChanged += gameplayUI.UpdateHpBar;
-    OnManaChanged += gameplayUI.UpdateManaBar;
-
-    // Khởi tạo Sprint
-    if (playerSprint != null)
-    playerSprint.Initialize(playerInput.actions["Sprint"]);
-    // Cập nhật UI ban đầu
-    gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
-    gameplayUI.UpdateHpBar(currentHp, maxHp);
-    gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
-
-    if (playerWeapon == null)
+        base.Awake();
         playerWeapon = GetComponent<PlayerWeapon>();
-    if (playerWeapon == null)
-        playerWeapon = gameObject.AddComponent<PlayerWeapon>();
-}
+        playerAnim = GetComponent<PlayerAnim>();
+        playerInput = GetComponent<PlayerInput>();
+        playerSprint = GetComponent<PlayerSprint>();
+        playerProgress = GetComponent<PlayerProgress>();
+        moveAction = playerInput.actions["Move"];
 
+        // Khởi tạo Sprint
+        if (playerSprint != null)
+            playerSprint.Initialize(playerInput.actions["Sprint"]);
+
+        if (playerWeapon == null)
+            playerWeapon = GetComponent<PlayerWeapon>();
+        if (playerWeapon == null)
+            playerWeapon = gameObject.AddComponent<PlayerWeapon>();
+    }
+    public void InitializeSceneReferences(JoystickMove joystick, GamePlayUI ui)
+    {
+        joystickMove = joystick;
+        gameplayUI = ui;
+
+        InitializePlayerStats();
+        if (gameplayUI != null)
+        {
+            if (playerProgress != null)
+            {
+                playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
+                playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
+                gameplayUI.UpdateLevelText(playerProgress);
+                gameplayUI.UpdateLevelBar(playerProgress);
+            }
+
+            OnHpChanged += gameplayUI.UpdateHpBar;
+            OnManaChanged += gameplayUI.UpdateManaBar;
+
+            // Cập nhật UI ban đầu
+            gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
+            gameplayUI.UpdateHpBar(currentHp, maxHp);
+            gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
+        }
+
+        Debug.Log("PlayerController: Đã gán JoystickMove và GamePlayUI từ Scene");
+    }
+    
     private void OnDestroy()
     {
         OnHpChanged -= gameplayUI.UpdateHpBar;

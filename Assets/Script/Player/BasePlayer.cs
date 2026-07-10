@@ -18,11 +18,24 @@ public abstract class BasePlayer : BaseCharacter
         
         controller = GetComponent<CharacterController>();
         playerCharacter = GetComponent<PlayerCharacter>();
+        
+    }
+    public virtual void InitializePlayerStats()
+    {
+        if (playerCharacter == null || playerCharacter.Data == null)
+        {
+            Debug.LogError("PlayerCharacter hoặc Data chưa được set!");
+            return;
+        }
+
         maxHp = playerCharacter.Data.CharacterStats.maxHp;
         currentHp = maxHp;
         currentMana = playerCharacter.Data.CharacterStats.maxMana;
         currentSprintEnergy = playerCharacter.Data.CharacterStats.maxSprint;
+
         OnManaChanged?.Invoke(currentMana, playerCharacter.Data.CharacterStats.maxMana);
+
+        Debug.Log("BasePlayer: Stats đã được khởi tạo");
     }
 
     protected virtual void ApplyGravity()

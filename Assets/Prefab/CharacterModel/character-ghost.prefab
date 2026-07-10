@@ -101,6 +101,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b928974644370642ad4a273ebcfff0e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1532271275783040011}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b928974644370642ad4a273ebcfff0e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 553546413738245089}
   m_SourcePrefab: {fileID: 100100000, guid: 4b928974644370642ad4a273ebcfff0e, type: 3}
 --- !u!4 &2639886823783083405 stripped
 Transform:
@@ -134,3 +137,17 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &553546413738245089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5982928375049809925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57fe2ac53cf8b964085658bb5d1cecee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  animator: {fileID: 1532271275783040011}
+  gunHolder: {fileID: 6794807329963431720}

@@ -20,12 +20,20 @@ public class PlayerInteraction : MonoBehaviour
         playerWeapon = GetComponent<PlayerWeapon>();
         playerController = GetComponent<PlayerController>();
 
-        gameplayUI.GetPickUpButton().onClick.AddListener(OnPickUpButtonClicked);
+        
         var playerInput = GetComponent<PlayerInput>();
         dropAction = playerInput.actions["Drop"];
         interactionAction = playerInput.actions["Interaction"];
 
     }
+    public void SetGameplayUI(GamePlayUI ui)
+{
+    gameplayUI = ui;
+    if (gameplayUI != null)
+    {
+        gameplayUI.GetPickUpButton().onClick.AddListener(OnPickUpButtonClicked);
+    }
+}
     public void EquipGun(GameObject gunPrefab, int ammo = -1, bool wasReloading = false)
     {
         playerWeapon.EquipGun(gunPrefab, ammo, wasReloading);

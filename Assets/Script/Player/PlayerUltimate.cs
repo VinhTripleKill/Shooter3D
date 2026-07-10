@@ -7,12 +7,15 @@ public class PlayerUltimate : MonoBehaviour
     private PlayerController playerController;
     private PlayerInput input;
     private InputAction ultimateAction;
-    private float currentCooldown;
-    [SerializeField] private GamePlayUI gameplayUI;
+
+    public GamePlayUI gameplayUI;
+
     private PlayerCharacter playerCharacter;
-    [SerializeField] private UltimateBehaviour currentUltimate;
+    private UltimateBehaviour currentUltimate;
     [SerializeField] private UltimateSocket ultimateSocket;
+
     private bool canUltimate = true;
+    private float currentCooldown;
     private float cooldownTimer;
     private bool isCooldown;
 
@@ -20,29 +23,60 @@ public class PlayerUltimate : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
         input = GetComponent<PlayerInput>();
-
-        ultimateAction = input.actions["Ultimate"];
-
-        gameplayUI.SetUltimateBar(1f);
         playerCharacter = GetComponent<PlayerCharacter>();
 
-        ultimateSocket.SetUltimate( playerCharacter.Data.ultimatePrefab, this);
+        if (input != null) ultimateAction = input.actions["Ultimate"];
+    }
 
 
+    public void InitializeUltimate()
+    {
+        if (playerCharacter?.Data?.ultimatePrefab == null)
+        {
+            Debug.LogWarning("Character không có UltimatePrefab");
+            return;
+        }
 
+        ultimateSocket.SetUltimate(playerCharacter.Data.ultimatePrefab, this);
         currentUltimate = ultimateSocket.CurrentUltimate;
+
+        Debug.Log("PlayerUltimate: Đã khởi tạo Ultimate");
+    }
+
+    public void SetGameplayUI(GamePlayUI ui)
+    {
+        gameplayUI = ui;
+
+        if (gameplayUI != null && currentUltimate != null)
+        {
+            UltimateData data = currentUltimate.Data;
+            if (data != null && data.icon != null)
+            {
+                gameplayUI.SetUltimateIcon(data.icon);     // ← Thêm hàm này
+            }
+
+            gameplayUI.SetUltimateBar(1f);
+            gameplayUI.GetUltimateButton().onClick.AddListener(UseUltimate);
+        }
     }
 
     private void OnEnable()
     {
-        ultimateAction.performed += UltimatePerformed;
-        gameplayUI.GetUltimateButton().onClick.AddListener(UseUltimate);
+        if (ultimateAction != null)
+            ultimateAction.performed += UltimatePerformed;
+
+        // Tránh lỗi nếu gameplayUI chưa được gán
+        if (gameplayUI != null)
+            gameplayUI.GetUltimateButton().onClick.AddListener(UseUltimate);
     }
 
     private void OnDisable()
     {
-        ultimateAction.performed -= UltimatePerformed;
-        gameplayUI.GetUltimateButton().onClick.RemoveListener(UseUltimate);
+        if (ultimateAction != null)
+            ultimateAction.performed -= UltimatePerformed;
+
+        if (gameplayUI != null)
+            gameplayUI.GetUltimateButton().onClick.RemoveListener(UseUltimate);
     }
 
     private void UltimatePerformed(InputAction.CallbackContext ctx)
@@ -51,50 +85,39 @@ public class PlayerUltimate : MonoBehaviour
     }
 
     private void UseUltimate()
-{
-    if (!canUltimate)
-        return;
-
-    if (playerController.IsDead())
-        return;
-
-    if (currentUltimate == null)
-        return;
-
-    UltimateData data = currentUltimate.Data;
-
-    if (!playerController.ConsumeMana(data.manaCost))
     {
-        Debug.Log("Not enough mana");
-        return;
+        if (!canUltimate || playerController.IsDead() || currentUltimate == null)
+            return;
+
+        UltimateData data = currentUltimate.Data;
+        if (!playerController.ConsumeMana(data.manaCost))
+        {
+            Debug.Log("Not enough mana");
+            return;
+        }
+
+        bool success = currentUltimate.Execute();
+        if (!success) return;
+
+        StartCooldown(data.cooldown);
     }
 
-    bool success = currentUltimate.Execute();
+    private void StartCooldown(float cooldown)
+    {
+        canUltimate = false;
+        isCooldown = true;
+        currentCooldown = cooldown;
+        cooldownTimer = cooldown;
 
-    if (!success)
-        return;
-
-    StartCooldown(data.cooldown);
-}
-
-private void StartCooldown(float cooldown)
-{
-    canUltimate = false;
-    isCooldown = true;
-
-    currentCooldown = cooldown;
-    cooldownTimer = cooldown;
-
-    gameplayUI.SetUltimateBar(0f);
-}
+        if (gameplayUI != null)
+            gameplayUI.SetUltimateBar(0f);
+    }
 
     private void Update()
     {
-        if (!isCooldown)
-            return;
+        if (!isCooldown || gameplayUI == null) return;
 
         cooldownTimer -= Time.deltaTime;
-
         float progress = 1 - (cooldownTimer / currentCooldown);
 
         gameplayUI.SetUltimateBar(progress);
@@ -103,9 +126,7 @@ private void StartCooldown(float cooldown)
         {
             isCooldown = false;
             canUltimate = true;
-
             gameplayUI.SetUltimateBar(1f);
         }
     }
-    
 }

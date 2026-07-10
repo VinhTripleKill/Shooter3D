@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public abstract class BaseCharacter :
-    MonoBehaviour, IDamageable
+public abstract class BaseCharacter : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     [SerializeField]
@@ -25,23 +24,17 @@ public abstract class BaseCharacter :
 
     public virtual void TakeDamage(float damage)
     {
-        if (isDead)
-            return;
+        if (isDead) return;
 
         currentHp -= damage;
 
-        currentHp = Mathf.Clamp(
-            currentHp,
-            0,
-            maxHp);
+        currentHp = Mathf.Clamp( currentHp, 0, maxHp);
 
         // Báo vừa nhận damage
         OnTakeDamage?.Invoke(damage);
 
         // Báo HP đã thay đổi
-        OnHpChanged?.Invoke(
-            currentHp,
-            maxHp);
+        OnHpChanged?.Invoke( currentHp, maxHp);
 
         if (currentHp <= 0)
         {
@@ -51,19 +44,13 @@ public abstract class BaseCharacter :
     }
     public virtual void Heal(float amount)
     {
-        if (isDead)
-            return;
+        if (isDead) return;
 
         currentHp += amount;
 
-        currentHp = Mathf.Clamp(
-            currentHp,
-            0,
-            maxHp);
+        currentHp = Mathf.Clamp( currentHp, 0, maxHp);
 
-        OnHpChanged?.Invoke(
-            currentHp,
-            maxHp);
+        OnHpChanged?.Invoke( currentHp, maxHp);
     }
     protected virtual void Die()
     {
