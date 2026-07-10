@@ -41,7 +41,11 @@ public class JoystickAttack : MonoBehaviour,
 
         currentZone = AttackZone.Inner;
     }
-
+    public void SetPlayerWeapon(PlayerWeapon weapon)
+    {
+        playerWeapon = weapon;
+        Debug.Log("JoystickAttack: Đã liên kết với PlayerWeapon");
+    }
 
     public void OnDrag(PointerEventData eventData)
     {

@@ -17,7 +17,7 @@ public class PlayerController : BasePlayer
 
     [Header("UI")]
     [SerializeField] private GamePlayUI gameplayUI;
-
+    private float damageTestTimer = 0f;
     private PlayerWeapon playerWeapon;
     private PlayerProgress playerProgress;
     private Vector2 moveInput;
@@ -103,13 +103,31 @@ protected override void Awake()
         Move();
         ApplyGravity();
 
-        
-
         if (!canDash)
         {
             dashLockTimer -= Time.deltaTime;
             if (dashLockTimer <= 0)
                 canDash = true;
+        }
+
+        // ==================== TEST DAMAGE ====================
+        //TestAutoDamage();
+    }
+
+    // Hàm test đơn giản: mỗi 2 giây tự mất 10 HP
+    private void TestAutoDamage()
+    {
+        damageTestTimer += Time.deltaTime;
+
+        if (damageTestTimer >= 2f)   // Mỗi 2 giây trừ 10 HP
+        {
+            damageTestTimer = 0f;
+
+            if (!isDead)
+            {
+                TakeDamage(10f);        // Gọi trực tiếp TakeDamage từ BaseCharacter
+                Debug.Log("TEST: Player tự mất 10 HP");
+            }
         }
     }
 

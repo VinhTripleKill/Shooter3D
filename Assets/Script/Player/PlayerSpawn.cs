@@ -5,12 +5,13 @@ public class PlayerSpawn : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private ListCharacterManager listCharacterManager;
-    [SerializeField] private ListSkillManager listSkillManager;        // ← THÊM
+    [SerializeField] private ListSkillManager listSkillManager;
     [SerializeField] private VisualCharacterInfo visualCharacterInfo;
     [SerializeField] private Button battleButton;
 
     [Header("Scene References")]
     [SerializeField] private JoystickMove sceneJoystickMove;
+    [SerializeField] private JoystickAttack sceneJoystickAttack;     // ← THÊM DÒNG NÀY
     [SerializeField] private GamePlayUI sceneGamePlayUI;
 
     [Header("Spawn Settings")]
@@ -45,7 +46,6 @@ public class PlayerSpawn : MonoBehaviour
         SpawnPlayer(selectedChar, selectedSkill);
     }
 
-    // Sửa thành nhận thêm SkillData
     public void SpawnPlayer(CharacterData charData, SkillData skillData)
     {
         if (playerPrefab == null || spawnPoint == null)
@@ -78,7 +78,7 @@ public class PlayerSpawn : MonoBehaviour
         // === GÁN TẤT CẢ REFERENCES ===
         InitializePlayerComponents(currentPlayer, skillData);
 
-        Debug.Log($"Player spawn thành công: {charData.characterName} | Skill: {(skillData?.skillName ?? "None")}");
+        Debug.Log($"Player spawn thành công: {charData.characterName}");
     }
 
     private void InitializePlayerComponents(GameObject player, SkillData selectedSkill)
@@ -87,9 +87,19 @@ public class PlayerSpawn : MonoBehaviour
         if (controller != null)
             controller.InitializeSceneReferences(sceneJoystickMove, sceneGamePlayUI);
 
-        if (sceneGamePlayUI == null) return;
+        // PlayerWeapon
+        PlayerWeapon weapon = player.GetComponent<PlayerWeapon>();
+        if (weapon != null)
+            weapon.SetGameplayUI(sceneGamePlayUI);
 
-        // PlayerUltimate
+        // === LIÊN KẾT JOYSTICK ATTACK ===
+        if (sceneJoystickAttack != null && weapon != null)
+        {
+            sceneJoystickAttack.SetPlayerWeapon(weapon);
+            Debug.Log("Đã liên kết JoystickAttack với PlayerWeapon");
+        }
+
+        // Các component khác...
         PlayerUltimate ultimate = player.GetComponent<PlayerUltimate>();
         if (ultimate != null)
         {
@@ -97,17 +107,12 @@ public class PlayerSpawn : MonoBehaviour
             ultimate.SetGameplayUI(sceneGamePlayUI);
         }
 
-        // PlayerSkill - Truyền skill được chọn
         PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
         if (skillComp != null)
         {
             skillComp.SetSelectedSkill(selectedSkill);
             skillComp.SetGameplayUI(sceneGamePlayUI);
         }
-
-        // Các component khác
-        PlayerWeapon weapon = player.GetComponent<PlayerWeapon>();
-        if (weapon != null) weapon.SetGameplayUI(sceneGamePlayUI);
 
         PlayerSprint sprint = player.GetComponent<PlayerSprint>();
         if (sprint != null) sprint.SetGameplayUI(sceneGamePlayUI);

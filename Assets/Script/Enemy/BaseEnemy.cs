@@ -3,50 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public abstract class BaseEnemy :
-    BaseCharacter, IAutoAimTarget
+public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
 {
+    public enum EnemyState { Idle, Chase, Attack, Dead }
 
-    public enum EnemyState
-    {
-        Idle,
-        Chase,
-        Attack,
-        Dead
-    }
-    [Header("Detect")]
-    [SerializeField]
-    protected float detectRange = 15f;
-
-    [SerializeField]
-    protected float atkRange = 1f;
-
-    [SerializeField]
-    protected float atkDamage = 10f;
-
-    [SerializeField]
-    protected float atkCD = 2f;
-    [SerializeField]
-    protected float atkTimeAnim= 2f;
-
-
-    protected float nextAttackTime;
+    [Header("Detect & Attack")]
+    [SerializeField] protected float detectRange = 15f;
+    [SerializeField] protected float atkRange = 4f;           // Tầm xa tấn công
+    [SerializeField] protected float atkDamage = 10f;
+    [SerializeField] protected float atkCD = 2f;
+    [SerializeField] protected float atkTimeAnim = 1.2f;
+    public float attackHeightOffset;
+    [Header("Cone Attack")]
+    [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón
+    [Header("Gizmos")]
+    [SerializeField] private Color gizmoColor = new Color(1f, 0.2f, 0f, 0.35f);
 
     protected EnemyState currentState;
-
     protected Transform player;
-    bool isAttacking;
+    protected bool isAttacking;
+
     [Header("Reward")]
-    [SerializeField]
-    protected int expReward = 200;
-    
-    public int GetExpReward()
-    {
-        return expReward;
-    }
+    [SerializeField] protected int expReward = 200;
+
     protected EnemyAnim enemyAnim;
     protected NavMeshAgent agent;
     private Collider[] enemyColliders;
+
     public static List<BaseEnemy> AllEnemies { get; } = new List<BaseEnemy>();
 
     protected override void Awake()
@@ -56,78 +39,51 @@ public abstract class BaseEnemy :
         enemyAnim = GetComponentInChildren<EnemyAnim>();
         agent = GetComponent<NavMeshAgent>();
     }
-    void Start()
-{
-    FindPlayer(); // tách riêng
-}
 
-private void FindPlayer()
-{
-    player = GameObject.FindGameObjectWithTag("Player")?.transform;
-}
+    void Start() => FindPlayer();
 
-protected virtual void Update()
-{
-    if (isDead) return;
-
-    if (player == null)
+    private void FindPlayer()
     {
-        FindPlayer(); // thử tìm lại
-        if (player == null) return;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
-        
 
-        BaseCharacter playerCharacter = player.GetComponent<BaseCharacter>();
-
-        if (playerCharacter == null || playerCharacter.IsDead())
+    protected virtual void Update()
+    {
+        if (isDead || player == null)
         {
-            currentState = EnemyState.Idle;
-
-            if (agent.isOnNavMesh)
-                agent.ResetPath();
-
-            enemyAnim.SetSpeed(0);
-
+            if (player == null) FindPlayer();
             return;
         }
 
-        float distance = Vector3.Distance( transform.position, player.position);
+        if (player.GetComponent<BaseCharacter>().IsDead())
+        {
+            currentState = EnemyState.Idle;
+            return;
+        }
+
+        float distance = Vector3.Distance(transform.position, player.position);
 
         switch (currentState)
         {
             case EnemyState.Idle:
-
-                enemyAnim.SetSpeed(0);
-
-                if (distance <= detectRange)
-                    currentState = EnemyState.Chase;
-
+                if (distance <= detectRange) currentState = EnemyState.Chase;
                 break;
 
             case EnemyState.Chase:
-
                 UpdateChase(distance);
-
                 break;
 
             case EnemyState.Attack:
-
                 UpdateAttack(distance);
-
                 break;
         }
     }
+
     protected virtual void UpdateChase(float distance)
     {
         if (distance > detectRange)
         {
             currentState = EnemyState.Idle;
-
-            if (agent.isOnNavMesh)
-                agent.ResetPath();
-
-            enemyAnim.SetSpeed(0);
-
             return;
         }
 
@@ -141,130 +97,161 @@ protected virtual void Update()
         {
             agent.isStopped = false;
             agent.SetDestination(player.position);
-
-            enemyAnim.SetSpeed(agent.velocity.magnitude);
         }
     }
 
     protected virtual void UpdateAttack(float distance)
     {
-        // player chạy ra khỏi vùng attack
         if (distance > atkRange)
         {
             currentState = EnemyState.Chase;
-
             return;
         }
 
-        // đứng yên khi đánh
         if (agent.isOnNavMesh)
         {
             agent.ResetPath();
             agent.isStopped = true;
         }
 
-        enemyAnim.SetSpeed(0);
-
-
-        // xoay mặt nhìn player
-        Vector3 lookPos = player.position;
-        lookPos.y = transform.position.y;
-
-        transform.LookAt(lookPos);
+        transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
 
         if (!isAttacking)
         {
             StartCoroutine(AttackRoutine());
         }
     }
+
     private IEnumerator AttackRoutine()
     {
         isAttacking = true;
-
         enemyAnim.PlayAttack();
 
-        // đợi animation attack chạy xong
-        yield return new WaitForSeconds(atkTimeAnim);
+        yield return new WaitForSeconds(atkTimeAnim * 0.6f);
 
-        // đợi thêm cooldown
-        yield return new WaitForSeconds(atkCD);
+        PerformConeAttack();   // Tấn công theo hình nón
 
+        yield return new WaitForSeconds(atkTimeAnim * 0.4f + atkCD);
         isAttacking = false;
     }
-    protected virtual void DealDamage()
-    {
-        if (player == null) return;
 
-        if (Vector3.Distance( transform.position, player.position) > atkRange) return;
-
-        IDamageable damageable = player.GetComponent<IDamageable>();
-
-        damageable?.TakeDamage(atkDamage);
-            
-    }
-    protected virtual void DisableCollision()
+    // ====================== CONE ATTACK ======================
+    protected virtual void PerformConeAttack()
 {
-    foreach (Collider col in enemyColliders)
+    if (player == null) return;
+
+    Vector3 origin = transform.position + Vector3.up * 1f;
+
+    // Bỏ ảnh hưởng của chiều cao, chỉ xét mặt phẳng XZ
+    Vector3 toPlayer = player.position - origin;
+    Vector3 flatToPlayer = Vector3.ProjectOnPlane(toPlayer, Vector3.up);
+    Vector3 flatForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+
+    float angle = Vector3.Angle(flatForward, flatToPlayer);
+
+    // Chỉ cần trong góc cone + trong tầm đánh
+    if (flatToPlayer.magnitude <= atkRange && angle <= attackAngle * 0.5f)
     {
-        col.enabled = false;
+        IDamageable damageable = player.GetComponentInChildren<IDamageable>();
+        if (damageable != null)
+        {
+            damageable.TakeDamage(atkDamage);
+            Debug.Log($"[ENEMY] Cone Attack gây {atkDamage} damage!");
+        }
     }
+
+    enemyAnim.AttackHitEvent();
 }
+    // ====================== VẼ GIZMOS HÌNH NÓN ======================
+    protected virtual void OnDrawGizmosSelected()
+    {
+        if (!enabled) return;
+
+        Vector3 origin = transform.position + Vector3.up * attackHeightOffset;
+
+        // Vẽ Detect Range
+        Gizmos.color = Color.green * 0.3f;
+        Gizmos.DrawWireSphere(transform.position, detectRange);
+
+        // Vẽ Cone Attack
+        Gizmos.color = gizmoColor;
+        DrawConeGizmo(origin, transform.forward, atkRange, attackAngle);
+
+        // Vẽ Attack Radius
+        Gizmos.color = Color.red * 0.6f;
+        
+    }
+
+    private void DrawConeGizmo(Vector3 origin, Vector3 direction, float range, float angle)
+    {
+        int segments = 12;
+        float halfAngle = angle * 0.5f * Mathf.Deg2Rad;
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float t = (float)i / segments;
+            float currentAngle = Mathf.Lerp(-halfAngle, halfAngle, t);
+            Quaternion rot = Quaternion.Euler(0, currentAngle * Mathf.Rad2Deg, 0);
+            Vector3 dir = rot * direction;
+
+            Gizmos.DrawRay(origin, dir * range);
+        }
+
+        // Vẽ cung tròn
+        for (int i = 0; i < segments; i++)
+        {
+            float a1 = Mathf.Lerp(-halfAngle, halfAngle, (float)i / segments);
+            float a2 = Mathf.Lerp(-halfAngle, halfAngle, (float)(i + 1) / segments);
+
+            Quaternion r1 = Quaternion.Euler(0, a1 * Mathf.Rad2Deg, 0);
+            Quaternion r2 = Quaternion.Euler(0, a2 * Mathf.Rad2Deg, 0);
+
+            Vector3 p1 = origin + r1 * direction * range;
+            Vector3 p2 = origin + r2 * direction * range;
+
+            Gizmos.DrawLine(p1, p2);
+        }
+    }
+
+    protected virtual void DisableCollision()
+    {
+        foreach (Collider col in enemyColliders) col.enabled = false;
+    }
+
     protected virtual void OnEnable()
     {
         AllEnemies.Add(this);
-
         AutoAimManager.Register(this);
     }
 
     protected virtual void OnDisable()
     {
         AllEnemies.Remove(this);
-
         AutoAimManager.Unregister(this);
     }
 
-
-    public virtual Transform GetTargetTransform()
-    {
-        return transform;
-    }
+    public virtual Transform GetTargetTransform() => transform;
 
     protected override void Die()
     {
         base.Die();
-
         StopAllCoroutines();
-
         isAttacking = false;
-
         currentState = EnemyState.Dead;
+
         DisableCollision();
-        enemyAnim.OnAttackHit -= DealDamage;
-
-        AutoAimManager.Unregister(this);
-        AllEnemies.Remove(this);
-
         if (agent != null)
         {
-            if (agent.isOnNavMesh)
-                agent.ResetPath();
-
             agent.isStopped = true;
             agent.enabled = false;
         }
 
-        enemyAnim.SetSpeed(0);
-
-        PlayerProgress playerProgress = player.GetComponent<PlayerProgress>();
-
-        if (playerProgress != null)
+        if (player != null)
         {
-            playerProgress.AddExp(expReward);
+            PlayerProgress pp = player.GetComponent<PlayerProgress>();
+            pp?.AddExp(expReward);
         }
-        
-        enemyAnim.PlayDead(() =>
-        {
-            Destroy(gameObject);
-        });
+
+        enemyAnim.PlayDead(() => Destroy(gameObject));
     }
 }
