@@ -48,79 +48,91 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     }
 
     protected virtual void Update()
+{
+    if (isDead || player == null)
     {
-        if (isDead || player == null)
-        {
-            if (player == null) FindPlayer();
-            return;
-        }
-
-        if (player.GetComponent<BaseCharacter>().IsDead())
-        {
-            currentState = EnemyState.Idle;
-            return;
-        }
-
-        float distance = Vector3.Distance(transform.position, player.position);
-
-        switch (currentState)
-        {
-            case EnemyState.Idle:
-                if (distance <= detectRange) currentState = EnemyState.Chase;
-                break;
-
-            case EnemyState.Chase:
-                UpdateChase(distance);
-                break;
-
-            case EnemyState.Attack:
-                UpdateAttack(distance);
-                break;
-        }
+        if (player == null) FindPlayer();
+        return;
     }
+
+    if (player.GetComponent<BaseCharacter>().IsDead())
+    {
+        currentState = EnemyState.Idle;
+        enemyAnim.SetSpeed(0);
+        return;
+    }
+
+    float distance = Vector3.Distance(transform.position, player.position);
+
+    switch (currentState)
+    {
+        case EnemyState.Idle:
+            enemyAnim.SetSpeed(0);
+            if (distance <= detectRange) currentState = EnemyState.Chase;
+            break;
+
+        case EnemyState.Chase:
+            UpdateChase(distance);
+            break;
+
+        case EnemyState.Attack:
+            UpdateAttack(distance);
+            break;
+    }
+}
 
     protected virtual void UpdateChase(float distance)
+{
+    if (distance > detectRange)
     {
-        if (distance > detectRange)
-        {
-            currentState = EnemyState.Idle;
-            return;
-        }
-
-        if (distance <= atkRange)
-        {
-            currentState = EnemyState.Attack;
-            return;
-        }
-
-        if (agent.isOnNavMesh)
-        {
-            agent.isStopped = false;
-            agent.SetDestination(player.position);
-        }
+        currentState = EnemyState.Idle;
+        enemyAnim.SetSpeed(0);           // ← Thêm
+        return;
     }
 
-    protected virtual void UpdateAttack(float distance)
+    if (distance <= atkRange)
     {
-        if (distance > atkRange)
-        {
-            currentState = EnemyState.Chase;
-            return;
-        }
-
-        if (agent.isOnNavMesh)
-        {
-            agent.ResetPath();
-            agent.isStopped = true;
-        }
-
-        transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
-
-        if (!isAttacking)
-        {
-            StartCoroutine(AttackRoutine());
-        }
+        currentState = EnemyState.Attack;
+        enemyAnim.SetSpeed(0);           // ← Thêm
+        return;
     }
+
+    if (agent.isOnNavMesh)
+    {
+        agent.isStopped = false;
+        agent.SetDestination(player.position);
+        float speed = agent.velocity.magnitude;
+        enemyAnim.SetSpeed(1);
+    }
+    else
+    {
+        enemyAnim.SetSpeed(0);
+    }
+}
+
+protected virtual void UpdateAttack(float distance)
+{
+    if (distance > atkRange)
+    {
+        currentState = EnemyState.Chase;
+        return;
+    }
+
+    if (agent.isOnNavMesh)
+    {
+        agent.ResetPath();
+        agent.isStopped = true;
+    }
+
+    transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
+
+    enemyAnim.SetSpeed(0);   // Đứng yên khi Attack
+
+    if (!isAttacking)
+    {
+        StartCoroutine(AttackRoutine());
+    }
+}
 
     private IEnumerator AttackRoutine()
     {
@@ -233,25 +245,32 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     public virtual Transform GetTargetTransform() => transform;
 
     protected override void Die()
+{
+    base.Die();
+    StopAllCoroutines();
+    isAttacking = false;
+    currentState = EnemyState.Dead;
+    
+    DisableCollision();
+    if (agent != null)
     {
-        base.Die();
-        StopAllCoroutines();
-        isAttacking = false;
-        currentState = EnemyState.Dead;
-
-        DisableCollision();
-        if (agent != null)
-        {
-            agent.isStopped = true;
-            agent.enabled = false;
-        }
-
-        if (player != null)
-        {
-            PlayerProgress pp = player.GetComponent<PlayerProgress>();
-            pp?.AddExp(expReward);
-        }
-
-        enemyAnim.PlayDead(() => Destroy(gameObject));
+        agent.isStopped = true;
+        agent.enabled = false;
     }
+
+    if (player != null)
+    {
+        PlayerProgress pp = player.GetComponent<PlayerProgress>();
+        pp?.AddExp(expReward);
+    }
+
+    // === THÔNG BÁO CHO WAVE UI ===
+    CoreGameUI coreUI = FindObjectOfType<CoreGameUI>();
+    coreUI?.OnEnemyDied();
+
+    AllEnemies.Remove(this);
+    AutoAimManager.Unregister(this);
+
+    enemyAnim.PlayDead(() => Destroy(gameObject));
+}
 }

@@ -68,6 +68,7 @@ protected override void Awake()
             // Cập nhật UI ban đầu
             gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
             gameplayUI.UpdateHpBar(currentHp, maxHp);
+            
             gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
         }
 
@@ -188,11 +189,17 @@ protected override void Awake()
     }
 
     protected override void Die()
-    {
-        Debug.Log("Player has die");
-        canMove = false;
-        playerAnim.PlayDead();
-    }
+{
+    Debug.Log("Player has die");
+    canMove = false;
+    playerAnim.PlayDead();
+
+    // Dừng wave
+    FindObjectOfType<EnemyWaveSpawn>()?.GameOver();
+
+    // Dừng timer
+    FindObjectOfType<CoreGameUI>()?.StopTimer();
+}
 
     // Public APIs
     public bool IsSprintingPublic() => IsSprinting();

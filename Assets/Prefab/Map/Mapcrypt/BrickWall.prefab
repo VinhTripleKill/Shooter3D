@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2682946443280915968}
   - component: {fileID: 6428962170618551515}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: brickwallC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7063050481168253146}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BrickWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,9 +77,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3456878441193420732}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 29, y: 0, z: -4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5260716549146787981}
@@ -137,6 +137,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e6d5ef2c658a4df4bb1c656cf4c9d6a7, type: 3}
       propertyPath: m_Name
       value: brick-wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e6d5ef2c658a4df4bb1c656cf4c9d6a7, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

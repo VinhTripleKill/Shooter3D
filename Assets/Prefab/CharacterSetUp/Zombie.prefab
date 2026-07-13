@@ -333,11 +333,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieEnemy
   maxHp: 100
-  detectRange: 15
-  atkRange: 1.8
+  currentHp: 0
+  detectRange: 100
+  atkRange: 2
   atkDamage: 1
   atkCD: 1
   atkTimeAnim: 1
+  attackHeightOffset: 0
+  attackAngle: 90
+  gizmoColor: {r: 1, g: 0.2, b: 0, a: 0.35}
+  expReward: 50
 --- !u!136 &6449497479353676384
 CapsuleCollider:
   m_ObjectHideFlags: 0

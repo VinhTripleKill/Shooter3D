@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7719749912506678058}
   - component: {fileID: 7415798756397697805}
   - component: {fileID: 6015171504873621171}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 749
+  m_VersionIndex: 755
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -381,7 +381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f8b5e307abcb26c438ddfd4a93e34a81, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f8b5e307abcb26c438ddfd4a93e34a81, type: 3}
       propertyPath: m_LocalRotation.y
@@ -406,6 +406,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: f8b5e307abcb26c438ddfd4a93e34a81, type: 3}
       propertyPath: m_Name
       value: cliff_blockSlopeHalfWalls_rock
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f8b5e307abcb26c438ddfd4a93e34a81, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

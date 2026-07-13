@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8675468944593931411}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1805877741700252689}
   - component: {fileID: 2950490173294891645}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptColumC_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1907628483087704476}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: WallCryptC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7318593441577400504}
   - component: {fileID: 7063108980178094090}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_TL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +186,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7088017529398583954}
   - component: {fileID: 7414396957739857204}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3449733939839881985}
   - component: {fileID: 57729003237908884}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptColumC_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -292,7 +292,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8579751598481523157}
   - component: {fileID: 5371280644923204712}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptColumC_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -345,7 +345,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8773353644434204877}
   - component: {fileID: 1316809352099778647}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -398,7 +398,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5333328841017763904}
   - component: {fileID: 5315908592436074208}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_TR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -450,7 +450,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7878264892601978455}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CryptL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -465,7 +465,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8073232947530267412}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 2, z: 4}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
@@ -484,7 +484,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6336069398825475150}
   - component: {fileID: 551718104558975451}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -536,7 +536,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8877097965452404822}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ColumC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -572,7 +572,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3609710767100958421}
   - component: {fileID: 1780454805230166318}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptC_TT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -625,7 +625,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5711617246474886329}
   - component: {fileID: 7773357815577269219}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: cryptColumC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,6 +719,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3b3041640ab68f34aa667e1c1ace0b2b, type: 3}
       propertyPath: m_Name
       value: crypt-large
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3b3041640ab68f34aa667e1c1ace0b2b, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

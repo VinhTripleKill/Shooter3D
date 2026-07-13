@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4310024534531496158}
   - component: {fileID: 5412232981536769806}
   - component: {fileID: 832350818153468463}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Doc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 43
+  m_VersionIndex: 55
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -381,7 +381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 495f60ada3e1f8e4c88da76bfea9cf26, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 495f60ada3e1f8e4c88da76bfea9cf26, type: 3}
       propertyPath: m_LocalRotation.y
@@ -406,6 +406,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 495f60ada3e1f8e4c88da76bfea9cf26, type: 3}
       propertyPath: m_Name
       value: sloping land block with walls
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 495f60ada3e1f8e4c88da76bfea9cf26, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

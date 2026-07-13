@@ -18,15 +18,14 @@ public class GamePlayUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI skillCount;
     [Header("Mana")]
     [SerializeField] private Image manaBar;
+    [SerializeField] private TextMeshProUGUI manaText;
     [Header("HpBar")]
     [SerializeField] private Image hpBar;
     [SerializeField] private TextMeshProUGUI hpText;
     [Header("Level")] 
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private Image levelBarProgress;
-    [Header("Wave Enemy")]
-    [SerializeField] private TextMeshProUGUI waveText;
-    [SerializeField] private Image waveBarProgress;
+    
     [Header("Coin")]
     [SerializeField] private TextMeshProUGUI coinText;
     [Header("Ammo")]
@@ -70,6 +69,7 @@ public void SetUltimateIcon(Sprite icon)
     public void UpdateManaBar(float currentMana, float maxMana)
     {
         manaBar.fillAmount = currentMana / maxMana;
+        manaText.text = $"{Mathf.CeilToInt(currentMana)}/{Mathf.CeilToInt(maxMana)}";
     }
     public void ShowPickUp()
     {

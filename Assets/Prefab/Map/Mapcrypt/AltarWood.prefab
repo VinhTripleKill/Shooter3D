@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8305298958830133992}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AltarWood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1005767416963730029}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 25, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -43,7 +43,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8714152494215946500}
   - component: {fileID: 7101833204128848743}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AltarWoodC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,6 +137,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 74c060ee974225145ac141d067db3140, type: 3}
       propertyPath: m_Name
       value: altar-wood
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 74c060ee974225145ac141d067db3140, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

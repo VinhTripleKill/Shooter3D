@@ -1,8 +1,7 @@
 using UnityEngine;
 public class PlayerCharacter : MonoBehaviour
 {
-    [SerializeField]
-    private CharacterData characterData;
+    [SerializeField] private CharacterData characterData;
 
     public CharacterData Data => characterData;
 

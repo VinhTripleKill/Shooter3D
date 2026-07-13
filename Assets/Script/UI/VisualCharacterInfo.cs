@@ -37,7 +37,6 @@ public class VisualCharacterInfo : MonoBehaviour
     [SerializeField] private TextMeshProUGUI reloadTime_text;
     [SerializeField] private TextMeshProUGUI manaRecor_text;
     [Header ("Button")]
-    [SerializeField] private Button BattleB;
     [SerializeField] private Button SkillChooseB;
     [SerializeField] private GameObject listSkill;
     [SerializeField]

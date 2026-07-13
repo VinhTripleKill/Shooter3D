@@ -8,16 +8,19 @@ public class PlayerSpawn : MonoBehaviour
     [SerializeField] private ListSkillManager listSkillManager;
     [SerializeField] private VisualCharacterInfo visualCharacterInfo;
     [SerializeField] private Button battleButton;
+    [SerializeField] private GameObject panelChoooseCharacter;
 
     [Header("Scene References")]
     [SerializeField] private JoystickMove sceneJoystickMove;
-    [SerializeField] private JoystickAttack sceneJoystickAttack;     // ← THÊM DÒNG NÀY
+    [SerializeField] private JoystickAttack sceneJoystickAttack;
     [SerializeField] private GamePlayUI sceneGamePlayUI;
+    [SerializeField] private CameraFollow cameraFollow;        // ← THÊM
 
     [Header("Spawn Settings")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform spawnPoint;
-
+    [SerializeField] private EnemyWaveSpawn waveManager ;
+    [SerializeField] private CoreGameUI coreUI;
     private GameObject currentPlayer;
 
     private void Awake()
@@ -37,50 +40,47 @@ public class PlayerSpawn : MonoBehaviour
         CharacterData selectedChar = listCharacterManager.CurrentCharacter;
         SkillData selectedSkill = listSkillManager?.CurrentSkill;
 
-        if (selectedChar == null)
-        {
-            Debug.LogWarning("Chưa chọn nhân vật!");
-            return;
-        }
+        if (selectedChar == null) return;
 
+        panelChoooseCharacter.SetActive(false);
         SpawnPlayer(selectedChar, selectedSkill);
     }
 
     public void SpawnPlayer(CharacterData charData, SkillData skillData)
+{
+    if (playerPrefab == null || spawnPoint == null) return;
+
+    if (currentPlayer != null)
+        Destroy(currentPlayer);
+
+    currentPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+
+    // Spawn Model + Set Data...
+    PlayerVisualChar visualChar = currentPlayer.GetComponent<PlayerVisualChar>();
+    if (visualChar != null)
+        visualChar.SpawnCharacterModel(charData);
+
+    PlayerCharacter playerChar = currentPlayer.GetComponent<PlayerCharacter>();
+    if (playerChar != null)
+        playerChar.SetCharacter(charData);
+
+    InitializePlayerComponents(currentPlayer, skillData);
+
+    if (cameraFollow != null)
+        cameraFollow.SetTarget(currentPlayer.transform);
+
+    // === KHỞI TẠO CORE GAME UI ===
+    if (coreUI != null)
     {
-        if (playerPrefab == null || spawnPoint == null)
-        {
-            Debug.LogError("PlayerPrefab hoặc SpawnPoint chưa được gán!");
-            return;
-        }
-
-        if (sceneJoystickMove == null || sceneGamePlayUI == null)
-        {
-            Debug.LogError("Chưa gán JoystickMove hoặc GamePlayUI!");
-            return;
-        }
-
-        if (currentPlayer != null)
-            Destroy(currentPlayer);
-
-        currentPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-
-        // Spawn Model
-        PlayerVisualChar visualChar = currentPlayer.GetComponent<PlayerVisualChar>();
-        if (visualChar != null)
-            visualChar.SpawnCharacterModel(charData);
-
-        // Set CharacterData
-        PlayerCharacter playerChar = currentPlayer.GetComponent<PlayerCharacter>();
-        if (playerChar != null)
-            playerChar.SetCharacter(charData);
-
-        // === GÁN TẤT CẢ REFERENCES ===
-        InitializePlayerComponents(currentPlayer, skillData);
-
-        Debug.Log($"Player spawn thành công: {charData.characterName}");
+        coreUI.Initialize(waveManager, currentPlayer.GetComponent<PlayerController>());
+        coreUI.StartTimer();
     }
 
+    Debug.Log($"Player spawn thành công: {charData.characterName}");
+
+    // CHỈ GỌI 1 LẦN
+    waveManager?.StartNextWave();
+}
     private void InitializePlayerComponents(GameObject player, SkillData selectedSkill)
     {
         PlayerController controller = player.GetComponent<PlayerController>();
