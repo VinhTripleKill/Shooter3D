@@ -1,16 +1,35 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MenuGameUI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("Buttons")]
+    public Button ExitGameB;
+
+    private void Start()
     {
-        
+        if (ExitGameB != null)
+        {
+            ExitGameB.onClick.AddListener(ExitGame);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ExitGame()
     {
-        
+#if UNITY_EDITOR
+        // Thoát Play Mode khi đang chạy trong Unity Editor
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // Thoát game khi đã build
+        Application.Quit();
+#endif
+    }
+
+    private void OnDestroy()
+    {
+        if (ExitGameB != null)
+        {
+            ExitGameB.onClick.RemoveListener(ExitGame);
+        }
     }
 }

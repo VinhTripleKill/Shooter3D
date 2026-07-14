@@ -85,7 +85,7 @@ public class PlayerSpawn : MonoBehaviour
     {
         PlayerController controller = player.GetComponent<PlayerController>();
         if (controller != null)
-            controller.InitializeSceneReferences(sceneJoystickMove, sceneGamePlayUI);
+            controller.InitializeSceneReferences( sceneJoystickMove, sceneGamePlayUI, coreUI, waveManager );
 
         // PlayerWeapon
         PlayerWeapon weapon = player.GetComponent<PlayerWeapon>();

@@ -61,11 +61,7 @@ public class CoreGameUI : MonoBehaviour
         }
     }
 
-    public void OnEnemyDied()
-    {
-        UpdateWaveUI();
-    }
-
+   
     public void OnWaveChanged()
     {
         UpdateWaveUI();

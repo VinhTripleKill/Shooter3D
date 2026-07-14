@@ -296,6 +296,7 @@ GameObject:
   - component: {fileID: 8641149402784629088}
   - component: {fileID: 6449497479353676384}
   - component: {fileID: 8600645082396633896}
+  - component: {fileID: 5621220999158064116}
   m_Layer: 7
   m_Name: Zombie
   m_TagString: Untagged
@@ -388,6 +389,21 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &5621220999158064116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8861852149474711234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b95d7f0c42f3f4fb23258008f9210e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamagePopupSpawner
+  damagePrefab: {fileID: 5563899755096399413, guid: 5aa9061baba37fe49b5e8bc11a0bc091, type: 3}
+  popupPoint: {fileID: 1210639631608068229}
+  offset: {x: 0, y: 2, z: 0}
 --- !u!1001 &1677510776559984494
 PrefabInstance:
   m_ObjectHideFlags: 0

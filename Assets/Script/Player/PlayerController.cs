@@ -14,9 +14,10 @@ public class PlayerController : BasePlayer
 
     [Header("Movement")]
     [SerializeField] private float rotationSpeed = 10f;
-
-    [Header("UI")]
-    [SerializeField] private GamePlayUI gameplayUI;
+[Header("Scene References")]
+[SerializeField] private GamePlayUI gameplayUI;
+[SerializeField] private CoreGameUI coreGameUI;
+[SerializeField] private EnemyWaveSpawn enemyWaveSpawn;
     private float damageTestTimer = 0f;
     private PlayerWeapon playerWeapon;
     private PlayerProgress playerProgress;
@@ -46,36 +47,39 @@ protected override void Awake()
         if (playerWeapon == null)
             playerWeapon = gameObject.AddComponent<PlayerWeapon>();
     }
-    public void InitializeSceneReferences(JoystickMove joystick, GamePlayUI ui)
+   public void InitializeSceneReferences(
+    JoystickMove joystick,
+    GamePlayUI ui,
+    CoreGameUI coreUI,
+    EnemyWaveSpawn waveSpawn)
+{
+    joystickMove = joystick;
+    gameplayUI = ui;
+    coreGameUI = coreUI;
+    enemyWaveSpawn = waveSpawn;
+
+    InitializePlayerStats();
+
+    if (gameplayUI != null)
     {
-        joystickMove = joystick;
-        gameplayUI = ui;
-
-        InitializePlayerStats();
-        if (gameplayUI != null)
+        if (playerProgress != null)
         {
-            if (playerProgress != null)
-            {
-                playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
-                playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
-                gameplayUI.UpdateLevelText(playerProgress);
-                gameplayUI.UpdateLevelBar(playerProgress);
-            }
-
-            OnHpChanged += gameplayUI.UpdateHpBar;
-            OnManaChanged += gameplayUI.UpdateManaBar;
-
-            // Cập nhật UI ban đầu
-            gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
-            gameplayUI.UpdateHpBar(currentHp, maxHp);
-            
-            gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
+            playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
+            playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
+            gameplayUI.UpdateLevelText(playerProgress);
+            gameplayUI.UpdateLevelBar(playerProgress);
         }
 
-        Debug.Log("PlayerController: Đã gán JoystickMove và GamePlayUI từ Scene");
+        OnHpChanged += gameplayUI.UpdateHpBar;
+        OnManaChanged += gameplayUI.UpdateManaBar;
+
+        gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
+        gameplayUI.UpdateHpBar(currentHp, maxHp);
+        gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
     }
-    
-    private void OnDestroy()
+
+    Debug.Log("PlayerController: Đã khởi tạo Scene References");
+}    private void OnDestroy()
     {
         OnHpChanged -= gameplayUI.UpdateHpBar;
         OnManaChanged -= gameplayUI.UpdateManaBar;
@@ -194,11 +198,8 @@ protected override void Awake()
     canMove = false;
     playerAnim.PlayDead();
 
-    // Dừng wave
-    FindObjectOfType<EnemyWaveSpawn>()?.GameOver();
-
-    // Dừng timer
-    FindObjectOfType<CoreGameUI>()?.StopTimer();
+    enemyWaveSpawn?.GameOver();
+    coreGameUI?.StopTimer();
 }
 
     // Public APIs

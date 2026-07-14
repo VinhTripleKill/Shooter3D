@@ -70,21 +70,27 @@ public class EnemyWaveSpawn : MonoBehaviour
             GameObject enemyObj = Instantiate(zombiePrefab, spawnPoint.position, spawnPoint.rotation);
             BaseEnemy enemy = enemyObj.GetComponent<BaseEnemy>();
 
-            if (enemy != null)
-                currentWaveEnemies.Add(enemy);
-
-            yield return new WaitForSeconds(0.3f);
+if (enemy != null)
+{
+    enemy.Initialize(this);
+    currentWaveEnemies.Add(enemy);
+}
         }
 
         isSpawning = false;
         coreGameUI?.OnWaveChanged();
     }
+    public void OnEnemyDied(BaseEnemy enemy)
+{
+    currentWaveEnemies.Remove(enemy);
 
+    coreGameUI?.OnWaveChanged();
+}
     private void Update()
     {
         if (!waveInProgress || gameOver) return;          // <--- THÊM gameOver
 
-        currentWaveEnemies.RemoveAll(enemy => enemy == null || enemy.IsDead());
+        currentWaveEnemies.RemoveAll(enemy => enemy == null );
 
         if (currentWaveEnemies.Count == 0 && !isSpawning)
         {
@@ -106,10 +112,10 @@ public class EnemyWaveSpawn : MonoBehaviour
     public int GetCurrentWave() => currentWave;
 
     public int GetRemainingEnemiesInWave()
-    {
-        currentWaveEnemies.RemoveAll(enemy => enemy == null || enemy.IsDead());
-        return currentWaveEnemies.Count;
-    }
+{
+    currentWaveEnemies.RemoveAll(enemy => enemy == null);
+    return currentWaveEnemies.Count;
+}
 
     public void GameOver()                                // <--- THÊM METHOD NÀY
     {

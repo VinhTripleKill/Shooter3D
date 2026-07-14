@@ -31,7 +31,12 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     private Collider[] enemyColliders;
 
     public static List<BaseEnemy> AllEnemies { get; } = new List<BaseEnemy>();
+    private EnemyWaveSpawn waveManager;
 
+public void Initialize(EnemyWaveSpawn manager)
+{
+    waveManager = manager;
+}
     protected override void Awake()
     {
         base.Awake();
@@ -264,13 +269,12 @@ protected virtual void UpdateAttack(float distance)
         pp?.AddExp(expReward);
     }
 
-    // === THÔNG BÁO CHO WAVE UI ===
-    CoreGameUI coreUI = FindObjectOfType<CoreGameUI>();
-    coreUI?.OnEnemyDied();
+    waveManager?.OnEnemyDied(this);
 
     AllEnemies.Remove(this);
     AutoAimManager.Unregister(this);
 
     enemyAnim.PlayDead(() => Destroy(gameObject));
 }
+
 }
