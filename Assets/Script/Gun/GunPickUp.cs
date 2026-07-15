@@ -6,17 +6,17 @@ public class GunPickup : MonoBehaviour
 
     [Tooltip("-1 = Full Ammo lần đầu")]
     public int currentAmmo = -1;
-
     public bool isReloading;
 
-    // SỬA Ở ĐÂY
     public void Pickup(PlayerInteraction playerInteraction)
     {
-        playerInteraction.EquipGun(
-            gunVisualPrefab,
-            currentAmmo,
-            isReloading);
-
+        playerInteraction.EquipGun(gunVisualPrefab, currentAmmo, isReloading);
         Destroy(gameObject);
+    }
+
+    // Đảm bảo itemVisual được tìm lại sau khi Instantiate
+    private void Awake()
+    {
+        GetComponent<GunItem>()?.Initialize();
     }
 }

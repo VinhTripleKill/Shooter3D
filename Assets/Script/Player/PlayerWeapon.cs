@@ -425,21 +425,32 @@ public class PlayerWeapon : MonoBehaviour
         playerAnim.SetHoldGun(false);
     }
     public void SpawnDroppedGun(GunData gunData, int ammo, bool wasReloading)
+{
+    Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
+    
+    GameObject droppedGun = Instantiate(gunData.gunItemPrefab, spawnPos, Quaternion.identity);
+    
+    GunItem gunItem = droppedGun.GetComponent<GunItem>();
+    if (gunItem != null)
     {
-        Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
-        GameObject droppedGun = Instantiate(gunData.gunItemPrefab, spawnPos, Quaternion.identity);
-        GunPickup pickup = droppedGun.GetComponent<GunPickup>();
-        pickup.currentAmmo = ammo;
-        pickup.isReloading = wasReloading;
-
-        Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            Vector3 throwDir = transform.forward + Vector3.up * 0.7f;
-            rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
-        }
+        gunItem.Initialize();
+        gunItem.SetGunData(gunData);        // ← Thêm dòng này
     }
 
+    GunPickup pickup = droppedGun.GetComponent<GunPickup>();
+    if (pickup != null)
+    {
+        pickup.currentAmmo = ammo;
+        pickup.isReloading = wasReloading;
+    }
+
+    Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        Vector3 throwDir = transform.forward + Vector3.up * 0.7f;
+        rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
+    }
+}
     private void CancelReload()
     {
         if (reloadCoroutine != null)
