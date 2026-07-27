@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.InputSystem;
 public class PlayerSpawn : MonoBehaviour
 {
     [Header("References")]
@@ -9,7 +9,8 @@ public class PlayerSpawn : MonoBehaviour
     [SerializeField] private VisualCharacterInfo visualCharacterInfo;
     [SerializeField] private Button battleButton;
     [SerializeField] private GameObject panelChoooseCharacter;
-
+    private CharacterData selectedCharacter;
+private SkillData selectedSkill;
     [Header("Scene References")]
     [SerializeField] private JoystickMove sceneJoystickMove;
     [SerializeField] private JoystickAttack sceneJoystickAttack;
@@ -36,49 +37,161 @@ public class PlayerSpawn : MonoBehaviour
     }
 
     private void OnBattleButtonClicked()
+{
+    selectedCharacter =
+        listCharacterManager.CurrentCharacter;
+
+    selectedSkill =
+        listSkillManager?.CurrentSkill;
+
+    if (selectedCharacter == null)
+        return;
+
+    panelChoooseCharacter.SetActive(false);
+
+    SpawnPlayer(
+        selectedCharacter,
+        selectedSkill
+    );
+}
+public void ReplayGame()
+{
+    if (selectedCharacter == null) return;
+    
+
+    Debug.Log("REPLAY GAME");
+
+    // Reset game time
+    Time.timeScale = 1f;
+
+    // ============================
+    // XÓA ENEMY CŨ
+    // ============================
+
+    if (waveManager != null)
     {
-        CharacterData selectedChar = listCharacterManager.CurrentCharacter;
-        SkillData selectedSkill = listSkillManager?.CurrentSkill;
-
-        if (selectedChar == null) return;
-
-        panelChoooseCharacter.SetActive(false);
-        SpawnPlayer(selectedChar, selectedSkill);
+        waveManager.ResetWaves();
     }
 
-    public void SpawnPlayer(CharacterData charData, SkillData skillData)
-{
-    if (playerPrefab == null || spawnPoint == null) return;
 
     if (currentPlayer != null)
+    {
         Destroy(currentPlayer);
-
-    currentPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-
-    // Spawn Model + Set Data...
-    PlayerVisualChar visualChar = currentPlayer.GetComponent<PlayerVisualChar>();
-    if (visualChar != null)
-        visualChar.SpawnCharacterModel(charData);
-
-    PlayerCharacter playerChar = currentPlayer.GetComponent<PlayerCharacter>();
-    if (playerChar != null)
-        playerChar.SetCharacter(charData);
-
-    InitializePlayerComponents(currentPlayer, skillData);
+        currentPlayer = null;
+    }
 
     if (cameraFollow != null)
-        cameraFollow.SetTarget(currentPlayer.transform);
+    {
+        cameraFollow.ClearTarget();
+    }
 
-    // === KHỞI TẠO CORE GAME UI ===
+
+    SpawnPlayer( selectedCharacter, selectedSkill );
+}
+    public void SpawnPlayer(
+    CharacterData charData,
+    SkillData skillData)
+{
+    if (
+        playerPrefab == null ||
+        spawnPoint == null
+    )
+    {
+        return;
+    }
+
+    // Xóa player cũ
+    if (currentPlayer != null)
+    {
+        Destroy(currentPlayer);
+    }
+
+    currentPlayer =
+        Instantiate(
+            playerPrefab,
+            spawnPoint.position,
+            spawnPoint.rotation
+        );
+
+    // ============================
+    // PLAYER INPUT
+    // ============================
+
+    PlayerInput playerInput =
+        currentPlayer.GetComponent<PlayerInput>();
+
+    if (
+        coreUI != null &&
+        playerInput != null
+    )
+    {
+        coreUI.RegisterPlayerInput(
+            playerInput
+        );
+    }
+
+    // ============================
+    // CHARACTER MODEL
+    // ============================
+
+    PlayerVisualChar visualChar =
+        currentPlayer.GetComponent<PlayerVisualChar>();
+
+    if (visualChar != null)
+    {
+        visualChar.SpawnCharacterModel(
+            charData
+        );
+    }
+
+    // ============================
+    // CHARACTER DATA
+    // ============================
+
+    PlayerCharacter playerChar =
+        currentPlayer.GetComponent<PlayerCharacter>();
+
+    if (playerChar != null)
+    {
+        playerChar.SetCharacter(
+            charData
+        );
+    }
+
+    // ============================
+    // INITIALIZE COMPONENTS
+    // ============================
+
+    InitializePlayerComponents(
+        currentPlayer,
+        skillData
+    );
+
+if (cameraFollow != null)
+{
+    cameraFollow.SetTarget(
+        currentPlayer.transform
+    );
+}
+
     if (coreUI != null)
     {
-        coreUI.Initialize(waveManager, currentPlayer.GetComponent<PlayerController>());
+        coreUI.Initialize(
+            waveManager,
+            currentPlayer.GetComponent<PlayerController>()
+        );
+
         coreUI.StartTimer();
     }
 
-    Debug.Log($"Player spawn thành công: {charData.characterName}");
+    Debug.Log(
+        $"Player spawn thành công: {charData.characterName}"
+    );
 
-    // CHỈ GỌI 1 LẦN
+    // ============================
+    // START WAVE
+    // ============================
+
     waveManager?.StartNextWave();
 }
     private void InitializePlayerComponents(GameObject player, SkillData selectedSkill)

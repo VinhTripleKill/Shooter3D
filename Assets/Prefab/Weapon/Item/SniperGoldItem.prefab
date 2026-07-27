@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5134469682251471989}
-  - {fileID: 1927523114003420912}
+  - {fileID: 2263101610990558322}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &905415828464821562
@@ -98,13 +98,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GunItem
   itemVisual: {fileID: 5134469682251471989}
+  itemNameVisual: {fileID: 8460626801939824042}
   floatSpeed: 2
   floatHeight: 0.15
   rotateSpeed: 50
   groundMask:
     serializedVersion: 2
     m_Bits: 8
-  itemNameVisual: {fileID: 1403020193190064585}
+  gunData: {fileID: 11400000, guid: 6972b933089178d48b381f00285103b1, type: 2}
 --- !u!114 &8225808672798947425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,7 +215,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 34fe33df172e3584eaf8ecebd22b0a12, type: 3}
   m_PrefabInstance: {fileID: 1128965100253403712}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1583627641569476810
+--- !u!1001 &1165862829195954760
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -240,15 +241,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1100528660239767098, guid: 718862254abfa0243be63bac4a822520, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1100528660239767098, guid: 718862254abfa0243be63bac4a822520, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1100528660239767098, guid: 718862254abfa0243be63bac4a822520, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1100528660239767098, guid: 718862254abfa0243be63bac4a822520, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -264,7 +265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8895556693945393882, guid: 718862254abfa0243be63bac4a822520, type: 3}
       propertyPath: m_Name
-      value: ItemBoxNameVisual
+      value: ItemBoxVisual
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -272,35 +273,35 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8895556693945393882, guid: 718862254abfa0243be63bac4a822520, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1403020193190064585}
+      addedObject: {fileID: 8460626801939824042}
   m_SourcePrefab: {fileID: 100100000, guid: 718862254abfa0243be63bac4a822520, type: 3}
---- !u!4 &1927523114003420912 stripped
+--- !u!4 &2263101610990558322 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1100528660239767098, guid: 718862254abfa0243be63bac4a822520, type: 3}
-  m_PrefabInstance: {fileID: 1583627641569476810}
+  m_PrefabInstance: {fileID: 1165862829195954760}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7965022063143133712 stripped
+--- !u!1 &7736805645880928402 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8895556693945393882, guid: 718862254abfa0243be63bac4a822520, type: 3}
-  m_PrefabInstance: {fileID: 1583627641569476810}
+  m_PrefabInstance: {fileID: 1165862829195954760}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1403020193190064585
+--- !u!114 &8460626801939824042
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7965022063143133712}
+  m_GameObject: {fileID: 7736805645880928402}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 00c6c6d00f6f5514f9796b544a51b7f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  itemNameText: {fileID: 8359580929940604772}
---- !u!114 &8359580929940604772 stripped
+  m_EditorClassIdentifier: Assembly-CSharp::ItemNameVisual
+  itemNameText: {fileID: 8202432005784128998}
+--- !u!114 &8202432005784128998 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7059707303578060718, guid: 718862254abfa0243be63bac4a822520, type: 3}
-  m_PrefabInstance: {fileID: 1583627641569476810}
+  m_PrefabInstance: {fileID: 1165862829195954760}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1

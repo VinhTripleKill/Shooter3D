@@ -2,36 +2,85 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [Header("Target")]
-    public Transform target;
+    [Header("Camera Target")]
+    [SerializeField] private Transform target;
 
-    [Header("Settings")]
-    [SerializeField] private Vector3 offset = new Vector3(0, 12, 8); // Khoảng cách mặc định
+    [Header("Follow Settings")]
+    [SerializeField] private bool smoothFollow = false;
+    [SerializeField] private float followSpeed = 10f;
+
+    [Header("Fixed Camera Offset")]
+    [SerializeField]
+    private Vector3 cameraOffset =
+        new Vector3(0f, 12f, -7f);
+
+    [Header("Fixed Camera Rotation")]
+    [SerializeField]
+    private Vector3 fixedCameraRotation =
+        new Vector3(60f, 0f, 0f);
 
     private void LateUpdate()
     {
-        if (target == null || target.GetComponent<BaseCharacter>()?.IsDead() == true)
-            return; // Giữ nguyên vị trí khi player chưa spawn hoặc đã chết
+        if (target == null)
+            return;
 
-        // Follow mượt mà theo toàn bộ vị trí Player + offset
-        transform.position = target.position + offset;
+        BaseCharacter character =
+            target.GetComponent<BaseCharacter>();
+
+        if (
+            character != null &&
+            character.IsDead()
+        )
+        {
+            return;
+        }
+
+        Vector3 targetPosition =
+            target.position + cameraOffset;
+
+        if (smoothFollow)
+        {
+            transform.position =
+                Vector3.Lerp(
+                    transform.position,
+                    targetPosition,
+                    followSpeed *
+                    Time.deltaTime
+                );
+        }
+        else
+        {
+            transform.position =
+                targetPosition;
+        }
+
+        transform.rotation =
+            Quaternion.Euler(
+                fixedCameraRotation
+            );
     }
 
-    // Gọi khi spawn Player
-    public void SetTarget(Transform newTarget)
+    public void SetTarget(
+        Transform newTarget
+    )
     {
         target = newTarget;
-        if (target != null)
-        {
-            // Force camera theo X của Player ngay lập tức (giữ Y,Z hiện tại)
-            Vector3 newPos = transform.position;
-            newPos.x = target.position.x;
-            transform.position = newPos;
 
-            // Cập nhật offset để follow mượt sau này
-            offset = transform.position - target.position;
+        if (target == null)
+            return;
 
-            Debug.Log("Camera đã lock vào Player mới");
-        }
+        transform.position =
+            target.position +
+            cameraOffset;
+
+        transform.rotation =
+            Quaternion.Euler(
+                fixedCameraRotation
+            );
+    }
+
+    public void ClearTarget()
+    {
+        target = null;
     }
 }

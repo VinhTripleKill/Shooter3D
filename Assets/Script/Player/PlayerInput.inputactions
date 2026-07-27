@@ -86,6 +86,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Pause&ResumeGame",
+                    "type": "Button",
+                    "id": "0ed150c0-ed66-410b-88ef-bf5f2d3ef3de",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -284,6 +293,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Skill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f10982da-4c03-4f85-9130-8b04dd76761e",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause&ResumeGame",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

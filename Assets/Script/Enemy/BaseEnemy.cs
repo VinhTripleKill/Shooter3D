@@ -18,7 +18,9 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón
     [Header("Gizmos")]
     [SerializeField] private Color gizmoColor = new Color(1f, 0.2f, 0f, 0.35f);
+    [Header("Reward")]
 
+private bool shouldGiveExp = true;
     protected EnemyState currentState;
     protected Transform player;
     protected bool isAttacking;
@@ -249,32 +251,60 @@ protected virtual void UpdateAttack(float distance)
 
     public virtual Transform GetTargetTransform() => transform;
 
-    protected override void Die()
+
+public void ForceKill()
+{
+    if (isDead)
+        return;
+
+    // Enemy bị hệ thống tự động giết
+    // Không được nhận EXP
+    shouldGiveExp = false;
+
+    Die();
+}
+protected override void Die()
 {
     base.Die();
+
     StopAllCoroutines();
+
     isAttacking = false;
     currentState = EnemyState.Dead;
-    
+
     DisableCollision();
+
     if (agent != null)
     {
         agent.isStopped = true;
         agent.enabled = false;
     }
 
-    if (player != null)
-    {
-        PlayerProgress pp = player.GetComponent<PlayerProgress>();
-        pp?.AddExp(expReward);
-    }
+   if (shouldGiveExp && player != null)
+{
+    PlayerProgress pp =
+        player.GetComponent<PlayerProgress>();
 
+    pp?.AddExp(expReward);
+
+    Debug.Log(
+        $"[ENEMY] Player giết enemy -> +{expReward} EXP"
+    );
+}
+else
+{
+    Debug.Log(
+        "[ENEMY] Enemy tự động chết do hết thời gian -> Không nhận EXP"
+    );
+}
     waveManager?.OnEnemyDied(this);
 
     AllEnemies.Remove(this);
+
     AutoAimManager.Unregister(this);
 
-    enemyAnim.PlayDead(() => Destroy(gameObject));
+    enemyAnim.PlayDead(
+        () => Destroy(gameObject)
+    );
 }
-
 }
