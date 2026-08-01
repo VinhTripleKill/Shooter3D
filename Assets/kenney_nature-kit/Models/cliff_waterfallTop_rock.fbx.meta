@@ -8,27 +8,27 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: _defaultMat
-    second: {fileID: -3963241562183589234, guid: 490bbcf4d9c2b6c47bb5171f1eb0bf21, type: 3}
+    second: {fileID: 2100000, guid: ddefeab7522278c489f4b6d0dc11c29c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: dirt
-    second: {fileID: 2100000, guid: 28a4ad4757020e84f9c71fbbadf59623, type: 2}
+    second: {fileID: 2100000, guid: 232fc1bddc1a83a40a48f8ca89a5e71c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: dirtDark
-    second: {fileID: 2100000, guid: 86218347e0cad8b4abac3cabf7d717ce, type: 2}
+    second: {fileID: 2100000, guid: a46fb534f91c70942b725bc0323c82c6, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: 1d202266e93b8b14cacf75dc3133a66f, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: water
-    second: {fileID: 2100000, guid: ba742f2cf60640f439114a55815b276f, type: 2}
+    second: {fileID: 2100000, guid: 2ab8d691487fc24489cc93d177de8fc9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

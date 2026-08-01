@@ -8,22 +8,22 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: _defaultMat
-    second: {fileID: -3963241562183589234, guid: 1e52d99dee1e6de4586a868b698ec9c8, type: 3}
+    second: {fileID: 2100000, guid: f5fa614f6ec78d4408f4de6e992d2cc0, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: colorRed
-    second: {fileID: 2100000, guid: e3d7585227ce8d74299b77e8efb48fd6, type: 2}
+    second: {fileID: 2100000, guid: 5f5bfdff48ee7c54a968c8bf1793a7bf, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: colorRedDark
-    second: {fileID: 2100000, guid: 52919129fd966eb4ba5f28f5508175e5, type: 2}
+    second: {fileID: 2100000, guid: f148443e0811ffc4e9f8fb36f240c4d4, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: wood
-    second: {fileID: 2100000, guid: 62e91be46c6431243a5fb7a1bda2dc29, type: 2}
+    second: {fileID: 2100000, guid: e086e592ace9136459aa795e44616bb0, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

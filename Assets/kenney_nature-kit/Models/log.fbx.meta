@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: woodBark
-    second: {fileID: 2100000, guid: 53cb640ab7c810944baf97f99c9aa7d8, type: 2}
+    second: {fileID: 2100000, guid: b7adb95d52efe984cb3e6046c1919eec, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: woodInner
-    second: {fileID: 2100000, guid: 0e4d3661ea4f00e44920088287851cc7, type: 2}
+    second: {fileID: 2100000, guid: d164ea9fe5c9263488ea702ba058e99f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

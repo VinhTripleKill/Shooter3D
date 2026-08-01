@@ -13,6 +13,13 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     [SerializeField] protected float atkDamage = 10f;
     [SerializeField] protected float atkCD = 2f;
     [SerializeField] protected float atkTimeAnim = 1.2f;
+    [Header("NavMesh Optimize")]
+[SerializeField] private float nearUpdateRate = 0.1f;
+[SerializeField] private float mediumUpdateRate = 0.25f;
+[SerializeField] private float farUpdateRate = 0.5f;
+[SerializeField] private float veryFarUpdateRate = 1f;
+
+private float nextUpdatePathTime;
     public float attackHeightOffset;
     [Header("Cone Attack")]
     [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón
@@ -107,14 +114,32 @@ public void Initialize(EnemyWaveSpawn manager)
     if (agent.isOnNavMesh)
     {
         agent.isStopped = false;
-        agent.SetDestination(player.position);
-        float speed = agent.velocity.magnitude;
-        enemyAnim.SetSpeed(1);
+
+if (Time.time >= nextUpdatePathTime)
+{
+    nextUpdatePathTime = Time.time + GetPathUpdateRate(distance);
+    agent.SetDestination(player.position);
+}
+
+enemyAnim.SetSpeed(agent.velocity.magnitude > 0.1f ? 1 : 0);
     }
     else
     {
         enemyAnim.SetSpeed(0);
     }
+}
+private float GetPathUpdateRate(float distance)
+{
+    if (distance < 10f)
+        return nearUpdateRate;
+
+    if (distance < 20f)
+        return mediumUpdateRate;
+
+    if (distance < 40f)
+        return farUpdateRate;
+
+    return veryFarUpdateRate;
 }
 
 protected virtual void UpdateAttack(float distance)

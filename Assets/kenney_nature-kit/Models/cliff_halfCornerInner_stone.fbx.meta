@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: _defaultMat
-    second: {fileID: -3963241562183589234, guid: d6ae946bb431cb445a04bc19604e9ee4, type: 3}
+    second: {fileID: 2100000, guid: e0f28775dfcb89f42bdff52e7b08d4ca, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: f217492e8ce3f594e848bf6079aedafc, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: stone
-    second: {fileID: 2100000, guid: 1edb272cd9f45e64eb56f1f956c57495, type: 2}
+    second: {fileID: 2100000, guid: 73ec6061492a1f14a95143897ab20159, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

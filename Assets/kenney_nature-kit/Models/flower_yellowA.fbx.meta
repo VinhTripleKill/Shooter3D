@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: colorYellow
-    second: {fileID: 2100000, guid: 9c1f83218a6361e498212c3a6260d2ac, type: 2}
+    second: {fileID: 2100000, guid: cce02fa22a9dc7a43a4f1cefc04296bb, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: eac29f3611d6e494a855d9696200b63d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

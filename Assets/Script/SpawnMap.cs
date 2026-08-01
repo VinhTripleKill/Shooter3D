@@ -1,49 +1,101 @@
 using UnityEngine;
 
-public class SpawnMap : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class ItemBase : MonoBehaviour
 {
-    [Header("Prefab Block")]
-    public GameObject blockPrefab; // Kéo prefab "blockCube1:1" vào đây
+    [Header("Ground Detection")]
+    [SerializeField] protected LayerMask groundLayer;
+    [SerializeField] protected float stopDistance = 0.15f;
+    [SerializeField] protected float rayLength = 5f;
 
-    [Header("Map Settings")]
-    public int mapSize = 100;
-    public float spacing = 1f;           // Khoảng cách giữa các block (thường là 1 nếu block size = 1)
-    public float defaultY = -1f;         // Y mặc định như bạn yêu cầu
+    [Header("Idle Effect")]
+    [SerializeField] protected float rotateSpeed = 90f;      // độ/giây
+    [SerializeField] protected float floatAmplitude = 0.08f; // độ cao nhấp nhô
+    [SerializeField] protected float floatSpeed = 2f;        // tốc độ nhấp nhô
 
-    void Start()
+    protected Rigidbody rb;
+    protected bool isStopped = false;
+    protected Vector3 basePosition;
+    protected float floatTimer;
+
+    protected virtual void Awake()
     {
-        SpawnGrid();
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = true;
+        rb.isKinematic = false;
     }
 
-    public void SpawnGrid()
+    private void FixedUpdate()
     {
-        if (blockPrefab == null)
-        {
-            Debug.LogError("Chưa gán Prefab blockPrefab!");
+        if (isStopped)
             return;
-        }
 
-        // Xóa các block cũ nếu có (tránh spawn nhiều lần khi test)
-        foreach (Transform child in transform)
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
         {
-            Destroy(child.gameObject);
-        }
+            Debug.DrawRay(transform.position, Vector3.down * hit.distance, Color.green);
 
-        for (int x = 0; x < mapSize; x++)
-        {
-            for (int z = 0; z < mapSize; z++)
+            if (hit.distance <= stopDistance)
             {
-                Vector3 spawnPos = new Vector3(
-                    x * spacing,     // pos.x từ 0 đến 99
-                    defaultY,        // Y = -1
-                    z * spacing      // pos.z từ 0 đến 99 (thay vì y như bạn nhầm)
-                );
-
-                GameObject block = Instantiate(blockPrefab, spawnPos, Quaternion.identity, transform);
-                block.name = $"Block_{x}_{z}";
+                StopOnGround(hit);
             }
         }
-
-        Debug.Log($"Đã spawn xong map {mapSize}x{mapSize} block!");
+        else
+        {
+            Debug.DrawRay(transform.position, Vector3.down * rayLength, Color.red);
+        }
     }
+
+    private void Update()
+    {
+        if (!isStopped)
+            return;
+
+        UpdateIdleEffect();
+    }
+
+    // Có thể override để chỉ animate visual con
+    protected virtual void UpdateIdleEffect()
+    {
+        // Xoay theo chiều kim đồng hồ quanh trục Y
+        transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime, Space.World);
+
+        // Hiệu ứng bay lơ lửng
+        floatTimer += Time.deltaTime * floatSpeed;
+        Vector3 pos = basePosition;
+        pos.y += Mathf.Sin(floatTimer) * floatAmplitude;
+        transform.position = pos;
+    }
+
+    private void StopOnGround(RaycastHit hit)
+    {
+        isStopped = true;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.useGravity = false;
+        rb.isKinematic = true;
+
+        Vector3 pos = transform.position;
+        pos.y = hit.point.y + stopDistance;
+        transform.position = pos;
+
+        // Lưu vị trí gốc để hiệu ứng lơ lửng
+        basePosition = transform.position;
+
+        // Để các Item không nhấp nhô cùng nhịp
+        floatTimer = Random.Range(0f, Mathf.PI * 2f);
+
+        OnLanded(hit);
+    }
+
+    // Hook cho class con (GunItem dùng để lưu startVisualPos)
+    protected virtual void OnLanded(RaycastHit hit) { }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
+    }
+#endif
 }

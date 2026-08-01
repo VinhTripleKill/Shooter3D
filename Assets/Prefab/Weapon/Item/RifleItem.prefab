@@ -81,14 +81,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9798f0c8c102fc743a33f217f66956ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GunItem
-  itemVisual: {fileID: 5708446690038660673}
-  itemNameVisual: {fileID: 2424653371409881210}
-  floatSpeed: 2
-  floatHeight: 0.15
-  rotateSpeed: 50
-  groundMask:
+  groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  stopDistance: 0.6
+  rayLength: 5
+  rotateSpeed: 90
+  floatAmplitude: 0.2
+  floatSpeed: 2
+  itemVisual: {fileID: 5708446690038660673}
+  itemNameVisual: {fileID: 2424653371409881210}
   gunData: {fileID: 11400000, guid: 7051c32482d87ae478b496216ddc12b0, type: 2}
 --- !u!114 &9083601119496379496
 MonoBehaviour:
@@ -147,7 +149,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

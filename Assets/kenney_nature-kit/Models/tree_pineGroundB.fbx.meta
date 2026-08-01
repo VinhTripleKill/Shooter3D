@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: leafsDark
-    second: {fileID: 2100000, guid: 70fcf417cc055d14f9fc33f921a78688, type: 2}
+    second: {fileID: 2100000, guid: 18d3861f499a7de4682f3b9e5e3fe10c, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

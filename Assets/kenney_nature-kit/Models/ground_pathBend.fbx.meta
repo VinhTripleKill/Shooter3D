@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: dirt
-    second: {fileID: 2100000, guid: 28a4ad4757020e84f9c71fbbadf59623, type: 2}
+    second: {fileID: 2100000, guid: a915dff6e0bfba14fabef5e8798e8043, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: dirtDark
-    second: {fileID: 2100000, guid: 86218347e0cad8b4abac3cabf7d717ce, type: 2}
+    second: {fileID: 2100000, guid: bf99764cb2f27d84c896b675301782ca, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: 7a7834bd311943f42b70efb8e3d339a8, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

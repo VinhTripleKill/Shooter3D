@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: colorRed
-    second: {fileID: 2100000, guid: e3d7585227ce8d74299b77e8efb48fd6, type: 2}
+    second: {fileID: 2100000, guid: 07b687f6b91ac78418e8404e3e8d185c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: colorWhite
-    second: {fileID: 2100000, guid: 6954d2d3e0a01dc42b1c485a2b9d3d79, type: 2}
+    second: {fileID: 2100000, guid: 8bf1a6b3e94a0fc4291ce33f7e509bc1, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: ebfe080debcd9d54f85953a800049306, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

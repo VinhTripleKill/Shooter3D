@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: leafsFall
-    second: {fileID: 2100000, guid: 99a6ddab224dfd748a366f133648a0d1, type: 2}
+    second: {fileID: 2100000, guid: e55f16c7f2806974c94fb1be7397063e, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: wood
-    second: {fileID: 2100000, guid: 62e91be46c6431243a5fb7a1bda2dc29, type: 2}
+    second: {fileID: 2100000, guid: fccbb755527794e4ba6457c3348b8301, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

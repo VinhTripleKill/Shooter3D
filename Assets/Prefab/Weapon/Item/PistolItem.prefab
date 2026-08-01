@@ -81,14 +81,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9798f0c8c102fc743a33f217f66956ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  itemVisual: {fileID: 2181165206219864636}
-  itemNameVisual: {fileID: 7254697321410385282}
-  floatSpeed: 2
-  floatHeight: 0.15
-  rotateSpeed: 50
-  groundMask:
+  groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  stopDistance: 0.6
+  rayLength: 5
+  rotateSpeed: 90
+  floatAmplitude: 0.2
+  floatSpeed: 2
+  itemVisual: {fileID: 2181165206219864636}
+  itemNameVisual: {fileID: 7254697321410385282}
   gunData: {fileID: 11400000, guid: b7334e01f5c646c4b845d2ca64740a81, type: 2}
 --- !u!114 &4592395351662970597
 MonoBehaviour:
@@ -147,7 +149,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

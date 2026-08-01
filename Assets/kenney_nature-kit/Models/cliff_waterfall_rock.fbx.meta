@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: _defaultMat
-    second: {fileID: -3963241562183589234, guid: 4132839d1d34186458d2b7e91375d2c7, type: 3}
+    second: {fileID: 2100000, guid: 8b7dedd27f264fb49b01453f3977b1ca, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: dirt
-    second: {fileID: 2100000, guid: 28a4ad4757020e84f9c71fbbadf59623, type: 2}
+    second: {fileID: 2100000, guid: 9e79931d71d5b01468dfdf626f04f666, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: water
-    second: {fileID: 2100000, guid: ba742f2cf60640f439114a55815b276f, type: 2}
+    second: {fileID: 2100000, guid: 9a616421f7361ef418574834d0aa59da, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

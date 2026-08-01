@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: _defaultMat
-    second: {fileID: -3963241562183589234, guid: 9aff40dd9d48b3b4b8b5c28e8268ad5c, type: 3}
+    second: {fileID: 2100000, guid: f9f5e44203fe3cb419ba9a5409c9dd13, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: leafsDark
-    second: {fileID: 2100000, guid: 70fcf417cc055d14f9fc33f921a78688, type: 2}
+    second: {fileID: 2100000, guid: 622b180df3b00b74caac13a4e687012c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: woodBirch
-    second: {fileID: 2100000, guid: ac8c22394ab531e44897bb2236fcac9c, type: 2}
+    second: {fileID: 2100000, guid: aba7c7bf6eaf515478309f02333e7233, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

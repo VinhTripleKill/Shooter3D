@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(SphereCollider))]
-public class GunItem : MonoBehaviour
+public class GunItem : ItemBase
 {
     [Header("Visual")]
     [Tooltip("Object con chứa model/vfx sẽ xoay và float")]
@@ -13,30 +11,18 @@ public class GunItem : MonoBehaviour
     [Tooltip("Component quản lý tên item")]
     public ItemNameVisual itemNameVisual;
 
-    [Header("Floating")]
-    public float floatSpeed = 2f;
-    public float floatHeight = 0.15f;
-
-    [Header("Rotation")]
-    public float rotateSpeed = 50f;
-
-    [Header("Ground Check")]
-    public LayerMask groundMask;
-
     [Header("Data")]
     [Tooltip("Gán GunData cho item đặt sẵn trong Scene")]
     public GunData gunData;
 
-    private Rigidbody rb;
     private SphereCollider sphereCollider;
     private Dictionary<Transform, int> originalLayers = new Dictionary<Transform, int>();
-
     private Vector3 startVisualPos;
-    private bool isGrounded = false;
 
-    private void Awake()
+    protected override void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        base.Awake(); // Khởi tạo Rigidbody từ ItemBase
+
         sphereCollider = GetComponent<SphereCollider>();
 
         // Lưu layer gốc
@@ -61,9 +47,7 @@ public class GunItem : MonoBehaviour
     {
         if (itemVisual != null) return;
 
-        itemVisual = transform.Find("itemVisual") 
-                  ?? transform.Find("Visual") 
-                  ?? transform.Find("Model");
+        itemVisual = transform.Find("ItemVisual");
 
         if (itemVisual == null)
         {
@@ -93,6 +77,7 @@ public class GunItem : MonoBehaviour
     public void SetGunData(GunData data)
     {
         if (data == null) return;
+
         gunData = data;
 
         if (itemNameVisual != null)
@@ -123,31 +108,30 @@ public class GunItem : MonoBehaviour
         }
     }
 
-    private void Update()
+    // Override để chỉ xoay + nhấp nhô itemVisual, giữ root ổn định (collider/rigidbody)
+    protected override void UpdateIdleEffect()
     {
-        if (!isGrounded || itemVisual == null) return;
+        if (itemVisual == null)
+        {
+            // Fallback: dùng logic gốc của ItemBase nếu không có visual
+            base.UpdateIdleEffect();
+            return;
+        }
 
-        float newY = startVisualPos.y + Mathf.Sin(Time.time * floatSpeed) * floatHeight;
-        itemVisual.position = new Vector3(itemVisual.position.x, newY, itemVisual.position.z);
+        // Xoay visual
+        itemVisual.Rotate(Vector3.up, rotateSpeed * Time.deltaTime, Space.World);
 
-        itemVisual.Rotate(Vector3.up * rotateSpeed * Time.deltaTime);
+        // Nhấp nhô visual
+        floatTimer += Time.deltaTime * floatSpeed;
+        Vector3 pos = startVisualPos;
+        pos.y += Mathf.Sin(floatTimer) * floatAmplitude;
+        itemVisual.position = pos;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    // Override để lưu vị trí visual khi đáp đất
+    protected override void OnLanded(RaycastHit hit)
     {
-        if (isGrounded) return;
-        if (((1 << collision.gameObject.layer) & groundMask) == 0) return;
-
-        LandItem();
-    }
-
-    private void LandItem()
-    {
-        isGrounded = true;
-
-        rb.isKinematic = true;
-        rb.useGravity = false;
-        sphereCollider.isTrigger = true;
+        base.OnLanded(hit); // Vẫn set position root + kinematic từ ItemBase
 
         if (itemVisual != null)
             startVisualPos = itemVisual.position;

@@ -8,22 +8,22 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: stone
-    second: {fileID: 2100000, guid: 1edb272cd9f45e64eb56f1f956c57495, type: 2}
+    second: {fileID: 2100000, guid: 81159f72a40e85c499db29336160b932, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: stoneDark
-    second: {fileID: 2100000, guid: 56b2b08b1898bb54884fdb049a230d56, type: 2}
+    second: {fileID: 2100000, guid: 8cfa39670e46e3f4eb06f2c317c6715f, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: wood
-    second: {fileID: 2100000, guid: 62e91be46c6431243a5fb7a1bda2dc29, type: 2}
+    second: {fileID: 2100000, guid: 0836c85dd3e2c7042bcf4277f108558b, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: woodBark
-    second: {fileID: 2100000, guid: 53cb640ab7c810944baf97f99c9aa7d8, type: 2}
+    second: {fileID: 2100000, guid: d5af6f8f61ab41040afbcda13a1ab261, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

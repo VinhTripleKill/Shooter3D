@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: grass
-    second: {fileID: 2100000, guid: 0922625966eb8e94aba2cc92f84381ac, type: 2}
+    second: {fileID: 2100000, guid: 3a9f97bfd9dd770409043b9c8588ae5a, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: woodBirch
-    second: {fileID: 2100000, guid: ac8c22394ab531e44897bb2236fcac9c, type: 2}
+    second: {fileID: 2100000, guid: 47360523962f5384d907921311c06da9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
