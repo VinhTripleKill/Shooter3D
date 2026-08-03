@@ -7,10 +7,6 @@ public class GamePlayUI : MonoBehaviour
     [SerializeField] private Image sprintBar;
     [SerializeField] private Button sprintButton;
     [SerializeField] private Image sprintLock;
-    [Header("Ultimate")]
-    [SerializeField] private Image ultimateBar;
-    [SerializeField] private Image ultimateIcon;
-    [SerializeField] private Button ultimateButton;
     [Header("Skill")]
     [SerializeField] private Image skillIcon;
     [SerializeField] private Button skillButton;
@@ -55,17 +51,7 @@ public class GamePlayUI : MonoBehaviour
 
         hpText.text = $"{Mathf.CeilToInt(currentHp)}/{Mathf.CeilToInt(maxHp)}";
     }
-    public Button GetUltimateButton()
-    {
-        return ultimateButton;
-    }
-    // Thêm vào phần Ultimate
-public void SetUltimateIcon(Sprite icon)
-{
-    if (ultimateIcon != null)
-        ultimateIcon.sprite = icon;
-        ultimateBar.sprite = icon;
-}
+
     public void UpdateManaBar(float currentMana, float maxMana)
     {
         manaBar.fillAmount = currentMana / maxMana;
@@ -116,10 +102,6 @@ public void SetUltimateIcon(Sprite icon)
     public void ResetAmmoBar()
     {
         statusAmmo.fillAmount = 1f;
-    }
-    public void SetUltimateBar(float value)
-    {
-        ultimateBar.fillAmount = value;
     }
     public Button GetReloadButton()
     {

@@ -2,9 +2,7 @@ using UnityEngine;
 
 public static class CombatTargetFinder
 {
-    public static Transform GetNearestTarget(
-        Vector3 origin,
-        float range)
+    public static Transform GetNearestTarget(Vector3 origin,float range)
     {
         Transform nearest = null;
 
@@ -12,22 +10,15 @@ public static class CombatTargetFinder
 
         foreach (IAutoAimTarget target in AutoAimManager.Targets)
         {
-            if (target == null)
-                continue;
+            if (target == null) continue;
 
-            Transform targetTransform =
-                target.GetTargetTransform();
+            Transform targetTransform = target.GetTargetTransform();
 
-            if (targetTransform == null)
-                continue;
+            if (targetTransform == null) continue;
 
-            float distance =
-                Vector3.Distance(
-                    origin,
-                    targetTransform.position);
+            float distance = Vector3.Distance(origin,targetTransform.position);
 
-            if (distance > range)
-                continue;
+            if (distance > range) continue;
 
             if (distance < nearestDistance)
             {
@@ -35,47 +26,35 @@ public static class CombatTargetFinder
                 nearest = targetTransform;
             }
         }
-
+        
         return nearest;
     }
-    public static Transform RotateToNearestTarget(
-        Transform owner,
-        float range)
+    public static Transform RotateToNearestTarget(Transform owner,float range)
     {
-        Transform target =
-            GetNearestTarget(
-                owner.position,
-                range);
+        Transform target = GetNearestTarget( owner.position, range);
 
-        if (target == null)
-            return null;
+        if (target == null) return null;
 
-        Vector3 dir =
-            target.position - owner.position;
+        Vector3 dir = target.position - owner.position;
 
         dir.y = 0;
 
         if (dir.sqrMagnitude > 0.001f)
         {
-            owner.forward =
-                dir.normalized;
+            owner.forward = dir.normalized;
         }
 
         return target;
     }
-    public static Vector3 GetAimDirection(
-    Transform owner,
-    Vector3 firePosition,
-    float range)
-{
-    Transform target =
-        RotateToNearestTarget(owner, range);
-
-    if (target != null)
+    public static Vector3 GetAimDirection(Transform owner,Vector3 firePosition,float range)
     {
-        return (target.position - firePosition).normalized;
+        Transform target = RotateToNearestTarget(owner, range);
+    
+        if (target != null)
+        {
+            return (target.position - firePosition).normalized;
+        }
+    
+        return owner.forward;
     }
-
-    return owner.forward;
-}
 }

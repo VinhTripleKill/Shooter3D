@@ -18,4 +18,6 @@ public class CharacterStats
     public float critDamage;
 
     public float defense;
+     
+    public float attackRange;
 }

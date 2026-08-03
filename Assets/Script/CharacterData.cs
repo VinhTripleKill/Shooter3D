@@ -14,6 +14,4 @@ public class CharacterData : ScriptableObject
     [Header("Stats")]
     public CharacterStats CharacterStats;
 
-    [Header("Ultimate")]
-    public UltimateBehaviour ultimatePrefab;
 }

@@ -1,16 +1,13 @@
 using UnityEngine;
 using System;
-public class BulletProjecTile : MonoBehaviour
+public class BulletProjectile : MonoBehaviour
 {
-    public enum BulletType{ bullet, missile }
+  
     private float speed;
-    private float lifeTime;
     private float damage;
-    public BulletType bulletType;
     private Vector3 moveDirection;
-    [SerializeField]
-    private float rotateSpeed = 180f;
-    private Transform target;
+    private float maxDistance;
+    private Vector3 startPosition;
     private Rigidbody rb;
     private LayerMask hitMask;
     public static event Action OnSuccessfulHit;
@@ -20,37 +17,31 @@ public class BulletProjecTile : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
     public void Initialize(
-        Vector3 dir,
-        float bulletSpeed,
-        float bulletLifeTime,
-        float bulletDamage,
-        LayerMask bulletHitMask,
-        LayerMask bulletInteractionMask,
-        Transform targetTransform = null)
-    {
-        moveDirection = dir.normalized;
+    Vector3 dir,
+    float bulletSpeed,
+    float bulletDamage,
+    float bulletRange,
+    LayerMask bulletHitMask,
+    LayerMask bulletInteractionMask)
+{
+    moveDirection = dir.normalized;
 
-        speed = bulletSpeed;
-        lifeTime = bulletLifeTime;
-        damage = bulletDamage;
+    speed = bulletSpeed;
+    damage = bulletDamage;
 
-        hitMask = bulletHitMask;
-        interactionMask = bulletInteractionMask;
-        target = targetTransform;
-        Destroy(gameObject, lifeTime);
-    }
+    maxDistance = bulletRange;
+    startPosition = transform.position;
+
+    hitMask = bulletHitMask;
+    interactionMask = bulletInteractionMask;
+}
     private void FixedUpdate()
     {
-        switch (bulletType)
-        {
-            case BulletType.bullet:
-                UpdateNormalBullet();
-                break;
-
-            case BulletType.missile:
-                UpdateMissile();
-                break;
-        }
+        UpdateNormalBullet();
+        if ((transform.position - startPosition).sqrMagnitude >= maxDistance * maxDistance)
+{
+    Destroy(gameObject);
+}
     }
     private void UpdateNormalBullet()
     {
@@ -63,35 +54,13 @@ public class BulletProjecTile : MonoBehaviour
             transform.position += moveDirection * speed * Time.fixedDeltaTime;
         }
     }
-    private void UpdateMissile()
-    {
-        if (target == null)
-        {
-            if (rb != null)
-                rb.linearVelocity = transform.forward * speed;
-
-            return;
-        }
-
-        Vector3 direction = (target.position - transform.position) .normalized;
-
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
-
-        transform.rotation = Quaternion.RotateTowards( transform.rotation, targetRotation, rotateSpeed * Time.fixedDeltaTime);
-
-        if (rb != null)
-        { 
-            rb.linearVelocity = transform.forward * speed;
-        }
-    }
-
-
-
     private void OnTriggerEnter(Collider other)
-    {
-    if (((1 << other.gameObject.layer) & hitMask) == 0) return;
+{
+    if (((1 << other.gameObject.layer) & hitMask) == 0)
+        return;
 
-    IDamageable damageable = other.GetComponentInParent<IDamageable>();
+    IDamageable damageable =
+        other.GetComponentInParent<IDamageable>();
 
     if (damageable != null)
     {
@@ -104,5 +73,6 @@ public class BulletProjecTile : MonoBehaviour
     }
 
     Destroy(gameObject);
-    }
+}
+   
 }

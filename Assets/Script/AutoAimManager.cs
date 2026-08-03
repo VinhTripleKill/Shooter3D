@@ -2,11 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 public static class AutoAimManager
 {
-    public static List<IAutoAimTarget> Targets =
-        new List<IAutoAimTarget>();
+    public static List<IAutoAimTarget> Targets = new List<IAutoAimTarget>();
 
-    public static void Register(
-        IAutoAimTarget target)
+    public static void Register(IAutoAimTarget target)
     {
         if (!Targets.Contains(target))
         {
@@ -14,8 +12,7 @@ public static class AutoAimManager
         }
     }
 
-    public static void Unregister(
-        IAutoAimTarget target)
+    public static void Unregister(IAutoAimTarget target)
     {
         Targets.Remove(target);
     }

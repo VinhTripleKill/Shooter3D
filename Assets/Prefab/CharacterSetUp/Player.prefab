@@ -394,9 +394,7 @@ GameObject:
   - component: {fileID: 9106935594860556004}
   - component: {fileID: 3138547354700429741}
   - component: {fileID: 2959926364516746955}
-  - component: {fileID: 2526991662631586841}
   - component: {fileID: 419620185627268416}
-  - component: {fileID: 7119583045611377075}
   - component: {fileID: 4129186038483614875}
   - component: {fileID: 87360897422917935}
   m_Layer: 8
@@ -622,18 +620,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   lineDebugPrefab: {fileID: 8826263514642348245, guid: fb945453551d22c43889d4793b913532, type: 3}
---- !u!114 &2526991662631586841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2328074943725962016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3d0e9be1ad77439d8820a39509a4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UltimateSocket
 --- !u!114 &419620185627268416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,20 +633,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   modelPos: {fileID: 1067233281617240455}
---- !u!114 &7119583045611377075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2328074943725962016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c97c31d93e2f2c34b8f5d9a02249b98f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimate
-  gameplayUI: {fileID: 0}
-  ultimateSocket: {fileID: 2526991662631586841}
 --- !u!114 &4129186038483614875
 MonoBehaviour:
   m_ObjectHideFlags: 0

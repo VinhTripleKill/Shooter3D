@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GunData
   gunName: Sniper
   fireType: 0
-  raycastDistance: 20
+  rangeAttack: 15
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2
@@ -26,10 +26,11 @@ MonoBehaviour:
   gunVisualPrefab: {fileID: 3547316800252406819, guid: b1e2d6fb63fc0da43903990567542334, type: 3}
   gunItemPrefab: {fileID: 4387299326062068396, guid: 2d9e5ca7233ff85428c445f473efeb9c, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 9c9a41f02d459be40a28d1b5b6526939, type: 3}
+  missilePrefab: {fileID: 0}
   damage: 50
   timeBetweenShots: 1
   bulletSpeed: 60
-  bulletLifeTime: 3
+  missileLifeTime: 5
   maxCountShot: 5
   manaRecoveryByHit: 2
   timeReload: 2

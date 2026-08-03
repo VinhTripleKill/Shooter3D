@@ -50,7 +50,7 @@ public class GunRayDebug : MonoBehaviour
      currentGunData.hitRadius,
      direction,
      out RaycastHit hit,
-     currentGunData.raycastDistance,
+     currentGunData.rangeAttack,
      currentGunData.hitMask,
      QueryTriggerInteraction.Ignore))
             {
@@ -58,7 +58,7 @@ public class GunRayDebug : MonoBehaviour
             }
             else
             {
-                endPos = currentFirePoint.position + direction * currentGunData.raycastDistance;
+                endPos = currentFirePoint.position + direction * currentGunData.rangeAttack;
             }
             float width =
     currentGunData.hitRadius * 2f;

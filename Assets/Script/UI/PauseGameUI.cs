@@ -19,23 +19,17 @@ public class PauseGameUI : MonoBehaviour
     {
         if (resumeB != null)
         {
-            resumeB.onClick.AddListener(
-                OnResumeClicked
-            );
+            resumeB.onClick.AddListener(OnResumeClicked);
         }
 
         if (replayB != null)
         {
-            replayB.onClick.AddListener(
-                OnReplayClicked
-            );
+            replayB.onClick.AddListener(OnReplayClicked);
         }
 
         if (exitB != null)
         {
-            exitB.onClick.AddListener(
-                OnExitClicked
-            );
+            exitB.onClick.AddListener(OnExitClicked);
         }
     }
 
@@ -43,29 +37,19 @@ public class PauseGameUI : MonoBehaviour
     {
         if (resumeB != null)
         {
-            resumeB.onClick.RemoveListener(
-                OnResumeClicked
-            );
+            resumeB.onClick.RemoveListener(OnResumeClicked);
         }
 
         if (replayB != null)
         {
-            replayB.onClick.RemoveListener(
-                OnReplayClicked
-            );
+            replayB.onClick.RemoveListener(OnReplayClicked);
         }
 
         if (exitB != null)
         {
-            exitB.onClick.RemoveListener(
-                OnExitClicked
-            );
+            exitB.onClick.RemoveListener(OnExitClicked);
         }
     }
-
-    // ============================
-    // RESUME
-    // ============================
 
     private void OnResumeClicked()
     {
@@ -74,47 +58,24 @@ public class PauseGameUI : MonoBehaviour
             coreGameUI.ResumeGame();
         }
     }
-
-    // ============================
-    // REPLAY
-    // ============================
-
     private void OnReplayClicked()
     {
-        Debug.Log("REPLAY BUTTON CLICKED");
-
-        // Tắt Pause UI
         if (pauseGameUI != null)
         {
             pauseGameUI.SetActive(false);
             pauseB.gameObject.SetActive(true);
         }
-
-        // Replay với character + skill đã chọn
         if (playerSpawn != null)
         {
             playerSpawn.ReplayGame();
         }
     }
-
-    // ============================
-    // EXIT
-    // ============================
-
     private void OnExitClicked()
     {
-        Debug.Log("EXIT BUTTON CLICKED");
-
-        // Tắt Pause UI
         if (pauseGameUI != null)
         {
             pauseGameUI.SetActive(false);
         }
-
-        // Đưa game về trạng thái bình thường
         Time.timeScale = 1f;
-
-        // Bạn có thể thêm logic chuyển scene
-        // hoặc mở lại panel chọn character ở đây.
     }
 }

@@ -83,25 +83,6 @@ private void ToggleSkillList()
 
     descriptionCharacter.text =data.descriptionCharacter;
 
-    if (data.ultimatePrefab != null)
-    {
-        UltimateData ultimate = data.ultimatePrefab.Data;
-    
-        ultimateIcon.sprite = ultimate.icon;
-        ultimateName.text = ultimate.ultimateName;
-        manaCost_text.text = $"Cost: {ultimate.manaCost:0}";
-        ultimateCD_text.text = $"CD: {ultimate.cooldown:0.0}s";
-        descriptionUltimate.text = ultimate.descriptionUltimate;
-    }
-    else
-    {
-        ultimateIcon.sprite = null;
-        ultimateName.text = "";
-        manaCost_text.text = "";
-        ultimateCD_text.text = "";
-        descriptionUltimate.text = "";
-    }
-    
     }
     public void ShowSkill(SkillData data)
     {

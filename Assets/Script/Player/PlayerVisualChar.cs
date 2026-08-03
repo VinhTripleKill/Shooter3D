@@ -48,15 +48,13 @@ public class PlayerVisualChar : MonoBehaviour
             playerAnim.SetAnimator(playerModel.Animator);
         }
 
-        // Gán GunHolder cho PlayerWeapon
         PlayerWeapon playerWeapon = GetComponent<PlayerWeapon>();
         if (playerWeapon != null && playerModel.GunHolder != null)
         {
             playerWeapon.SetGunHolder(playerModel.GunHolder);
         }
 
-        // Gán cho PlayerUltimate nếu cần (nếu ultimate dùng model)
-        // PlayerUltimate ultimate = GetComponent<PlayerUltimate>();
+       
     }
 
     public PlayerModel GetPlayerModel() => playerModel;

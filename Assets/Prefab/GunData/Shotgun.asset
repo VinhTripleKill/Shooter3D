@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GunData
   gunName: Shotgun
   fireType: 1
-  raycastDistance: 10
+  rangeAttack: 15
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2
@@ -26,10 +26,11 @@ MonoBehaviour:
   gunVisualPrefab: {fileID: 1288899136825821740, guid: 1ac86896bf5920d4099f67d282706389, type: 3}
   gunItemPrefab: {fileID: 7684841745191892969, guid: 1b85f07487a4d9c458d98aa961f23f28, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 0fb82d1041264f9428c413013096ea33, type: 3}
+  missilePrefab: {fileID: 0}
   damage: 5
   timeBetweenShots: 1
   bulletSpeed: 15
-  bulletLifeTime: 3
+  missileLifeTime: 0
   maxCountShot: 5
   manaRecoveryByHit: 1
   timeReload: 3

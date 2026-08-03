@@ -27,8 +27,7 @@ public class ItemBase : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isStopped)
-            return;
+        if (isStopped) return;
 
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer))
         {
@@ -47,13 +46,11 @@ public class ItemBase : MonoBehaviour
 
     private void Update()
     {
-        if (!isStopped)
-            return;
+        if (!isStopped) return;
 
         UpdateIdleEffect();
     }
 
-    // Có thể override để chỉ animate visual con
     protected virtual void UpdateIdleEffect()
     {
         // Xoay theo chiều kim đồng hồ quanh trục Y

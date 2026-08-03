@@ -46,7 +46,9 @@ public class PlayerWeapon : MonoBehaviour
         attackManualAction = playerInput.actions["AttackManual"];
         reloadAction = playerInput.actions["Reload"];
 
-        BulletProjecTile.OnSuccessfulHit += RecoverManaByProjectileHit;
+        BulletProjectile.OnSuccessfulHit += RecoverManaByProjectileHit;
+        
+        MissileProjectile.OnSuccessfulHit += RecoverManaByProjectileHit;
         gameplayUI?.ResetAmmoBar();
 
         if (gameplayUI != null)
@@ -79,7 +81,8 @@ public class PlayerWeapon : MonoBehaviour
     {
         if (gameplayUI != null)
             gameplayUI.GetReloadButton().onClick.RemoveListener(OnReloadButtonClicked);
-            BulletProjecTile.OnSuccessfulHit -= RecoverManaByProjectileHit;
+            BulletProjectile.OnSuccessfulHit -= RecoverManaByProjectileHit;
+            MissileProjectile.OnSuccessfulHit -= RecoverManaByProjectileHit;
     }
 
     private void OnReloadButtonClicked() => ManualReload();
@@ -231,14 +234,20 @@ public class PlayerWeapon : MonoBehaviour
     {
         GunData gunData = currentGunVisual.gunData;
 
-        if (gunData.fireType == GunData.GunFireType.Raycast)
-        {
-            ShootRaycast(gunData);
-        }
-        else
-        {
-            ShootProjectile(gunData);
-        }
+        switch (gunData.fireType)
+{
+    case GunData.GunFireType.Raycast:
+        ShootRaycast(gunData);
+        break;
+
+    case GunData.GunFireType.Bullet:
+        ShootBullet(gunData);
+        break;
+
+    case GunData.GunFireType.Missile:
+        ShootMissile(gunData);
+        break;
+}
 
         if (gunData.recoilForce > 0)
         {
@@ -247,7 +256,51 @@ public class PlayerWeapon : MonoBehaviour
             cc.Move( -transform.forward * gunData.recoilForce);
         }
     }
-    private void ShootProjectile( GunData gunData)
+    private void ShootMissile(GunData gunData)
+{
+    Transform firePoint = currentGunVisual.GetFirePoint();
+
+    int pelletCount = gunData.pelletCount;
+
+    float angleStep = gunData.angleBetweenBullets;
+
+    float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
+
+    for (int i = 0; i < pelletCount; i++)
+    {
+        float currentAngle = startAngle + angleStep * i;
+
+        Quaternion fixedSpread =
+            Quaternion.Euler(0, currentAngle, 0);
+
+        Quaternion randomSpread =
+            Quaternion.Euler(
+                Random.Range(-gunData.randomSpreadX, gunData.randomSpreadX),
+                Random.Range(-gunData.randomSpreadY, gunData.randomSpreadY),
+                Random.Range(-gunData.randomSpreadZ, gunData.randomSpreadZ));
+
+        Quaternion finalRotation =
+            firePoint.rotation * fixedSpread * randomSpread;
+
+        GameObject missileObj =
+            Instantiate(
+                gunData.missilePrefab,
+                firePoint.position,
+                finalRotation);
+
+        MissileProjectile missile =
+            missileObj.GetComponent<MissileProjectile>();
+
+        missile.Initialize(
+            gunData.bulletSpeed,
+            gunData.missileLifeTime,
+            gunData.damage,
+            gunData.hitMask,
+            gunData.interactionMask,
+            currentTarget);
+    }
+}
+    private void ShootBullet( GunData gunData)
     {
         Transform firePoint = currentGunVisual.GetFirePoint();
 
@@ -279,15 +332,14 @@ public class PlayerWeapon : MonoBehaviour
 
             GameObject bulletObj = Instantiate( gunData.bulletPrefab, firePoint.position, finalRotation);
 
-            BulletProjecTile bullet = bulletObj.GetComponent<BulletProjecTile>();
+            BulletProjectile bullet = bulletObj.GetComponent<BulletProjectile>();
             bullet.Initialize(
                 finalRotation * Vector3.forward,
                 gunData.bulletSpeed,
-                gunData.bulletLifeTime,
+                gunData.rangeAttack,
                 gunData.damage,
                 gunData.hitMask,
-                gunData.interactionMask,
-                currentTarget);
+                gunData.interactionMask);
         }
     }
 
@@ -336,7 +388,7 @@ public class PlayerWeapon : MonoBehaviour
          gunData.hitRadius,
          direction,
          out hit,
-         gunData.raycastDistance,
+         gunData.rangeAttack,
          gunData.hitMask,
          QueryTriggerInteraction.Ignore))
             {
@@ -355,7 +407,7 @@ public class PlayerWeapon : MonoBehaviour
             }
             else
             {
-                endPos = startPos + direction * gunData.raycastDistance;
+                endPos = startPos + direction * gunData.rangeAttack;
             }
 
             SpawnTrail(startPos, endPos, gunData);
