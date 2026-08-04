@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85901d497c7b6e34f8b98954a2adc8a1, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: Assembly-CSharp::GunData
+  icon: {fileID: 21300000, guid: e15e32b8bb38c1e4bb41c82b768edf5f, type: 3}
   gunName: Pistol
   fireType: 1
-  raycastDistance: 10
+  rangeAttack: 15
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2
@@ -26,10 +27,11 @@ MonoBehaviour:
   gunVisualPrefab: {fileID: 7153347977920189024, guid: 10768f782e442f243b1e01577dfdeb94, type: 3}
   gunItemPrefab: {fileID: 8074242924553788827, guid: c3a5bc32cb69f284f80afff8501c7aa9, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 0fb82d1041264f9428c413013096ea33, type: 3}
+  missilePrefab: {fileID: 0}
   damage: 10
   timeBetweenShots: 0.5
   bulletSpeed: 10
-  bulletLifeTime: 1
+  missileLifeTime: 0
   maxCountShot: 10
   manaRecoveryByHit: 1
   timeReload: 2

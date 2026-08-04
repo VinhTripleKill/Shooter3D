@@ -17,18 +17,14 @@ public class VisualCharacterInfo : MonoBehaviour
     [SerializeField] private TextMeshProUGUI defense_text;
     [SerializeField] private TextMeshProUGUI descriptionCharacter;
 
-    [Header ("Ultimate character")]
-    [SerializeField] private Image ultimateIcon;
-    [SerializeField] private TextMeshProUGUI ultimateName;
-    [SerializeField] private TextMeshProUGUI manaCost_text;
-    [SerializeField] private TextMeshProUGUI ultimateCD_text;
-    [SerializeField] private TextMeshProUGUI descriptionUltimate;
-    
     [Header ("Skill")]
     [SerializeField] private Image skillIcon;
     [SerializeField] private TextMeshProUGUI skillName_text;
     [SerializeField] private TextMeshProUGUI skillStack_text;
     [SerializeField] private TextMeshProUGUI skillCD_text;
+    [SerializeField] private Button SkillChooseB;
+    [SerializeField] private GameObject listSkill;
+    [SerializeField] private ListSkillManager skillManager;
     [Header("Gun")]
     [SerializeField] private Image GunIcon;
     [SerializeField] private TextMeshProUGUI gunName_text;
@@ -36,24 +32,33 @@ public class VisualCharacterInfo : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countShot_text;
     [SerializeField] private TextMeshProUGUI reloadTime_text;
     [SerializeField] private TextMeshProUGUI manaRecor_text;
-    [Header ("Button")]
-    [SerializeField] private Button SkillChooseB;
-    [SerializeField] private GameObject listSkill;
-    [SerializeField]
-private ListSkillManager skillManager;
+    [SerializeField] private Button gunChooseB;
+    [SerializeField] private GameObject listGun;
+    [SerializeField] private ListGunManager gunManager;
     private void Awake()
-    {
-        if (listSkill != null)
-            listSkill.SetActive(false);
-    
-        SkillChooseB.onClick.AddListener(ToggleSkillList);
-    }
+{
+    if (listSkill != null)
+        listSkill.SetActive(false);
+
+    if (listGun != null)
+        listGun.SetActive(false);
+
+    SkillChooseB.onClick.AddListener(ToggleSkillList);
+    gunChooseB.onClick.AddListener(ToggleGunList);
+}
 
     private void OnDestroy()
-    {
-        SkillChooseB.onClick.RemoveListener(ToggleSkillList);
-    }
-    
+{
+    SkillChooseB.onClick.RemoveListener(ToggleSkillList);
+    gunChooseB.onClick.RemoveListener(ToggleGunList);
+}
+    private void ToggleGunList()
+{
+    if (listGun == null)
+        return;
+
+    listGun.SetActive(!listGun.activeSelf);
+}
 private void ToggleSkillList()
     {
         if (listSkill == null) return;
@@ -99,8 +104,35 @@ private void ToggleSkillList()
     
         skillName_text.text = data.skillName;
     
-        skillStack_text.text = $"{data.maxStack}";
+        //skillStack_text.text = $"{data.maxStack}";
     
-        skillCD_text.text = $"{data.cooldown:0.0}s";
+        //skillCD_text.text = $"{data.cooldown:0.0}s";
     }
+    public void ShowGun(GunData data)
+{
+    if (data == null)
+    {
+        GunIcon.sprite = null;
+
+        gunName_text.text = "";
+        damageGun_text.text = "";
+        countShot_text.text = "";
+        reloadTime_text.text = "";
+        manaRecor_text.text = "";
+
+        return;
+    }
+
+    GunIcon.sprite = data.icon;
+
+    gunName_text.text = data.gunName;
+
+    //damageGun_text.text = data.damage.ToString();
+
+    //countShot_text.text = data.maxCountShot.ToString();
+
+    //reloadTime_text.text = $"{data.timeReload:0.0}s";
+
+    //manaRecor_text.text = data.manaRecoveryByHit.ToString();
+}
 }

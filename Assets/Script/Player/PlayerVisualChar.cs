@@ -53,8 +53,6 @@ public class PlayerVisualChar : MonoBehaviour
         {
             playerWeapon.SetGunHolder(playerModel.GunHolder);
         }
-
-       
     }
 
     public PlayerModel GetPlayerModel() => playerModel;

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85901d497c7b6e34f8b98954a2adc8a1, type: 3}
   m_Name: SniperGold
   m_EditorClassIdentifier: Assembly-CSharp::GunData
+  icon: {fileID: 21300000, guid: f1a1ac03187e82746a3e2949780ee1b9, type: 3}
   gunName: Sniper
   fireType: 0
   rangeAttack: 15
@@ -30,7 +31,7 @@ MonoBehaviour:
   damage: 50
   timeBetweenShots: 1
   bulletSpeed: 60
-  missileLifeTime: 5
+  missileLifeTime: 0
   maxCountShot: 5
   manaRecoveryByHit: 2
   timeReload: 2

@@ -336,8 +336,12 @@ public class PlayerWeapon : MonoBehaviour
             bullet.Initialize(
                 finalRotation * Vector3.forward,
                 gunData.bulletSpeed,
-                gunData.rangeAttack,
+
+                //damage trước , khoảng cách sau
                 gunData.damage,
+                gunData.rangeAttack,
+                //
+
                 gunData.hitMask,
                 gunData.interactionMask);
         }
@@ -522,11 +526,11 @@ public class PlayerWeapon : MonoBehaviour
             yield break;
 
         isReloading = true;
-
-        gameplayUI?.StartReloadVisual();
-
         GunData gunData = currentGunVisual.gunData;
 
+        gameplayUI?.StartReloadVisual(gunData.timeReload);
+
+        
         yield return new WaitForSeconds(gunData.timeReload);
 
         currentShotCount = gunData.maxCountShot;
@@ -537,5 +541,15 @@ public class PlayerWeapon : MonoBehaviour
 
         gameplayUI?.UpdateAmmoBar(currentShotCount,gunData.maxCountShot);
     }
+    public void EquipStartingGun(GunData gunData)
+{
+    if (gunData == null)
+    {
+        Debug.LogWarning("Starting GunData is null!");
+        return;
+    }
+
+    EquipGun(gunData.gunVisualPrefab);
+}
 
 }

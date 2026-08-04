@@ -9,6 +9,8 @@ public class GunData : ScriptableObject
         Bullet,
         Missile
         }
+
+    public Sprite icon;
     [Header("Info")]
     public string gunName;
     [Header("Fire Type")]

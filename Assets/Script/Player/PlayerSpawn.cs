@@ -6,11 +6,14 @@ public class PlayerSpawn : MonoBehaviour
     [Header("References")]
     [SerializeField] private ListCharacterManager listCharacterManager;
     [SerializeField] private ListSkillManager listSkillManager;
+    [SerializeField] private ListGunManager listGunManagr;
     [SerializeField] private VisualCharacterInfo visualCharacterInfo;
     [SerializeField] private Button battleButton;
     [SerializeField] private GameObject panelChoooseCharacter;
     private CharacterData selectedCharacter;
     private SkillData selectedSkill;
+    private GunData selectedGun;
+
     [Header("Scene References")]
     [SerializeField] private JoystickMove sceneJoystickMove;
     [SerializeField] private JoystickAttack sceneJoystickAttack;
@@ -41,12 +44,12 @@ public class PlayerSpawn : MonoBehaviour
         selectedCharacter = listCharacterManager.CurrentCharacter;
     
         selectedSkill = listSkillManager?.CurrentSkill;
-    
+        selectedGun = listGunManagr?.CurrentGun;
         if (selectedCharacter == null) return;
     
         panelChoooseCharacter.SetActive(false);
     
-        SpawnPlayer( selectedCharacter, selectedSkill );
+        SpawnPlayer( selectedCharacter, selectedSkill ,selectedGun);
     }
     public void ReplayGame()
     {
@@ -72,9 +75,9 @@ public class PlayerSpawn : MonoBehaviour
         }
     
     
-        SpawnPlayer( selectedCharacter, selectedSkill );
+        SpawnPlayer( selectedCharacter, selectedSkill, selectedGun );
     }
-    public void SpawnPlayer( CharacterData charData, SkillData skillData)
+    public void SpawnPlayer( CharacterData charData, SkillData skillData,GunData gunData)
     {
         if (playerPrefab == null ||spawnPoint == null) return;
     
@@ -117,7 +120,7 @@ public class PlayerSpawn : MonoBehaviour
         // INITIALIZE COMPONENTS
         // ============================
     
-        InitializePlayerComponents(currentPlayer,skillData);
+        InitializePlayerComponents(currentPlayer,skillData,gunData);
     
         if (cameraFollow != null)
         {
@@ -139,10 +142,10 @@ public class PlayerSpawn : MonoBehaviour
     
         waveManager?.StartNextWave();
     }
-    private void InitializePlayerComponents(GameObject player, SkillData selectedSkill)
+    private void InitializePlayerComponents(GameObject player, SkillData selectedSkill, GunData selectedGun)
     {
         PlayerController controller = player.GetComponent<PlayerController>();
-        
+
         if (controller != null)
             controller.InitializeSceneReferences( sceneJoystickMove, sceneGamePlayUI, coreUI, waveManager );
 
@@ -150,6 +153,8 @@ public class PlayerSpawn : MonoBehaviour
         PlayerWeapon weapon = player.GetComponent<PlayerWeapon>();
         if (weapon != null)
             weapon.SetGameplayUI(sceneGamePlayUI);
+        if (selectedGun != null)
+            weapon.EquipStartingGun(selectedGun);
 
         // === LIÊN KẾT JOYSTICK ATTACK ===
         if (sceneJoystickAttack != null && weapon != null)

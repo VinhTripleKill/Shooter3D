@@ -25,13 +25,14 @@ public class BulletProjectile : MonoBehaviour
     LayerMask bulletInteractionMask)
 {
     moveDirection = dir.normalized;
-
     speed = bulletSpeed;
+
+    // sẽ không có vụ nhầm đâu
     damage = bulletDamage;
-
     maxDistance = bulletRange;
-    startPosition = transform.position;
+    //
 
+    startPosition = transform.position;
     hitMask = bulletHitMask;
     interactionMask = bulletInteractionMask;
 }

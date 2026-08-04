@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85901d497c7b6e34f8b98954a2adc8a1, type: 3}
   m_Name: Rifle
   m_EditorClassIdentifier: Assembly-CSharp::GunData
+  icon: {fileID: 21300000, guid: 170e586340b334e41bd7658eedd72468, type: 3}
   gunName: Rifle
   fireType: 0
-  rangeAttack: 15
+  rangeAttack: 12.3
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2
@@ -22,7 +23,7 @@ MonoBehaviour:
   interactionMask:
     serializedVersion: 2
     m_Bits: 640
-  showRay: 1
+  showRay: 0
   gunVisualPrefab: {fileID: 5513453165033166812, guid: c6ab4dece44495c4dbb8c3967647fd64, type: 3}
   gunItemPrefab: {fileID: 6136311237187020477, guid: 80360a89cde7733449eb1dd81f7b7384, type: 3}
   bulletPrefab: {fileID: 1494176188833829425, guid: 9c9a41f02d459be40a28d1b5b6526939, type: 3}

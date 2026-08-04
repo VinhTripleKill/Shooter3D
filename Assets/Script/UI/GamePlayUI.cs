@@ -1,17 +1,14 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 public class GamePlayUI : MonoBehaviour
 {
     [Header("Sprint")]
     [SerializeField] private Image sprintBar;
     [SerializeField] private Button sprintButton;
     [SerializeField] private Image sprintLock;
-    [Header("Skill")]
-    [SerializeField] private Image skillIcon;
-    [SerializeField] private Button skillButton;
-    [SerializeField] private Image skillCD;
-    [SerializeField] private TextMeshProUGUI skillCount;
+    [SerializeField] private SkillSlot skillSlot;
     [Header("Mana")]
     [SerializeField] private Image manaBar;
     [SerializeField] private TextMeshProUGUI manaText;
@@ -27,8 +24,12 @@ public class GamePlayUI : MonoBehaviour
     [Header("Ammo")]
     [SerializeField] private Image statusAmmo;
     [SerializeField] private Image ammoI;
+    [Header("Reload")]
     [SerializeField] private Button reloadButton;
     [SerializeField] private float reloadRotateSpeed = 360f;
+    [SerializeField] private Image reloadLock;
+    [SerializeField] private TextMeshProUGUI reloadText;
+    private Coroutine reloadCoroutine;
     [Header("Pick Up")]
     [SerializeField] private Button pickUp;
     private bool isReloading;
@@ -36,6 +37,7 @@ public class GamePlayUI : MonoBehaviour
     private void Awake()
     {
         sprintLock.gameObject.SetActive(false);
+        reloadLock.gameObject.SetActive(false);
         pickUp.gameObject.SetActive(false);
     }
 
@@ -71,16 +73,55 @@ public class GamePlayUI : MonoBehaviour
     {
         return pickUp;
     }
-    public void StartReloadVisual()
+    public void StartReloadVisual(float reloadTime)
     {
-        isReloading = true;
+    isReloading = true;
+
+    reloadLock.gameObject.SetActive(true);
+
+    if (reloadCoroutine != null)
+        StopCoroutine(reloadCoroutine);
+
+    reloadCoroutine = StartCoroutine(ReloadCountdown(reloadTime));
     }
 
     public void StopReloadVisual()
     {
         isReloading = false;
-
+    
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+    
+        reloadLock.gameObject.SetActive(false);
+    
+        reloadText.text = "";
+    
         ammoI.rectTransform.localEulerAngles = Vector3.zero;
+    }
+    private IEnumerator ReloadCountdown(float duration)
+    {
+        float timer = duration;
+    
+        while (timer > 0f)
+        {
+            if (timer >= 1f)
+            {
+                reloadText.text = Mathf.CeilToInt(timer).ToString();
+            }
+            else
+            {
+                float value = Mathf.Max(0f, timer);
+                reloadText.text = value.ToString("F1");
+            }
+    
+            timer -= Time.deltaTime;
+            yield return null;
+        }
+    
+        reloadText.text = "0";
     }
 
     public void UpdateSprintBar( float currentSprint,float maxSprint)
@@ -124,41 +165,29 @@ public class GamePlayUI : MonoBehaviour
     }
 
     public void InitializeSkillUI(Sprite icon, int currentStack, int maxStack)
-    {
-    skillIcon.sprite = icon;
+{
+    skillSlot.Initialize(icon, currentStack, maxStack);
+}
 
-    UpdateSkillStack(currentStack);
+public void UpdateSkillStack(int currentStack)
+{
+    skillSlot.UpdateSkillStack(currentStack);
+}
 
-    skillCD.gameObject.SetActive(currentStack < maxStack);
+public void UpdateSkillCooldown(float timer, float cooldown)
+{
+    skillSlot.UpdateSkillCooldown(timer, cooldown);
+}
 
-    skillCD.fillAmount = 0f;
-    }
-    public void UpdateSkillStack(int currentStack)
-    {
-        skillCount.text = currentStack.ToString();
-    }
-    public void UpdateSkillCooldown(float timer, float cooldown)
-    {
-        if (cooldown <= 0f)
-        {
-            skillCD.fillAmount = 0f;
-            return;
-        }
-    
-        skillCD.fillAmount = 1f - (timer / cooldown);
-    }
-    public void ShowSkillCooldown(bool show)
-    {
-        skillCD.gameObject.SetActive(show);
-    
-        if (!show)
-            skillCD.fillAmount = 0f;
-    }
-    public Button GetSkillButton()
-    {
-        return skillButton;
-    }
-    public void UpdateLevelText(PlayerProgress progress)
+public void ShowSkillCooldown(bool show)
+{
+    skillSlot.ShowSkillCooldown(show);
+}
+
+public Button GetSkillButton()
+{
+    return skillSlot.GetSkillButton();
+}    public void UpdateLevelText(PlayerProgress progress)
     {
         levelText.text = progress.CurrentLevel.ToString();
     }
