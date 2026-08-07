@@ -184,10 +184,11 @@ public void ShowSkillCooldown(bool show)
     skillSlot.ShowSkillCooldown(show);
 }
 
-public Button GetSkillButton()
-{
-    return skillSlot.GetSkillButton();
-}    public void UpdateLevelText(PlayerProgress progress)
+// public Button GetSkillButton()
+// {
+//     return skillSlot.GetSkillButton();
+// }   
+ public void UpdateLevelText(PlayerProgress progress)
     {
         levelText.text = progress.CurrentLevel.ToString();
     }

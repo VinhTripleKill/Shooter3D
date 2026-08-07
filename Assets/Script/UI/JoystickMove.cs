@@ -20,7 +20,7 @@ public class JoystickMove : MonoBehaviour,
 
     public Vector2 MoveDirection { get; private set; }
 
-    private void Awake()
+    private void Start()
     {
         circleRect = circleAreaMove.rectTransform;
         moveRect = moveB.rectTransform;
@@ -71,7 +71,12 @@ public class JoystickMove : MonoBehaviour,
         MoveDirection =
             clampedPosition.normalized;
     }
-
+    public void ResetJoystick()
+{
+    isDragging = false;
+    moveRect.anchoredPosition = startPosition;
+    MoveDirection = Vector2.zero;
+}
     public bool IsDragging()
     {
         return isDragging;

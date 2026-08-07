@@ -7,8 +7,10 @@ public class PlayerSkill : MonoBehaviour
     private PlayerController playerController;
 
     [SerializeField] private Transform firePoint;
+    [Header("Aim")]
+public float timeAuto = 0.2f;
 
-    // Không cần serialize currentSkill nữa nếu dùng prefab từ SkillData
+private bool useAutoAim = true;
     private SkillBehaviour currentSkillInstance; // chỉ dùng khi cần
     private SkillData currentSkillData;
 
@@ -17,7 +19,14 @@ public class PlayerSkill : MonoBehaviour
 
     private float rechargeTimer;
     private int currentStack;
+    private Vector3 aimDirection = Vector3.forward;
 
+
+
+public Vector3 GetAimDirection()
+{
+    return aimDirection;
+}
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -50,17 +59,30 @@ public class PlayerSkill : MonoBehaviour
         if (gameplayUI != null && currentSkillData != null)
         {
             gameplayUI.InitializeSkillUI(currentSkillData.icon, currentStack, currentSkillData.maxStack);
-            gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
+            //gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
         }
     }
+
+    public void SetAimDirection(Vector3 dir, bool autoAim)
+{
+    useAutoAim = autoAim;
+
+    if (dir.sqrMagnitude > 0.001f)
+        aimDirection = dir.normalized;
+}
+
+public bool IsAutoAim()
+{
+    return useAutoAim;
+}
 
     private void OnEnable()
     {
         if (skillAction != null)
             skillAction.performed += SkillPerformed;
 
-        if (gameplayUI != null)
-            gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
+        // if (gameplayUI != null)
+        //     gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
     }
 
     private void OnDisable()
@@ -68,8 +90,8 @@ public class PlayerSkill : MonoBehaviour
         if (skillAction != null)
             skillAction.performed -= SkillPerformed;
 
-        if (gameplayUI != null)
-            gameplayUI.GetSkillButton().onClick.RemoveListener(UseSkill);
+        // if (gameplayUI != null)
+        //     gameplayUI.GetSkillButton().onClick.RemoveListener(UseSkill);
     }
 
     private void Update()
@@ -126,6 +148,11 @@ public class PlayerSkill : MonoBehaviour
             Debug.LogWarning("SkillBehaviourPrefab chưa được gán trong SkillData!");
         }
     }
+    public void TryUseSkill()
+{
+    Debug.Log("Skill được gọi từ SkillNavigationArea!");
 
+    UseSkill();
+}
     public Transform GetFirePoint() => firePoint;
 }

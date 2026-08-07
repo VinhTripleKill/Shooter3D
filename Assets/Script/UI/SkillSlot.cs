@@ -6,7 +6,7 @@ public class SkillSlot : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private Image skillIcon;
-    [SerializeField] private Button skillButton;
+    //[SerializeField] private Button skillButton;
     [SerializeField] private Image skillCD;
     [SerializeField] private TextMeshProUGUI skillCount;
 
@@ -45,8 +45,6 @@ public class SkillSlot : MonoBehaviour
             skillCD.fillAmount = 0f;
     }
 
-    public Button GetSkillButton()
-    {
-        return skillButton;
-    }
+    //public Button GetSkillButton()=> skillButton;
+    
 }

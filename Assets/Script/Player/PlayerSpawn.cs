@@ -8,6 +8,7 @@ public class PlayerSpawn : MonoBehaviour
     [SerializeField] private ListSkillManager listSkillManager;
     [SerializeField] private ListGunManager listGunManagr;
     [SerializeField] private VisualCharacterInfo visualCharacterInfo;
+    [SerializeField] private SkillNavigationArea skillNav ;
     [SerializeField] private Button battleButton;
     [SerializeField] private GameObject panelChoooseCharacter;
     private CharacterData selectedCharacter;
@@ -169,7 +170,12 @@ public class PlayerSpawn : MonoBehaviour
             skillComp.SetSelectedSkill(selectedSkill);
             skillComp.SetGameplayUI(sceneGamePlayUI);
         }
+        
 
+if (skillNav != null)
+{
+    skillNav.SetPlayerSkill(skillComp);
+}
         PlayerSprint sprint = player.GetComponent<PlayerSprint>();
         if (sprint != null) sprint.SetGameplayUI(sceneGamePlayUI);
 
