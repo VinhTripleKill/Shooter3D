@@ -8,18 +8,27 @@ public class SkillNavigationArea : MonoBehaviour,
     IPointerUpHandler
 {
     [Header("References")]
-[SerializeField] private Image skillArea;
-[SerializeField] private Image skillJoystick;
-[SerializeField] private PlayerSkill playerSkill;
+    [SerializeField] private Image skillArea;
+    [SerializeField] private Image skillJoystick;
+    [SerializeField] private PlayerSkill playerSkill;
     private RectTransform skillAreaRect;
     private RectTransform skillJoystickRect;
-[Header("Alpha")]
-public float alphaColorHide = 0f;
-public float alphaColorVisible = 1f;
-private float pointerDownTime;
+    [Header("Alpha")]
+    [SerializeField] private float alphaColorHide = 0f;
+    [SerializeField] private float alphaColorVisible = 1f;
+    private float pointerDownTime;
     private Vector2 startPosition;
 
     private bool isDragging;
+
+
+    [Header("Initial Skill Area")]
+    [SerializeField] private float initialLength = 150f;
+    [SerializeField] private float initialWidth = 150f;
+    
+    [Header("Drag Skill Area")]
+    [SerializeField] private float dragLength = 300f;
+    [SerializeField] private float dragWidth = 300f;
 
 
     public Vector2 SkillDirection { get; private set; }
@@ -32,19 +41,24 @@ private float pointerDownTime;
         skillJoystickRect = skillJoystick.rectTransform;
 
         startPosition = skillJoystickRect.anchoredPosition;
+        SetSkillAreaSize(initialWidth, initialLength);
         SetImageAlpha(alphaColorHide);
         Debug.Log( $"Skill Awake | Joystick Start Position: {startPosition}" );
     }
-private void SetImageAlpha(float alpha)
-{
-    Color areaColor = skillArea.color;
-    areaColor.a = alpha;
-    skillArea.color = areaColor;
-
-    Color joystickColor = skillJoystick.color;
-    joystickColor.a = alpha;
-    skillJoystick.color = joystickColor;
-}
+    private void SetSkillAreaSize(float width, float height)
+    {
+        skillAreaRect.sizeDelta = new Vector2(width, height);
+    }
+    private void SetImageAlpha(float alpha)
+    {
+        Color areaColor = skillArea.color;
+        areaColor.a = alpha;
+        skillArea.color = areaColor;
+    
+        Color joystickColor = skillJoystick.color;
+        joystickColor.a = alpha;
+        skillJoystick.color = joystickColor;
+    }
 
 
     public void OnPointerDown(PointerEventData eventData)
@@ -53,6 +67,7 @@ private void SetImageAlpha(float alpha)
         pointerDownTime = Time.time;
         isDragging = true;
         SetImageAlpha(alphaColorVisible);
+        SetSkillAreaSize(dragWidth, dragLength);
         Debug.Log($"IsDragging: {isDragging}");
 
         UpdateSkillJoystick(eventData);
@@ -69,49 +84,52 @@ private void SetImageAlpha(float alpha)
 
 
     public void OnPointerUp(PointerEventData eventData)
-{
-    Debug.Log("========== SKILL POINTER UP ==========");
-float holdTime = Time.time - pointerDownTime;
+    {
+        Debug.Log("========== SKILL POINTER UP ==========");
+        float holdTime = Time.time - pointerDownTime;
+    
+        bool autoAim = holdTime <= playerSkill.timeAuto;
+    
+        Debug.Log($"Before Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
+    
+    
+        Debug.Log($"Before Reset | Skill Direction: {SkillDirection}");
+    
+    
+        isDragging = false;
+        SetImageAlpha(alphaColorHide);
+        SetSkillAreaSize(initialWidth, initialLength);
+        Vector2 dir = SkillDirection;
+    
+        Vector3 worldDir = new Vector3( SkillDirection.x, 0, SkillDirection.y);
+    
+        playerSkill.SetAimDirection(worldDir, autoAim);
+    
+        playerSkill.TryUseSkill();
+    
+    
+        skillJoystickRect.anchoredPosition = startPosition;
+    
+    
+        SkillDirection = Vector2.zero;
+    
+    
+        Debug.Log($"After Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
+    
+    
+        Debug.Log($"IsDragging: {isDragging}");
+    
+        Debug.Log("=======================================");
+    }
 
-bool autoAim = holdTime <= playerSkill.timeAuto;
 
-    Debug.Log($"Before Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
-
-
-    Debug.Log($"Before Reset | Skill Direction: {SkillDirection}");
-
-
-    isDragging = false;
-    SetImageAlpha(alphaColorHide);
-
-    Vector2 dir = SkillDirection;
-
-Vector3 worldDir = new Vector3( SkillDirection.x, 0, SkillDirection.y);
-
-playerSkill.SetAimDirection(worldDir, autoAim);
-
-playerSkill.TryUseSkill();
-
-
-    skillJoystickRect.anchoredPosition = startPosition;
-
-
-    SkillDirection = Vector2.zero;
-
-
-    Debug.Log($"After Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
-
-
-    Debug.Log($"IsDragging: {isDragging}");
-
-    Debug.Log("=======================================");
-}
-public void SetPlayerSkill(PlayerSkill skill)
-{
-    playerSkill = skill;
-
-    Debug.Log("SkillNavigationArea đã nhận PlayerSkill");
-}
+    
+    public void SetPlayerSkill(PlayerSkill skill)
+    {
+        playerSkill = skill;
+    
+        Debug.Log("SkillNavigationArea đã nhận PlayerSkill");
+    }
 
 
 
@@ -129,13 +147,11 @@ public void SetPlayerSkill(PlayerSkill skill)
 
 
 
-        float radius =
-            skillAreaRect.rect.width * 0.5f;
+        float radius = skillAreaRect.rect.width * 0.5f;
 
 
 
-        Vector2 clampedPosition =
-            Vector2.ClampMagnitude(localPoint, radius);
+        Vector2 clampedPosition = Vector2.ClampMagnitude(localPoint, radius);
 
 
 

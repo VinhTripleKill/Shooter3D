@@ -646,6 +646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkill
   firePoint: {fileID: 6190892275398048827}
+  timeAuto: 0.27
   targetRange: 15
   gameplayUI: {fileID: 0}
 --- !u!114 &87360897422917935

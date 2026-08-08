@@ -17064,6 +17064,14 @@ PrefabInstance:
       propertyPath: pauseGameUI
       value: 
       objectReference: {fileID: 900273620}
+    - target: {fileID: 3261646177181125176, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3261646177181125176, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 4165609546461890114, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -17072,6 +17080,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 5454117872942401073, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f25e27f74a2fe25489dae13a9d078615, type: 3}
     - target: {fileID: 5540562584759630488, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
