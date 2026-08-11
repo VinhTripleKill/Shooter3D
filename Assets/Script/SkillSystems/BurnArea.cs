@@ -1,17 +1,17 @@
+
+
+
 using System.Collections;
 using UnityEngine;
 
 public class BurnArea : MonoBehaviour
 {
     [Header("Burn")]
-    [SerializeField]
-    private float duration = 3f;
+    [SerializeField] private float duration = 3f;
 
-    [SerializeField]
-    private float damagePerTick = 5f;
+    [SerializeField] private float damagePerTick = 5f;
 
-    [SerializeField]
-    private float tickRate = 0.5f;
+    [SerializeField] private float tickRate = 0.5f;
 
     private GrenadeSkillData data;
 
@@ -19,10 +19,9 @@ public class BurnArea : MonoBehaviour
     {
         data = skillData;
 
-        SphereCollider col =
-            GetComponent<SphereCollider>();
+        SphereCollider col = GetComponent<SphereCollider>();
 
-        col.radius = data.radius;
+        col.radius = data.explodeRadius;
 
         StartCoroutine(BurnRoutine());
 
@@ -31,8 +30,7 @@ public class BurnArea : MonoBehaviour
 
     private IEnumerator BurnRoutine()
     {
-        WaitForSeconds wait =
-            new WaitForSeconds(tickRate);
+        WaitForSeconds wait = new WaitForSeconds(tickRate);
 
         while (true)
         {
@@ -47,16 +45,14 @@ public class BurnArea : MonoBehaviour
         Collider[] hits =
             Physics.OverlapSphere(
                 transform.position,
-                data.radius,
+                data.explodeRadius,
                 data.effectMask);
 
         foreach (Collider hit in hits)
         {
-            IDamageable damageable =
-                hit.GetComponentInParent<IDamageable>();
+            IDamageable damageable = hit.GetComponentInParent<IDamageable>();
 
-            if (damageable == null)
-                continue;
+            if (damageable == null) continue;
 
             damageable.TakeDamage(damagePerTick);
         }
@@ -65,17 +61,13 @@ public class BurnArea : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        SphereCollider col =
-            GetComponent<SphereCollider>();
+        SphereCollider col = GetComponent<SphereCollider>();
 
-        if (col == null)
-            return;
+        if (col == null) return;
 
         Gizmos.color = Color.red;
 
-        Gizmos.DrawWireSphere(
-            transform.position,
-            col.radius);
+        Gizmos.DrawWireSphere( transform.position, col.radius);
     }
 #endif
 }

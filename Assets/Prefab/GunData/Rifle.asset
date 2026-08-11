@@ -15,7 +15,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 170e586340b334e41bd7658eedd72468, type: 3}
   gunName: Rifle
   fireType: 0
-  rangeAttack: 12.3
+  rangeAttack: 12.5
   hitRadius: 0.5
   hitMask:
     serializedVersion: 2

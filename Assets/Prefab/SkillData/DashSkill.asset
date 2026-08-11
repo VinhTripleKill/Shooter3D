@@ -16,7 +16,11 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 50646e453b63778469ce24a1a52c278d, type: 3}
   cooldown: 2
   maxStack: 2
+  rangeRadius: 5
   skillBehaviourPrefab: {fileID: 7192575363007486831, guid: e91af1b8f33bdcc4592a97485876e86a, type: 3}
+  dashDistance: 5
   timeDash: 0.2
-  speedDash: 30
   timeNextDash: 0.1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0

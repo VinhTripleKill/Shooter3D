@@ -1,3 +1,5 @@
+
+
 using UnityEngine;
 
 public class ExplosionEffect : MonoBehaviour
@@ -44,7 +46,7 @@ public class ExplosionEffect : MonoBehaviour
         Collider[] hits =
             Physics.OverlapSphere(
                 transform.position,
-                data.radius,
+                data.explodeRadius,
                 data.effectMask);
 
         foreach (Collider hit in hits)
@@ -70,3 +72,9 @@ public class ExplosionEffect : MonoBehaviour
             explosionParticle.main.startLifetime.constantMax);
     }
 }
+
+
+
+
+
+

@@ -1,3 +1,7 @@
+
+
+
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -11,6 +15,7 @@ public class SkillNavigationArea : MonoBehaviour,
     [SerializeField] private Image skillArea;
     [SerializeField] private Image skillJoystick;
     [SerializeField] private PlayerSkill playerSkill;
+    private SkillIndicatorUI skillIndicator;
     private RectTransform skillAreaRect;
     private RectTransform skillJoystickRect;
     [Header("Alpha")]
@@ -62,16 +67,27 @@ public class SkillNavigationArea : MonoBehaviour,
 
 
     public void OnPointerDown(PointerEventData eventData)
-    {
-        Debug.Log("========== SKILL POINTER DOWN ==========");
-        pointerDownTime = Time.time;
-        isDragging = true;
-        SetImageAlpha(alphaColorVisible);
-        SetSkillAreaSize(dragWidth, dragLength);
-        Debug.Log($"IsDragging: {isDragging}");
+{
+Debug.Log("========== SKILL POINTER DOWN ==========");
+pointerDownTime = Time.time;
+isDragging = true;
 
-        UpdateSkillJoystick(eventData);
-    }
+// ==========================================
+// HIỆN SKILL INDICATOR
+// ==========================================
+
+if (skillIndicator != null)
+    skillIndicator.ShowIndicator();
+
+SetImageAlpha(alphaColorVisible);
+SetSkillAreaSize(dragWidth, dragLength);
+
+Debug.Log($"IsDragging: {isDragging}");
+
+UpdateSkillJoystick(eventData);
+
+}
+
 
 
 
@@ -81,47 +97,60 @@ public class SkillNavigationArea : MonoBehaviour,
         UpdateSkillJoystick(eventData);
     }
 
+public void OnPointerUp(PointerEventData eventData)
+{
+Debug.Log("========== SKILL POINTER UP ==========");
 
+float holdTime = Time.time - pointerDownTime;
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        Debug.Log("========== SKILL POINTER UP ==========");
-        float holdTime = Time.time - pointerDownTime;
-    
-        bool autoAim = holdTime <= playerSkill.timeAuto;
-    
-        Debug.Log($"Before Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
-    
-    
-        Debug.Log($"Before Reset | Skill Direction: {SkillDirection}");
-    
-    
-        isDragging = false;
-        SetImageAlpha(alphaColorHide);
-        SetSkillAreaSize(initialWidth, initialLength);
-        Vector2 dir = SkillDirection;
-    
-        Vector3 worldDir = new Vector3( SkillDirection.x, 0, SkillDirection.y);
-    
-        playerSkill.SetAimDirection(worldDir, autoAim);
-    
-        playerSkill.TryUseSkill();
-    
-    
-        skillJoystickRect.anchoredPosition = startPosition;
-    
-    
-        SkillDirection = Vector2.zero;
-    
-    
-        Debug.Log($"After Reset | SkillJoystick Position: {skillJoystickRect.anchoredPosition}");
-    
-    
-        Debug.Log($"IsDragging: {isDragging}");
-    
-        Debug.Log("=======================================");
-    }
+bool autoAim = holdTime <= playerSkill.timeAuto;
 
+Debug.Log(
+    $"Before Reset | SkillJoystick Position: " +
+    $"{skillJoystickRect.anchoredPosition}"
+);
+
+Debug.Log(
+    $"Before Reset | Skill Direction: {SkillDirection}"
+);
+
+isDragging = false;
+
+// ==========================================
+// ẨN SKILL INDICATOR
+// ==========================================
+
+if (skillIndicator != null)
+    skillIndicator.HideIndicator();
+
+SetImageAlpha(alphaColorHide);
+SetSkillAreaSize(initialWidth, initialLength);
+
+Vector3 worldDir = new Vector3(
+    SkillDirection.x,
+    0f,
+    SkillDirection.y
+);
+
+playerSkill.SetAimDirection(worldDir, autoAim);
+
+playerSkill.TryUseSkill();
+
+skillJoystickRect.anchoredPosition = startPosition;
+
+SkillDirection = Vector2.zero;
+
+Debug.Log(
+    $"After Reset | " +
+    $"SkillJoystick Position: " +
+    $"{skillJoystickRect.anchoredPosition}"
+);
+
+Debug.Log($"IsDragging: {isDragging}");
+
+Debug.Log("=======================================");
+
+}
 
     
     public void SetPlayerSkill(PlayerSkill skill)
@@ -130,7 +159,15 @@ public class SkillNavigationArea : MonoBehaviour,
     
         Debug.Log("SkillNavigationArea đã nhận PlayerSkill");
     }
+public void SetSkillIndicator(SkillIndicatorUI indicator)
+{
+    skillIndicator = indicator;
 
+    if (skillIndicator != null)
+        skillIndicator.HideIndicator();
+
+    Debug.Log("SkillNavigationArea đã nhận SkillIndicatorUI");
+}
 
 
     private void UpdateSkillJoystick(PointerEventData eventData)
@@ -194,9 +231,12 @@ public class SkillNavigationArea : MonoBehaviour,
     }
 
 
-
-    public bool IsDragging()
-    {
-        return isDragging;
-    }
+    public bool IsDragging() => isDragging;
+    
 }
+
+
+
+
+
+

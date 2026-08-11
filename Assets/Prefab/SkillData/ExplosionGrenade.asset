@@ -16,12 +16,13 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 4fdb3fb90cca2cc458cd869e6f489aa5, type: 3}
   cooldown: 5
   maxStack: 3
+  rangeRadius: 10
   skillBehaviourPrefab: {fileID: 7897214159764592600, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   grenadePrefab: {fileID: 4116265864312067926, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 00f29969904a6024990a6dcf6f674ab9, type: 3}
   explodeDelay: 1
   throwForce: 15
-  radius: 3
+  explodeRadius: 3
   damage: 20
   hitMask:
     serializedVersion: 2

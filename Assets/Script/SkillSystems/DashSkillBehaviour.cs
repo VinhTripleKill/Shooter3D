@@ -1,33 +1,105 @@
+
+
+
+
+
 using UnityEngine;
 
 public class DashSkillBehaviour : SkillBehaviour
 {
-    [SerializeField]
-    private DashSkillData skillData;
+    [SerializeField] private DashSkillData skillData;
 
-public override bool Execute(PlayerSkill playerSkill)
-{
-    if (skillData == null)
-        return false;
+    public override bool Execute(PlayerSkill playerSkill)
+    {
+        if (skillData == null)
+            return false;
 
-    PlayerController player =
-        playerSkill.GetComponent<PlayerController>();
+        PlayerController player = playerSkill.GetComponent<PlayerController>();
 
-    if (player == null)
-        return false;
+        if (player == null)
+            return false;
 
-    if (!player.IsMoving())
-        return false;
+        Vector3 direction;
 
-    return player.StartDash(
-        skillData.timeDash,
-        skillData.speedDash,
-        skillData.timeNextDash);
-        
-}
+        // ==========================================
+        // AUTO DASH
+        // ==========================================
+        if (playerSkill.IsAutoAim())
+        {
+            // Nếu player đang giữ Move
+            // => dash theo hướng đang di chuyển
+            if (player.IsMoving())
+            {
+                direction = player.GetMoveDirection();
+
+                Debug.Log(
+                    $"DASH AUTO + MOVE | Direction: {direction}"
+                );
+            }
+            else
+            {
+                // Không di chuyển
+                // => dash theo hướng player đang nhìn
+                direction = player.transform.forward;
+
+                Debug.Log(
+                    $"DASH AUTO + NO MOVE | Forward: {direction}"
+                );
+            }
+        }
+        // ==========================================
+        // MANUAL DASH
+        // ==========================================
+        else
+        {
+            direction = playerSkill.GetAimDirection();
+
+            if (direction.sqrMagnitude < 0.001f)
+            {
+                direction = player.transform.forward;
+
+                Debug.Log(
+                    "DASH MANUAL | No Aim Direction -> Forward"
+                );
+            }
+            else
+            {
+                Debug.Log(
+                    $"DASH MANUAL | Aim Direction: {direction}"
+                );
+            }
+        }
+
+        // ==========================================
+        // NORMALIZE
+        // ==========================================
+
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.001f)
+            return false;
+
+        direction.Normalize();
+
+        // ==========================================
+        // START DASH
+        // ==========================================
+
+        return player.StartDash(
+            direction,
+            skillData.dashDistance,
+            skillData.timeDash,
+            skillData.timeNextDash,
+            skillData.obstacleMask
+        );
+    }
 
     public override SkillData GetSkillData()
     {
         return skillData;
     }
 }
+
+
+
+

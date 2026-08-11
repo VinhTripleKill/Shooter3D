@@ -165,17 +165,54 @@ public class PlayerSpawn : MonoBehaviour
         }
 
         PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
-        if (skillComp != null)
-        {
-            skillComp.SetSelectedSkill(selectedSkill);
-            skillComp.SetGameplayUI(sceneGamePlayUI);
-        }
-        
 
+    if (skillComp != null)
+    {
+    skillComp.SetSelectedSkill(selectedSkill);
+    skillComp.SetGameplayUI(sceneGamePlayUI);
+    }
+    
+    
 if (skillNav != null)
 {
+    // ==========================================
+    // LIÊN KẾT PLAYER SKILL
+    // ==========================================
+
     skillNav.SetPlayerSkill(skillComp);
+
+    // ==========================================
+    // LIÊN KẾT SKILL INDICATOR
+    // ==========================================
+
+    SkillIndicatorUI skillIndicator =
+        player.GetComponentInChildren<SkillIndicatorUI>(true);
+
+    if (skillIndicator != null)
+    {
+        // Gán indicator cho SkillNavigation
+        skillNav.SetSkillIndicator(skillIndicator);
+
+        // ==========================================
+        // SET RANGE THEO SKILL ĐANG TRANG BỊ
+        // ==========================================
+
+        skillIndicator.SetSkillData(selectedSkill);
+
+        Debug.Log(
+            $"PlayerSpawn: Đã set SkillIndicator " +
+            $"cho skill {selectedSkill?.skillName}"
+        );
+    }
+    else
+    {
+        Debug.LogWarning(
+            "PlayerSpawn: Không tìm thấy SkillIndicatorUI " +
+            "trong Player prefab!"
+        );
+    }
 }
+
         PlayerSprint sprint = player.GetComponent<PlayerSprint>();
         if (sprint != null) sprint.SetGameplayUI(sceneGamePlayUI);
 

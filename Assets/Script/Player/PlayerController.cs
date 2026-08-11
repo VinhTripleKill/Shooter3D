@@ -14,11 +14,10 @@ public class PlayerController : BasePlayer
 
     [Header("Movement")]
     [SerializeField] private float rotationSpeed = 10f;
-[Header("Scene References")]
-[SerializeField] private GamePlayUI gameplayUI;
-[SerializeField] private CoreGameUI coreGameUI;
-[SerializeField] private EnemyWaveSpawn enemyWaveSpawn;
-    private float damageTestTimer = 0f;
+    [Header("Scene References")]
+    [SerializeField] private GamePlayUI gameplayUI;
+    [SerializeField] private CoreGameUI coreGameUI;
+    [SerializeField] private EnemyWaveSpawn enemyWaveSpawn;
     private PlayerWeapon playerWeapon;
     private PlayerProgress playerProgress;
     private Vector2 moveInput;
@@ -28,7 +27,7 @@ public class PlayerController : BasePlayer
     private bool isDashing;
     private float dashLockTimer;
 
-protected override void Awake()
+    protected override void Awake()
     {
         base.Awake();
         playerWeapon = GetComponent<PlayerWeapon>();
@@ -47,39 +46,36 @@ protected override void Awake()
         if (playerWeapon == null)
             playerWeapon = gameObject.AddComponent<PlayerWeapon>();
     }
-   public void InitializeSceneReferences(
-    JoystickMove joystick,
-    GamePlayUI ui,
-    CoreGameUI coreUI,
-    EnemyWaveSpawn waveSpawn)
-{
-    joystickMove = joystick;
-    gameplayUI = ui;
-    coreGameUI = coreUI;
-    enemyWaveSpawn = waveSpawn;
-
-    InitializePlayerStats();
-
-    if (gameplayUI != null)
+    
+    public void InitializeSceneReferences(JoystickMove joystick,GamePlayUI ui,CoreGameUI coreUI,EnemyWaveSpawn waveSpawn)
     {
-        if (playerProgress != null)
+        joystickMove = joystick;
+        gameplayUI = ui;
+        coreGameUI = coreUI;
+        enemyWaveSpawn = waveSpawn;
+    
+        InitializePlayerStats();
+    
+        if (gameplayUI != null)
         {
-            playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
-            playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
-            gameplayUI.UpdateLevelText(playerProgress);
-            gameplayUI.UpdateLevelBar(playerProgress);
-        }
+            if (playerProgress != null)
+            {
+                playerProgress.OnLevelChanged += gameplayUI.UpdateLevelText;
+                playerProgress.OnExpChanged += gameplayUI.UpdateLevelBar;
+                gameplayUI.UpdateLevelText(playerProgress);
+                gameplayUI.UpdateLevelBar(playerProgress);
+            }
+    
+            OnHpChanged += gameplayUI.UpdateHpBar;
+            OnManaChanged += gameplayUI.UpdateManaBar;
+    
+            gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
+            gameplayUI.UpdateHpBar(currentHp, maxHp);
+            gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
+        } 
+    }    
 
-        OnHpChanged += gameplayUI.UpdateHpBar;
-        OnManaChanged += gameplayUI.UpdateManaBar;
-
-        gameplayUI.UpdateSprintBar(currentSprintEnergy, playerCharacter.Data.CharacterStats.maxSprint);
-        gameplayUI.UpdateHpBar(currentHp, maxHp);
-        gameplayUI.UpdateManaBar(currentMana, playerCharacter.Data.CharacterStats.maxMana);
-    }
-
-    Debug.Log("PlayerController: Đã khởi tạo Scene References");
-}    private void OnDestroy()
+    private void OnDestroy()
     {
         OnHpChanged -= gameplayUI.UpdateHpBar;
         OnManaChanged -= gameplayUI.UpdateManaBar;
@@ -114,26 +110,6 @@ protected override void Awake()
             if (dashLockTimer <= 0)
                 canDash = true;
         }
-
-        // ==================== TEST DAMAGE ====================
-        //TestAutoDamage();
-    }
-
-    // Hàm test đơn giản: mỗi 2 giây tự mất 10 HP
-    private void TestAutoDamage()
-    {
-        damageTestTimer += Time.deltaTime;
-
-        if (damageTestTimer >= 2f)   // Mỗi 2 giây trừ 10 HP
-        {
-            damageTestTimer = 0f;
-
-            if (!isDead)
-            {
-                TakeDamage(10f);        // Gọi trực tiếp TakeDamage từ BaseCharacter
-                Debug.Log("TEST: Player tự mất 10 HP");
-            }
-        }
     }
 
     private void ReadMovementInput()
@@ -157,24 +133,19 @@ protected override void Awake()
         Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
         float currentSpeed = playerCharacter.Data.CharacterStats.moveSpeed;
 
-        // === SPRINT LOGIC ===
-        bool canSprint = playerSprint != null && 
-                        playerSprint.CanSprint() && 
-                        move != Vector3.zero;
+        bool canSprint = playerSprint != null && playerSprint.CanSprint() && move != Vector3.zero;
 
         if (canSprint)
             currentSpeed += playerSprint.GetSprintSpeedBonus();
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // Xoay hướng
         if (move != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(move);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
-        // Animation
         float animSpeed = 0f;
         if (move != Vector3.zero)
             animSpeed = canSprint ? 1f : 0.5f;
@@ -193,18 +164,16 @@ protected override void Awake()
     }
 
     protected override void Die()
-{
-    Debug.Log("Player has die");
-    canMove = false;
-    playerAnim.PlayDead();
+    {
+        Debug.Log("Player has die");
+        canMove = false;
+        playerAnim.PlayDead();
+    
+        enemyWaveSpawn?.GameOver();
+        coreGameUI?.StopTimer();
+    }
 
-    enemyWaveSpawn?.GameOver();
-    coreGameUI?.StopTimer();
-}
-
-    // Public APIs
-    public bool IsSprintingPublic() => IsSprinting();
-
+    
     public Vector3 GetMoveDirection()
     {
         Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
@@ -216,41 +185,174 @@ protected override void Awake()
         canMove = value;
     }
 
-    public bool StartDash(float dashTime, float dashSpeed, float nextDashTime)
-    {
-        if (isDashing || !canDash) return false;
 
-        StartCoroutine(DashCoroutine(dashTime, dashSpeed, nextDashTime));
+    public bool StartDash(Vector3 direction,float dashDistance,float dashTime,float nextDashTime,LayerMask obstacleMask)
+    {
+        if (isDashing || !canDash)
+            return false;
+    
+        direction.y = 0f;
+    
+        if (direction.sqrMagnitude < 0.001f)
+            direction = transform.forward;
+    
+        direction.Normalize();
+    
+        transform.forward = direction;
+    
+        StartCoroutine(
+            DashCoroutine(
+                direction,
+                dashDistance,
+                dashTime,
+                nextDashTime,
+                obstacleMask
+            )
+        );
+    
         return true;
     }
-
-    private IEnumerator DashCoroutine(float dashTime, float dashSpeed, float nextDashTime)
+    
+    private IEnumerator DashCoroutine(
+        Vector3 direction,
+        float dashDistance,
+        float dashTime,
+        float nextDashTime,
+        LayerMask obstacleMask)
     {
-        Vector3 direction = GetMoveDirection();
-        if (direction == Vector3.zero) yield break;
-
         isDashing = true;
         canDash = false;
         canMove = false;
-
+    
+        direction.y = 0f;
+        direction.Normalize();
+    
+        transform.forward = direction;
+    
+        // ==========================================
+        // TÍNH KHOẢNG CÁCH DASH THỰC TẾ
+        // ==========================================
+    
+        float actualDistance =
+            CalculateDashDistance(
+                direction,
+                dashDistance,
+                obstacleMask
+            );
+    
+        Debug.Log(
+            $"DASH | " +
+            $"Requested: {dashDistance:F2}m | " +
+            $"Actual: {actualDistance:F2}m"
+        );
+    
+        // ==========================================
+        // DASH
+        // ==========================================
+    
         float timer = 0f;
-        while (timer < dashTime)
+        float distanceMoved = 0f;
+    
+        while ( timer < dashTime && distanceMoved < actualDistance)
         {
-            controller.Move(direction * dashSpeed * Time.deltaTime);
+            float deltaDistance = (actualDistance / dashTime) * Time.deltaTime;
+    
+            deltaDistance = Mathf.Min( deltaDistance, actualDistance - distanceMoved );
+    
+            if (deltaDistance <= 0f) break;
+    
+            CollisionFlags flags = controller.Move( direction * deltaDistance );
+    
+            distanceMoved += deltaDistance;
             timer += Time.deltaTime;
+    
+            if ((flags & CollisionFlags.Sides) != 0)
+            {
+                Debug.Log("DASH STOPPED BY COLLISION");
+                break;
+            }
+    
             yield return null;
         }
-
+    
         canMove = true;
         isDashing = false;
-
+    
+        Debug.Log(
+            $"DASH END | " +
+            $"Moved: {distanceMoved:F2}/{dashDistance:F2}"
+        );
+    
         yield return new WaitForSeconds(nextDashTime);
+    
         canDash = true;
         dashLockTimer = dashTime + nextDashTime;
+    
+        Debug.Log("DASH READY");
     }
+    
+    
+    
+    
+    private float CalculateDashDistance( Vector3 direction, float maxDistance, LayerMask obstacleMask)
+    {
+        if (controller == null) return maxDistance;
+    
+        direction.y = 0f;
+        direction.Normalize();
+    
+        // ==========================================
+        // CHARACTER CONTROLLER SIZE
+        // ==========================================
+    
+        float radius = controller.radius;
+    
+        float height = controller.height;
+    
+        Vector3 center = transform.position + controller.center;
+    
+        // Đảm bảo capsule không bị đảo ngược
+        float cylinderHeight = Mathf.Max( height - radius * 2f, 0f);
+    
+        Vector3 point1 = center + Vector3.up * (cylinderHeight * 0.5f);
+    
+        Vector3 point2 = center - Vector3.up * (cylinderHeight * 0.5f);
 
-    // Expose cho PlayerSprint truy cập
+    
+        RaycastHit hit;
+    
+        bool blocked =
+            Physics.CapsuleCast(
+                point1,
+                point2,
+                radius,
+                direction,
+                out hit,
+                maxDistance,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore);
+    
+        if (!blocked) return maxDistance;
+        
+        float safeDistance = Mathf.Max(hit.distance - 0.02f,0f);
+    
+        Debug.Log(
+            $"DASH BLOCKED | " +
+            $"Obstacle: {hit.collider.name} | " +
+            $"Hit Distance: {hit.distance} | " +
+            $"Dash Distance: {safeDistance}"
+        );
+    
+        return safeDistance;
+    }
+    public bool IsSprintingPublic() => IsSprinting();
     public CharacterController Controller => controller;
     public float CurrentSprintEnergy { get => currentSprintEnergy; set => currentSprintEnergy = value; }
     public float MaxSprintEnergy => playerCharacter.Data.CharacterStats.maxSprint;
 }
+
+
+
+
+
+
