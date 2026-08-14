@@ -20,13 +20,14 @@ MonoBehaviour:
   skillBehaviourPrefab: {fileID: 7897214159764592600, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   grenadePrefab: {fileID: 4116265864312067926, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 00f29969904a6024990a6dcf6f674ab9, type: 3}
-  explodeDelay: 1
-  throwForce: 15
-  explodeRadius: 3
-  damage: 20
+  arcHeightPerMeter: 0.35
+  minArcHeight: 0.5
   hitMask:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 648
+  explodeDelay: 1
+  explodeRadius: 3
+  damage: 20
   effectMask:
     serializedVersion: 2
     m_Bits: 640

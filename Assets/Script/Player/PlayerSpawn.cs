@@ -11,6 +11,7 @@ public class PlayerSpawn : MonoBehaviour
     [SerializeField] private SkillNavigationArea skillNav ;
     [SerializeField] private Button battleButton;
     [SerializeField] private GameObject panelChoooseCharacter;
+    [SerializeField] private SkillJoystickHandle joystickHandle;
     private CharacterData selectedCharacter;
     private SkillData selectedSkill;
     private GunData selectedGun;
@@ -164,54 +165,40 @@ public class PlayerSpawn : MonoBehaviour
             Debug.Log("Đã liên kết JoystickAttack với PlayerWeapon");
         }
 
-        PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
 
-    if (skillComp != null)
-    {
+
+
+PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
+
+if (skillComp != null)
+{
     skillComp.SetSelectedSkill(selectedSkill);
     skillComp.SetGameplayUI(sceneGamePlayUI);
-    }
-    
-    
-if (skillNav != null)
+}
+
+if (skillNav != null && skillComp != null)
 {
-    // ==========================================
-    // LIÊN KẾT PLAYER SKILL
-    // ==========================================
-
     skillNav.SetPlayerSkill(skillComp);
-
-    // ==========================================
-    // LIÊN KẾT SKILL INDICATOR
-    // ==========================================
+    skillNav.SetCurrentSkill(selectedSkill);
 
     SkillIndicatorUI skillIndicator =
         player.GetComponentInChildren<SkillIndicatorUI>(true);
 
     if (skillIndicator != null)
     {
-        // Gán indicator cho SkillNavigation
-        skillNav.SetSkillIndicator(skillIndicator);
-
-        // ==========================================
-        // SET RANGE THEO SKILL ĐANG TRANG BỊ
-        // ==========================================
-
-        skillIndicator.SetSkillData(selectedSkill);
-
-        Debug.Log(
-            $"PlayerSpawn: Đã set SkillIndicator " +
-            $"cho skill {selectedSkill?.skillName}"
-        );
-    }
-    else
-    {
-        Debug.LogWarning(
-            "PlayerSpawn: Không tìm thấy SkillIndicatorUI " +
-            "trong Player prefab!"
-        );
-    }
+        if (skillIndicator != null)
+{
+    skillNav.SetSkillIndicator(skillIndicator);
+    skillIndicator.SetPlayerTransform(player.transform);
+    skillIndicator.SetSkillData(selectedSkill);
+    skillNav.SetJoystickHandle(joystickHandle);
+    joystickHandle?.SetIndicator(skillIndicator);
 }
+    }
+
+    Debug.Log($"PlayerSpawn | Skill = {selectedSkill?.skillName}");
+}
+
 
         PlayerSprint sprint = player.GetComponent<PlayerSprint>();
         if (sprint != null) sprint.SetGameplayUI(sceneGamePlayUI);
@@ -221,4 +208,5 @@ if (skillNav != null)
 
         Debug.Log("Đã gán GamePlayUI và khởi tạo các hệ thống");
     }
-}
+    }
+

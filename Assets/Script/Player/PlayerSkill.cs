@@ -8,9 +8,9 @@ public class PlayerSkill : MonoBehaviour
 
     [SerializeField] private Transform firePoint;
     [Header("Aim")]
-public float timeAuto = 0.2f;
+    public float timeAuto = 0.2f;
 
-private bool useAutoAim = true;
+    private bool useAutoAim = true;
     private SkillBehaviour currentSkillInstance; // chỉ dùng khi cần
     private SkillData currentSkillData;
 
@@ -21,12 +21,10 @@ private bool useAutoAim = true;
     private int currentStack;
     private Vector3 aimDirection = Vector3.forward;
 
+    private Vector3 skillTargetPosition;
+    private bool hasSkillTargetPosition;
+    public Vector3 GetAimDirection()=> aimDirection;
 
-
-public Vector3 GetAimDirection()
-{
-    return aimDirection;
-}
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
@@ -35,13 +33,37 @@ public Vector3 GetAimDirection()
             skillAction = playerInput.actions["Skill"];
     }
 
+    public void SetSkillTargetPosition(Vector3 targetPosition)
+    {
+        skillTargetPosition = targetPosition;
+    
+        hasSkillTargetPosition = true;
+    }
+    
+    
+    public SkillData GetCurrentSkillData() =>currentSkillData;
+    
+    public bool TryGetSkillTargetPosition( out Vector3 targetPosition)
+    {
+        targetPosition = skillTargetPosition;
+    
+        return hasSkillTargetPosition;
+    }
+    
+    public bool IsCurrentSkillGrenade()
+    {
+        return currentSkillData is GrenadeSkillData;
+    }
+    
+    public void ClearSkillTargetPosition()
+    {
+        skillTargetPosition = Vector3.zero;
+        hasSkillTargetPosition = false;
+    }
     public void SetSelectedSkill(SkillData skillData)
     {
-        if (skillData == null)
-        {
-            Debug.LogWarning("Không có SkillData nào được chọn!");
-            return;
-        }
+        if (skillData == null) return;
+        
 
         currentSkillData = skillData;
         currentStack = currentSkillData.maxStack;
@@ -59,22 +81,22 @@ public Vector3 GetAimDirection()
         if (gameplayUI != null && currentSkillData != null)
         {
             gameplayUI.InitializeSkillUI(currentSkillData.icon, currentStack, currentSkillData.maxStack);
-            //gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
+            // gameplayUI.GetSkillButton().onClick.AddListener(UseSkill);
         }
     }
 
     public void SetAimDirection(Vector3 dir, bool autoAim)
-{
-    useAutoAim = autoAim;
-
-    if (dir.sqrMagnitude > 0.001f)
-        aimDirection = dir.normalized;
-}
-
-public bool IsAutoAim()
-{
-    return useAutoAim;
-}
+    {
+        useAutoAim = autoAim;
+    
+        if (dir.sqrMagnitude > 0.001f)
+            aimDirection = dir.normalized;
+    }
+    
+    public bool IsAutoAim()
+    {
+        return useAutoAim;
+    }
 
     private void OnEnable()
     {
@@ -126,10 +148,8 @@ public bool IsAutoAim()
 
     private void SkillPerformed(InputAction.CallbackContext ctx)
     {
-        if (playerController.IsDead() || currentSkillData == null || currentStack <= 0)
-            return;
-
-        // Tạo instance tạm thời khi dùng skill (hoặc cache nếu cần)
+        if (playerController.IsDead() || currentSkillData == null || currentStack <= 0) return;
+        
         if (currentSkillData.skillBehaviourPrefab != null)
         {
             SkillBehaviour tempSkill = Instantiate(currentSkillData.skillBehaviourPrefab);
@@ -148,11 +168,11 @@ public bool IsAutoAim()
             Debug.LogWarning("SkillBehaviourPrefab chưa được gán trong SkillData!");
         }
     }
-    public void TryUseSkill()
-{
-    Debug.Log("Skill được gọi từ SkillNavigationArea!");
 
-    UseSkill();
-}
+    public void TryUseSkill()
+    {
+        UseSkill();
+    }
+
     public Transform GetFirePoint() => firePoint;
 }

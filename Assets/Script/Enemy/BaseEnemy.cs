@@ -200,7 +200,6 @@ protected virtual void UpdateAttack(float distance)
         if (damageable != null)
         {
             damageable.TakeDamage(atkDamage);
-            Debug.Log($"[ENEMY] Cone Attack gây {atkDamage} damage!");
         }
     }
 
@@ -279,11 +278,8 @@ protected virtual void UpdateAttack(float distance)
 
 public void ForceKill()
 {
-    if (isDead)
-        return;
+    if (isDead) return;
 
-    // Enemy bị hệ thống tự động giết
-    // Không được nhận EXP
     shouldGiveExp = false;
 
     Die();
@@ -312,15 +308,11 @@ protected override void Die()
 
     pp?.AddExp(expReward);
 
-    Debug.Log(
-        $"[ENEMY] Player giết enemy -> +{expReward} EXP"
-    );
+  
 }
 else
 {
-    Debug.Log(
-        "[ENEMY] Enemy tự động chết do hết thời gian -> Không nhận EXP"
-    );
+    Debug.Log("[ENEMY] Enemy tự động chết do hết thời gian -> Không nhận EXP");
 }
     waveManager?.OnEnemyDied(this);
 
@@ -328,8 +320,6 @@ else
 
     AutoAimManager.Unregister(this);
 
-    enemyAnim.PlayDead(
-        () => Destroy(gameObject)
-    );
+    enemyAnim.PlayDead(() => Destroy(gameObject));
 }
 }

@@ -1,89 +1,99 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SkillIndicatorUI : MonoBehaviour
 {
-    [Header("References")]
     [SerializeField] private GameObject skillIndicatorCanvas;
     [SerializeField] private Image rangeCircleSkill;
-    [SerializeField] private Image dashIndicator;
-    [SerializeField] private Image gradeIndicator;
+    [SerializeField] private DashIndicatorUI dashIndicator;
+    [SerializeField] private GrenadeIndicatorUI grenadeIndicator;
 
     [Header("Range Visual")]
     [SerializeField] private float pixelsPerMeter = 100f;
 
-    private void Awake()
-    {
-        HideIndicator();
-    }
+    private Transform playerTransform;
+    private SkillData currentSkillData;
 
-    // =========================================================
-    // SET SKILL DATA
-    // =========================================================
+    public SkillData CurrentSkillData => currentSkillData;
+
+    private void Awake() => HideIndicator();
+
+    public void SetPlayerTransform(Transform player)
+    {
+        playerTransform = player;
+        dashIndicator?.SetPlayerTransform(player);
+        grenadeIndicator?.SetPlayerTransform(player);
+    }
 
     public void SetSkillData(SkillData skillData)
     {
+        currentSkillData = skillData;
+
         if (skillData == null)
         {
-            Debug.LogWarning(
-                "SkillIndicatorUI: SkillData is null!"
-            );
-
+            HideIndicator();
             return;
         }
 
-        if (rangeCircleSkill == null)
-        {
-            Debug.LogWarning(
-                "SkillIndicatorUI: rangeCircleSkill chưa được gán!"
-            );
+        UpdateRangeCircle(skillData);
 
-            return;
-        }
+        dashIndicator?.SetPixelsPerMeter(pixelsPerMeter);
+        grenadeIndicator?.SetPixelsPerMeter(pixelsPerMeter);
 
-        // =====================================================
-        // TÍNH KÍCH THƯỚC VÒNG TRÒN
-        //
-        // 1 unit range = 100 pixel
-        // Vì rangeRadius là bán kính
-        // nên Width / Height = radius * 100 * 2
-        // =====================================================
-
-        float diameter =
-            skillData.rangeRadius *
-            pixelsPerMeter *
-            2f;
-
-        rangeCircleSkill.rectTransform.sizeDelta =
-            new Vector2(diameter, diameter);
-
-        Debug.Log(
-            $"Skill Indicator | " +
-            $"Skill: {skillData.skillName} | " +
-            $"Range Radius: {skillData.rangeRadius} | " +
-            $"Indicator Size: {diameter} x {diameter}"
-        );
+        dashIndicator?.SetSkillData(skillData);
+        grenadeIndicator?.SetSkillData(skillData);
     }
 
-    // =========================================================
-    // SHOW / HIDE
-    // =========================================================
+    private void UpdateRangeCircle(SkillData skillData)
+    {
+        if (rangeCircleSkill == null) return;
+
+        float diameter = skillData.rangeRadius * pixelsPerMeter * 2f;
+        rangeCircleSkill.rectTransform.sizeDelta = new Vector2(diameter, diameter);
+    }
 
     public void ShowIndicator()
     {
-        if (skillIndicatorCanvas != null)
-            skillIndicatorCanvas.SetActive(true);
+        skillIndicatorCanvas?.SetActive(true);
+
+        if (currentSkillData is DashSkillData)
+            dashIndicator?.Show();
     }
 
     public void HideIndicator()
     {
-        if (skillIndicatorCanvas != null)
-            skillIndicatorCanvas.SetActive(false);
+        skillIndicatorCanvas?.SetActive(false);
+        dashIndicator?.Hide();
+        grenadeIndicator?.Hide();
     }
 
-    public GameObject GetIndicatorCanvas()
+    public void ShowAutoPreview()
     {
-        return skillIndicatorCanvas;
+        if (currentSkillData is DashSkillData)
+            dashIndicator?.SetAutoDirection();
+        else if (currentSkillData is GrenadeSkillData)
+            grenadeIndicator?.ShowAutoPreview();
     }
+
+    public void UpdateDirection(Vector2 direction, float distance)
+    {
+        if (currentSkillData is DashSkillData)
+            dashIndicator?.SetDirection(direction);
+        else if (currentSkillData is GrenadeSkillData)
+            grenadeIndicator?.SetDirection(direction, distance);
+    }
+
+    public bool TryGetGrenadeTarget(out Vector3 target)
+    {
+        target = Vector3.zero;
+
+        if (currentSkillData is not GrenadeSkillData || grenadeIndicator == null)
+            return false;
+
+        return grenadeIndicator.TryGetTargetPosition(out target);
+    }
+
+    public GameObject GetIndicatorCanvas() => skillIndicatorCanvas;
+    public void SetAutoDashDirection() => dashIndicator?.SetAutoDirection();
+    public void SetDashDirection(Vector2 direction) => dashIndicator?.SetDirection(direction);
 }

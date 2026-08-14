@@ -7,7 +7,7 @@ using UnityEngine;
 public class DashSkillData : SkillData
 {
     [Header("Dash")]
-    public float dashDistance = 3f;
+    public float dashDistance = 5f;
     public float timeDash = 0.2f;
     public float timeNextDash = 0.05f;
 

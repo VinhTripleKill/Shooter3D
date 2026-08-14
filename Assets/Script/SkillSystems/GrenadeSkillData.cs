@@ -1,6 +1,5 @@
-
-
 using UnityEngine;
+
 [CreateAssetMenu(menuName = "Skill/Grenade Skill")]
 public class GrenadeSkillData : SkillData
 {
@@ -10,21 +9,30 @@ public class GrenadeSkillData : SkillData
     [Header("Explosion")]
     public GameObject explosionPrefab;
 
-    public float explodeDelay = 2f;
+    [Header("Trajectory")]
+    [Tooltip("Độ cao đỉnh quỹ đạo tăng theo khoảng cách.")]
+    public float arcHeightPerMeter = 0.35f;
 
-    public float throwForce = 12f;
+    [Tooltip("Độ cao tối thiểu của đỉnh quỹ đạo.")]
+    public float minArcHeight = 0.5f;
 
-    [Header("Common Effect")]
+    [Header("Collision")]
+    [Tooltip(
+        "Collider thuộc layer này sẽ làm grenade nổ ngay khi va chạm."
+    )]
+    public LayerMask hitMask;
+
+    [Tooltip(
+        "Sau khoảng thời gian này grenade sẽ tự nổ " +
+        "nếu chưa chạm hitMask."
+    )]
+    public float explodeDelay = 3f;
+
+    [Header("Explosion Damage")]
     public float explodeRadius = 3f;
 
     public float damage = 20f;
 
-    public LayerMask hitMask;
-
+    [Tooltip("Layer của các sinh vật nhận damage.")]
     public LayerMask effectMask;
 }
-
-
-
-
-
