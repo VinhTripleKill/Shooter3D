@@ -416,10 +416,16 @@ MonoBehaviour:
   atkDamage: 1
   atkCD: 1
   atkTimeAnim: 1
+  nearUpdateRate: 0.1
+  mediumUpdateRate: 0.25
+  farUpdateRate: 0.5
+  veryFarUpdateRate: 1
   attackHeightOffset: 0
   attackAngle: 90
   gizmoColor: {r: 1, g: 0.2, b: 0, a: 0.35}
   expReward: 50
+  coinReward: 20
+  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!136 &6449497479353676384
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -15,6 +15,15 @@ public class GrenadeSkillData : SkillData
 
     [Tooltip("Độ cao tối thiểu của đỉnh quỹ đạo.")]
     public float minArcHeight = 0.5f;
+    [Header("Movement")]
+[Tooltip(
+    "Tốc độ thời gian bay của grenade.\n" +
+    "1 = tốc độ hiện tại.\n" +
+    "2 = bay nhanh gấp 2 lần.\n" +
+    "0.5 = bay chậm một nửa."
+)]
+[Min(0.01f)]
+public float speedGrenadeMove = 1f;
 
     [Header("Collision")]
     [Tooltip(

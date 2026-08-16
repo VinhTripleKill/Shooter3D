@@ -7,6 +7,7 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
     [Header("References")]
     [SerializeField] private Image skillArea;
     [SerializeField] private Image skillJoystick;
+    [SerializeField] private Image skillCancelZone;
     [SerializeField] private PlayerSkill playerSkill;
     [SerializeField] private SkillIndicatorUI skillIndicator;
     [SerializeField] private SkillJoystickHandle joystickHandle;
@@ -14,6 +15,10 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
     [Header("Alpha")]
     [SerializeField] private float alphaColorHide;
     [SerializeField] private float alphaColorVisible = 1f;
+
+    [Header("Color Cancel")]
+    [SerializeField] private Color notCancelColor;
+    [SerializeField] private Color isCancelColor;
 
     [Header("Area")]
     [SerializeField] private float initialLength = 150f;
@@ -23,10 +28,14 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
 
     private RectTransform skillAreaRect;
     private RectTransform skillJoystickRect;
+    private RectTransform skillCancelZoneRect;
+
     private Vector2 startPosition;
 
     private float pointerDownTime;
+
     private bool isDragging;
+    private bool isSkillCancel;
 
     public Vector2 SkillDirection { get; private set; }
 
@@ -34,16 +43,25 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
     {
         skillAreaRect = skillArea.rectTransform;
         skillJoystickRect = skillJoystick.rectTransform;
+
+        skillCancelZoneRect = skillCancelZone != null
+            ? skillCancelZone.rectTransform
+            : null;
+
         startPosition = skillJoystickRect.anchoredPosition;
+
+        if (skillCancelZone != null)
+        {
+            notCancelColor = skillCancelZone.color;
+            skillCancelZone.gameObject.SetActive(false);
+        }
 
         ResetVisual();
     }
 
-
     public void SetPlayerSkill(PlayerSkill skill)
     {
         playerSkill = skill;
-        //bhbhb
     }
 
     public void SetSkillIndicator(SkillIndicatorUI indicator)
@@ -67,11 +85,20 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
         if (playerSkill == null) return;
 
         pointerDownTime = Time.time;
+
         isDragging = false;
+        isSkillCancel = false;
+
         SkillDirection = Vector2.zero;
 
         SetImageAlpha(alphaColorVisible);
         SetSkillAreaSize(dragWidth, dragLength);
+
+        if (skillCancelZone != null)
+        {
+            skillCancelZone.gameObject.SetActive(true);
+            SetColorCancelSkill(false);
+        }
 
         skillIndicator?.ShowIndicator();
         joystickHandle?.Begin();
@@ -82,6 +109,7 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
         if (playerSkill == null) return;
 
         isDragging = true;
+        UpdateCancelState(eventData);
         UpdateJoystick(eventData);
     }
 
@@ -92,9 +120,18 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
             ResetNavigation();
             return;
         }
+        UpdateCancelState(eventData);
+
+        if (isSkillCancel)
+        {
+            ResetNavigation();
+            return;
+        }
 
         float holdTime = Time.time - pointerDownTime;
+
         bool autoAim = holdTime <= playerSkill.timeAuto && !isDragging;
+
         bool manualAim = isDragging;
 
         if (joystickHandle != null && joystickHandle.RequiresDrag() && !autoAim && !manualAim)
@@ -106,16 +143,18 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
         if (autoAim)
         {
             Vector3 direction = playerSkill.transform.forward;
+
             direction.y = 0f;
 
             if (direction.sqrMagnitude < 0.001f)
                 direction = Vector3.forward;
 
             direction.Normalize();
-
-            SkillDirection = new Vector2(direction.x, direction.z);
+            SkillDirection = new Vector2( direction.x, direction.z);
             playerSkill.SetAimDirection(direction, true);
         }
+
+
         else if (manualAim)
         {
             if (SkillDirection.sqrMagnitude < 0.001f)
@@ -124,12 +163,9 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
                 return;
             }
 
-            Vector3 direction = new Vector3(
-                SkillDirection.x,
-                0f,
-                SkillDirection.y);
+            Vector3 direction = new Vector3( SkillDirection.x, 0f, SkillDirection.y );
 
-            playerSkill.SetAimDirection(direction.normalized, false);
+            playerSkill.SetAimDirection( direction.normalized, false );
 
             if (joystickHandle != null &&
                 joystickHandle.TryGetGrenadeTarget(out Vector3 target))
@@ -137,9 +173,27 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
                 playerSkill.SetSkillTargetPosition(target);
             }
         }
-
         playerSkill.TryUseSkill();
         ResetNavigation();
+    }
+
+    private void UpdateCancelState(PointerEventData eventData)
+    {
+        if (skillCancelZoneRect == null)
+        {
+            isSkillCancel = false;
+            SetColorCancelSkill(false);
+            return;
+        }
+
+        bool inside = RectTransformUtility.RectangleContainsScreenPoint(
+            skillCancelZoneRect,
+            eventData.position,
+            eventData.pressEventCamera
+        );
+
+        isSkillCancel = inside;
+        SetColorCancelSkill(isSkillCancel);
     }
 
     private void UpdateJoystick(PointerEventData eventData)
@@ -149,10 +203,14 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
             eventData.position,
             eventData.pressEventCamera,
             out Vector2 localPoint))
+        {
             return;
+        }
 
         float radius = skillAreaRect.rect.width * 0.5f;
-        Vector2 position = Vector2.ClampMagnitude(localPoint, radius);
+
+        Vector2 position =
+            Vector2.ClampMagnitude(localPoint, radius);
 
         skillJoystickRect.anchoredPosition = position;
 
@@ -160,25 +218,53 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
             ? Mathf.Clamp01(position.magnitude / radius)
             : 0f;
 
-        SkillDirection = position.sqrMagnitude > 0.001f
-            ? position.normalized
-            : Vector2.zero;
+        SkillDirection =
+            position.sqrMagnitude > 0.001f
+                ? position.normalized
+                : Vector2.zero;
 
-        joystickHandle?.UpdateDirection(SkillDirection, distance);
+        joystickHandle?.UpdateDirection(
+            SkillDirection,
+            distance
+        );
     }
+
+    private void SetColorCancelSkill(bool isCancel)
+    {
+        if (skillCancelZone == null)
+            return;
+
+        skillCancelZone.color =
+            isCancel
+                ? isCancelColor
+                : notCancelColor;
+    }
+
 
     private void ResetNavigation()
     {
         skillIndicator?.HideIndicator();
 
         SetImageAlpha(alphaColorHide);
-        SetSkillAreaSize(initialWidth, initialLength);
+
+        SetSkillAreaSize(
+            initialWidth,
+            initialLength
+        );
 
         skillJoystickRect.anchoredPosition = startPosition;
+
         SkillDirection = Vector2.zero;
 
         playerSkill?.ClearSkillTargetPosition();
+
         isDragging = false;
+        isSkillCancel = false;
+
+        SetColorCancelSkill(false);
+
+        if (skillCancelZone != null)
+            skillCancelZone.gameObject.SetActive(false);
     }
 
     private void SetSkillAreaSize(float width, float height)
@@ -197,13 +283,18 @@ public class SkillNavigationArea : MonoBehaviour, IPointerDownHandler, IDragHand
         if (image == null) return;
 
         Color color = image.color;
+
         color.a = alpha;
+
         image.color = color;
     }
 
     private void ResetVisual()
     {
-        SetSkillAreaSize(initialWidth, initialLength);
+        SetSkillAreaSize( initialWidth, initialLength );
+
         SetImageAlpha(alphaColorHide);
+
+        SetColorCancelSkill(false);
     }
 }

@@ -5,7 +5,10 @@ public class PlayerProgress : MonoBehaviour
 {
     public Action<PlayerProgress> OnLevelChanged;
     public Action<PlayerProgress> OnExpChanged;
+    public Action<PlayerProgress> OnCoinChanged;
+
     public int MaxLevel => maxLevel;
+
     [Header("Level")]
     [SerializeField] private int maxLevel = 20;
 
@@ -15,21 +18,36 @@ public class PlayerProgress : MonoBehaviour
 
     private int requiredExp;
 
+    [Header("Coin")]
+    [SerializeField] private int currentCoins;
+
     private void Awake()
     {
         requiredExp = CalculateRequiredExp(currentLevel);
 
         OnExpChanged?.Invoke(this);
         OnLevelChanged?.Invoke(this);
+        OnCoinChanged?.Invoke(this);
     }
+
+    // =====================================================
+    // EXP
+    // =====================================================
 
     public void AddExp(int amount)
     {
-        if (currentLevel >= maxLevel) return;
+        if (amount <= 0)
+            return;
+
+        if (currentLevel >= maxLevel)
+            return;
 
         currentExp += amount;
 
-        while (currentExp >= requiredExp && currentLevel < maxLevel)
+        while (
+            currentExp >= requiredExp &&
+            currentLevel < maxLevel
+        )
         {
             currentExp -= requiredExp;
 
@@ -40,35 +58,83 @@ public class PlayerProgress : MonoBehaviour
     }
 
     private void LevelUp()
-{
-    currentLevel++;
-
-    OnLevelChanged?.Invoke(this);
-
-    if (currentLevel >= maxLevel)
     {
-        currentExp = 0;
-        requiredExp = 0;
+        currentLevel++;
 
-        OnExpChanged?.Invoke(this);
+        OnLevelChanged?.Invoke(this);
 
-        Debug.Log("MAX LEVEL");
-        return;
+        if (currentLevel >= maxLevel)
+        {
+            currentExp = 0;
+            requiredExp = 0;
+
+            OnExpChanged?.Invoke(this);
+
+            Debug.Log("MAX LEVEL");
+            return;
+        }
+
+        requiredExp =
+            CalculateRequiredExp(currentLevel);
+
+        Debug.Log(
+            $"LEVEL UP -> {currentLevel}"
+        );
     }
-
-    requiredExp = CalculateRequiredExp(currentLevel);
-
-    Debug.Log($"LEVEL UP -> {currentLevel}");
-}
 
     private int CalculateRequiredExp(int level)
     {
-        return Mathf.RoundToInt( 200f * Mathf.Pow(level, 1.35f));
+        return Mathf.RoundToInt(
+            200f * Mathf.Pow(level, 1.35f)
+        );
     }
+
+    // =====================================================
+    // COIN
+    // =====================================================
+
+    public void AddCoins(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        currentCoins += amount;
+
+        OnCoinChanged?.Invoke(this);
+
+        Debug.Log(
+            $"PLAYER COIN +{amount} | TOTAL = {currentCoins}"
+        );
+    }
+
+    public bool SpendCoins(int amount)
+    {
+        if (amount <= 0)
+            return false;
+
+        if (currentCoins < amount)
+            return false;
+
+        currentCoins -= amount;
+
+        OnCoinChanged?.Invoke(this);
+
+        Debug.Log(
+            $"PLAYER COIN -{amount} | TOTAL = {currentCoins}"
+        );
+
+        return true;
+    }
+
+    // =====================================================
+    // GET
+    // =====================================================
 
     public int CurrentLevel => currentLevel;
 
     public int CurrentExp => currentExp;
 
     public int RequiredExp => requiredExp;
+
+    public int CurrentCoins => currentCoins;
 }

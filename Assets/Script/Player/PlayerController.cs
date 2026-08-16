@@ -246,10 +246,6 @@ public class PlayerController : BasePlayer
             $"Actual: {actualDistance:F2}m"
         );
     
-        // ==========================================
-        // DASH
-        // ==========================================
-    
         float timer = 0f;
         float distanceMoved = 0f;
     
@@ -278,10 +274,7 @@ public class PlayerController : BasePlayer
         canMove = true;
         isDashing = false;
     
-        Debug.Log(
-            $"DASH END | " +
-            $"Moved: {distanceMoved:F2}/{dashDistance:F2}"
-        );
+        Debug.Log($"DASH END | " +$"Moved: {distanceMoved:F2}/{dashDistance:F2}");
     
         yield return new WaitForSeconds(nextDashTime);
     
@@ -291,9 +284,6 @@ public class PlayerController : BasePlayer
         Debug.Log("DASH READY");
     }
     
-    
-    
-    
     private float CalculateDashDistance( Vector3 direction, float maxDistance, LayerMask obstacleMask)
     {
         if (controller == null) return maxDistance;
@@ -301,17 +291,12 @@ public class PlayerController : BasePlayer
         direction.y = 0f;
         direction.Normalize();
     
-        // ==========================================
-        // CHARACTER CONTROLLER SIZE
-        // ==========================================
-    
         float radius = controller.radius;
     
         float height = controller.height;
     
         Vector3 center = transform.position + controller.center;
     
-        // Đảm bảo capsule không bị đảo ngược
         float cylinderHeight = Mathf.Max( height - radius * 2f, 0f);
     
         Vector3 point1 = center + Vector3.up * (cylinderHeight * 0.5f);
@@ -350,9 +335,3 @@ public class PlayerController : BasePlayer
     public float CurrentSprintEnergy { get => currentSprintEnergy; set => currentSprintEnergy = value; }
     public float MaxSprintEnergy => playerCharacter.Data.CharacterStats.maxSprint;
 }
-
-
-
-
-
-

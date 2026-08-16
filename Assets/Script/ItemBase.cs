@@ -44,24 +44,28 @@ public class ItemBase : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (!isStopped) return;
+ protected virtual void Update()
+{
+    if (!isStopped) return;
 
-        UpdateIdleEffect();
-    }
+    UpdateIdleEffect();
+}
 
-    protected virtual void UpdateIdleEffect()
-    {
-        // Xoay theo chiều kim đồng hồ quanh trục Y
-        transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime, Space.World);
+protected virtual void UpdateIdleEffect()
+{
+    transform.Rotate(
+        Vector3.up,
+        rotateSpeed * Time.deltaTime,
+        Space.World
+    );
 
-        // Hiệu ứng bay lơ lửng
-        floatTimer += Time.deltaTime * floatSpeed;
-        Vector3 pos = basePosition;
-        pos.y += Mathf.Sin(floatTimer) * floatAmplitude;
-        transform.position = pos;
-    }
+    floatTimer += Time.deltaTime * floatSpeed;
+
+    Vector3 pos = basePosition;
+    pos.y += Mathf.Sin(floatTimer) * floatAmplitude;
+
+    transform.position = pos;
+}
 
     private void StopOnGround(RaycastHit hit)
     {

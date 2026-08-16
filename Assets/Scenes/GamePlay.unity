@@ -7816,6 +7816,17 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &996628321 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3536085821971148703, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+  m_PrefabInstance: {fileID: 6229201487849596602}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1001 &997067972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10563,7 +10574,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.25, g: 0.25, b: 0.25, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -13392,11 +13403,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillNavigationArea
   skillArea: {fileID: 1718497407}
   skillJoystick: {fileID: 1531749483}
+  skillCancelZone: {fileID: 996628321}
   playerSkill: {fileID: 0}
   skillIndicator: {fileID: 0}
   joystickHandle: {fileID: 1531749480}
   alphaColorHide: 0
   alphaColorVisible: 1
+  notCancelColor: {r: 1, g: 1, b: 1, a: 1}
+  isCancelColor: {r: 1, g: 0, b: 0, a: 1}
   initialLength: 150
   initialWidth: 150
   dragLength: 300
@@ -17137,6 +17151,18 @@ PrefabInstance:
       propertyPath: pauseGameUI
       value: 
       objectReference: {fileID: 900273620}
+    - target: {fileID: 2056261977152326637, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2203399960068049528, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Name
+      value: skillCancelZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 3536085821971148703, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 966d9e8d58d4bfa44b81ae37894dddcb, type: 3}
     - target: {fileID: 4165609546461890114, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -17155,6 +17181,18 @@ PrefabInstance:
       objectReference: {fileID: 314651187}
     - target: {fileID: 5580091471761531624, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5745867634492737589, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Color.b
+      value: 0.10196078
+      objectReference: {fileID: 0}
+    - target: {fileID: 5745867634492737589, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Color.g
+      value: 0.94476956
+      objectReference: {fileID: 0}
+    - target: {fileID: 5745867634492737589, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5843465249079055890, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
@@ -17266,7 +17304,8 @@ PrefabInstance:
       value: GameplayUI
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 9007646323253869371, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3241524103715151518, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}

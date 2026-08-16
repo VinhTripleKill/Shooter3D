@@ -10,6 +10,9 @@ public class GrenadeProjectile : MonoBehaviour
     private Vector3 startPosition;
     private Vector3 targetPosition;
 
+    private float totalFlightTime;
+    private float currentFlightTime;
+
     private bool exploded;
     private bool initialized;
 
@@ -17,7 +20,10 @@ public class GrenadeProjectile : MonoBehaviour
     // INITIALIZE
     // =============================================================
 
-    public void Initialize(GrenadeSkillData skillData,Vector3 start,Vector3 target)
+    public void Initialize(
+        GrenadeSkillData skillData,
+        Vector3 start,
+        Vector3 target)
     {
         data = skillData;
 
@@ -26,6 +32,7 @@ public class GrenadeProjectile : MonoBehaviour
 
         exploded = false;
         initialized = true;
+        currentFlightTime = 0f;
 
         // =========================================================
         // GET RIGIDBODY
@@ -35,123 +42,307 @@ public class GrenadeProjectile : MonoBehaviour
 
         if (rb == null)
         {
-            Debug.LogError("[GRENADE] Grenade prefab phải có Rigidbody!");
+            Debug.LogError(
+                "[GRENADE] Grenade prefab phải có Rigidbody!"
+            );
 
             Destroy(gameObject);
-
             return;
         }
 
         // =========================================================
-        // PHẢI DÙNG PHYSICS THẬT
+        // PHYSICS SETUP
         // =========================================================
 
-        rb.isKinematic = false;
+        rb.isKinematic = true;
 
-        // Bạn có thể tự bật/tắt Use Gravity trong prefab.
-        // Nhưng với hệ thống này nên để Use Gravity = ON.
+        rb.collisionDetectionMode =
+            CollisionDetectionMode.ContinuousSpeculative;
 
-        // =========================================================
-        // COLLISION DETECTION
-        // =========================================================
-
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.interpolation =
+            RigidbodyInterpolation.Interpolate;
 
         // =========================================================
-        // TÍNH INITIAL VELOCITY
+        // TÍNH THỜI GIAN BAY GỐC
         // =========================================================
 
-        Vector3 initialVelocity = CalculateLaunchVelocity( startPosition, targetPosition );
+        totalFlightTime =
+            CalculateFlightTime(
+                startPosition,
+                targetPosition
+            );
 
-        rb.linearVelocity = initialVelocity;
+        totalFlightTime =
+            Mathf.Max(totalFlightTime, 0.01f);
+
+        // =========================================================
+        // SPEED
+        //
+        // 1x  -> thời gian gốc
+        // 2x  -> thời gian còn một nửa
+        // 0.5 -> thời gian gấp đôi
+        // =========================================================
+
+        float speedMultiplier =
+            Mathf.Max(data.speedGrenadeMove, 0.01f);
+
+        totalFlightTime /= speedMultiplier;
 
         // =========================================================
         // EXPLODE DELAY
         // =========================================================
 
-        StartCoroutine( ExplodeDelayRoutine() );
+        StartCoroutine(
+            ExplodeDelayRoutine()
+        );
 
-        Debug.Log( $"[GRENADE] Launch velocity = " + $"{initialVelocity}" );
+        Debug.Log(
+            $"[GRENADE] Flight Time = {totalFlightTime:F2}s | " +
+            $"Speed = {data.speedGrenadeMove:F2}x"
+        );
     }
 
     // =============================================================
-    // TÍNH VẬN TỐC NÉM
+    // UPDATE
     // =============================================================
 
-    private Vector3 CalculateLaunchVelocity( Vector3 start, Vector3 target)
+    private void Update()
     {
-        Vector3 displacement = target - start;
+        if (!initialized || exploded)
+            return;
+
+        currentFlightTime += Time.deltaTime;
+
+        float normalizedTime =
+            Mathf.Clamp01(
+                currentFlightTime / totalFlightTime
+            );
+
+        Vector3 position =
+            CalculatePosition(
+                startPosition,
+                targetPosition,
+                normalizedTime
+            );
+
+        rb.MovePosition(position);
 
         // =========================================================
-        // GRAVITY
+        // ĐÃ TỚI TARGET
         // =========================================================
 
-        float gravity = Mathf.Abs( Physics.gravity.y );
+        if (normalizedTime >= 1f)
+        {
+            rb.MovePosition(targetPosition);
 
-        gravity = Mathf.Max( gravity, 0.01f );
+            Explode();
+        }
+    }
 
-        // =========================================================
-        // TÍNH KHOẢNG CÁCH NGANG
-        // =========================================================
+    // =============================================================
+    // CALCULATE FLIGHT TIME
+    // =============================================================
 
-        Vector3 horizontal = new Vector3( displacement.x, 0f, displacement.z );
+    private float CalculateFlightTime(
+        Vector3 start,
+        Vector3 target)
+    {
+        float gravity =
+            Mathf.Abs(Physics.gravity.y);
 
-        float horizontalDistance = horizontal.magnitude;
+        gravity =
+            Mathf.Max(gravity, 0.01f);
 
-        // =========================================================
-        // TÍNH ĐỘ CAO ĐỈNH PARABOL
-        // =========================================================
+        Vector3 displacement =
+            target - start;
 
-        float arcHeight = Mathf.Max( data.minArcHeight, horizontalDistance * data.arcHeightPerMeter );
+        Vector3 horizontal =
+            new Vector3(
+                displacement.x,
+                0f,
+                displacement.z
+            );
 
-        // Đỉnh quỹ đạo nằm cao hơn điểm bắt đầu
-        // khoảng arcHeight.
-
-        float apexHeight = start.y + arcHeight;
-
-        // =========================================================
-        // VẬN TỐC Y ĐỂ ĐẠT ĐỈNH
-        // =========================================================
-
-        float verticalVelocity = Mathf.Sqrt( 2f * gravity * Mathf.Max( 0.01f, apexHeight - start.y ) );
-
-        // =========================================================
-        // THỜI GIAN LÊN ĐẾN ĐỈNH
-        // =========================================================
-
-        float timeUp = verticalVelocity / gravity;
-
-        // =========================================================
-        // TÍNH THỜI GIAN TỪ ĐỈNH XUỐNG TARGET
-        // =========================================================
-
-        float heightFromApexToTarget = apexHeight - target.y;
-
-        heightFromApexToTarget = Mathf.Max( heightFromApexToTarget, 0.01f );
-
-        float timeDown = Mathf.Sqrt( 2f * heightFromApexToTarget / gravity );
-
-        float totalFlightTime = timeUp + timeDown;
-
-        totalFlightTime = Mathf.Max( totalFlightTime, 0.01f );
+        float horizontalDistance =
+            horizontal.magnitude;
 
         // =========================================================
-        // VẬN TỐC NGANG
+        // APEX
         // =========================================================
 
-        Vector3 horizontalVelocity = horizontal / totalFlightTime;
+        float arcHeight =
+            Mathf.Max(
+                data.minArcHeight,
+                horizontalDistance *
+                data.arcHeightPerMeter
+            );
+
+        float apexHeight =
+            start.y + arcHeight;
 
         // =========================================================
-        // FINAL VELOCITY
+        // VELOCITY Y
         // =========================================================
 
-        Vector3 launchVelocity = horizontalVelocity;
+        float verticalVelocity =
+            Mathf.Sqrt(
+                2f *
+                gravity *
+                Mathf.Max(
+                    0.01f,
+                    apexHeight - start.y
+                )
+            );
 
-        launchVelocity.y = verticalVelocity;
+        // =========================================================
+        // TIME UP
+        // =========================================================
 
-        return launchVelocity;
+        float timeUp =
+            verticalVelocity / gravity;
+
+        // =========================================================
+        // TIME DOWN
+        // =========================================================
+
+        float heightFromApexToTarget =
+            apexHeight - target.y;
+
+        heightFromApexToTarget =
+            Mathf.Max(
+                heightFromApexToTarget,
+                0.01f
+            );
+
+        float timeDown =
+            Mathf.Sqrt(
+                2f *
+                heightFromApexToTarget /
+                gravity
+            );
+
+        return timeUp + timeDown;
+    }
+
+    // =============================================================
+    // CALCULATE POSITION
+    // =============================================================
+
+    private Vector3 CalculatePosition(
+        Vector3 start,
+        Vector3 target,
+        float t)
+    {
+        float gravity =
+            Mathf.Abs(Physics.gravity.y);
+
+        gravity =
+            Mathf.Max(gravity, 0.01f);
+
+        Vector3 displacement =
+            target - start;
+
+        Vector3 horizontal =
+            new Vector3(
+                displacement.x,
+                0f,
+                displacement.z
+            );
+
+        float horizontalDistance =
+            horizontal.magnitude;
+
+        // =========================================================
+        // SAME ARC AS ORIGINAL SYSTEM
+        // =========================================================
+
+        float arcHeight =
+            Mathf.Max(
+                data.minArcHeight,
+                horizontalDistance *
+                data.arcHeightPerMeter
+            );
+
+        float apexHeight =
+            start.y + arcHeight;
+
+        // =========================================================
+        // ORIGINAL VERTICAL VELOCITY
+        // =========================================================
+
+        float verticalVelocity =
+            Mathf.Sqrt(
+                2f *
+                gravity *
+                Mathf.Max(
+                    0.01f,
+                    apexHeight - start.y
+                )
+            );
+
+        // =========================================================
+        // ORIGINAL FLIGHT TIME
+        //
+        // QUAN TRỌNG:
+        // Ta tính lại flight time nguyên bản ở đây.
+        // speedGrenadeMove chỉ thay đổi tốc độ chạy
+        // qua normalized time.
+        // =========================================================
+
+        float timeUp =
+            verticalVelocity / gravity;
+
+        float heightFromApexToTarget =
+            Mathf.Max(
+                apexHeight - target.y,
+                0.01f
+            );
+
+        float timeDown =
+            Mathf.Sqrt(
+                2f *
+                heightFromApexToTarget /
+                gravity
+            );
+
+        float originalFlightTime =
+            timeUp + timeDown;
+
+        originalFlightTime =
+            Mathf.Max(
+                originalFlightTime,
+                0.01f
+            );
+
+        // =========================================================
+        // TÍNH VỊ TRÍ NGANG
+        // =========================================================
+
+        Vector3 horizontalPosition =
+            Vector3.Lerp(
+                start,
+                target,
+                t
+            );
+
+        // Chỉ giữ X/Z
+        horizontalPosition.y = start.y;
+
+        // =========================================================
+        // TÍNH Y THEO PARABOLA GỐC
+        // =========================================================
+
+        float time =
+            t * originalFlightTime;
+
+        float y =
+            start.y +
+            verticalVelocity * time -
+            0.5f * gravity * time * time;
+
+        horizontalPosition.y = y;
+
+        return horizontalPosition;
     }
 
     // =============================================================
@@ -160,11 +351,16 @@ public class GrenadeProjectile : MonoBehaviour
 
     private IEnumerator ExplodeDelayRoutine()
     {
-        yield return new WaitForSeconds( data.explodeDelay );
+        yield return new WaitForSeconds(
+            data.explodeDelay
+        );
 
-        if (exploded) yield break;
+        if (exploded)
+            yield break;
 
-        Debug.Log( "[GRENADE] Explode bởi explodeDelay." );
+        Debug.Log(
+            "[GRENADE] Explode bởi explodeDelay."
+        );
 
         Explode();
     }
@@ -175,43 +371,33 @@ public class GrenadeProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!initialized) return;
+        if (!initialized)
+            return;
 
-        if (exploded) return;
+        if (exploded)
+            return;
 
-        // =========================================================
-        // CHECK HIT MASK
-        // =========================================================
+        int layerBit =
+            1 << collision.gameObject.layer;
 
-        int layerBit = 1 << collision.gameObject.layer;
-
-        bool isHitMask = (data.hitMask.value & layerBit) != 0;
-
-        // =========================================================
-        // KHÔNG THUỘC HIT MASK
-        // =========================================================
+        bool isHitMask =
+            (data.hitMask.value & layerBit) != 0;
 
         if (!isHitMask)
         {
-            Debug.Log($"[GRENADE] Va vào " +$"{collision.gameObject.name} " +$"nhưng không thuộc hitMask.");
-
-            // Không explode.
-            //
-            // Rigidbody sẽ tự:
-            // - bounce
-            // - rơi
-            // - nằm xuống
-            //
-            // Sau explodeDelay sẽ tự explode.
+            Debug.Log(
+                $"[GRENADE] Va vào " +
+                $"{collision.gameObject.name} " +
+                $"nhưng không thuộc hitMask."
+            );
 
             return;
         }
 
-        // =========================================================
-        // THUỘC HIT MASK
-        // =========================================================
-
-        Debug.Log( $"[GRENADE] Hit hitMask: " + $"{collision.gameObject.name}" );
+        Debug.Log(
+            $"[GRENADE] Hit hitMask: " +
+            $"{collision.gameObject.name}"
+        );
 
         Explode();
     }
@@ -222,31 +408,39 @@ public class GrenadeProjectile : MonoBehaviour
 
     private void Explode()
     {
-        if (exploded) return;
+        if (exploded)
+            return;
 
         exploded = true;
 
         StopAllCoroutines();
 
-        Vector3 explosionPosition = transform.position;
+        Vector3 explosionPosition =
+            transform.position;
 
-        Debug.Log( $"[GRENADE] EXPLODE tại " + $"{explosionPosition}" );
-
-        // =========================================================
-        // SPAWN EXPLOSION
-        // =========================================================
+        Debug.Log(
+            $"[GRENADE] EXPLODE tại " +
+            $"{explosionPosition}"
+        );
 
         if (data.explosionPrefab != null)
         {
-            GameObject explosion = Instantiate( data.explosionPrefab, explosionPosition, Quaternion.identity );
+            GameObject explosion =
+                Instantiate(
+                    data.explosionPrefab,
+                    explosionPosition,
+                    Quaternion.identity
+                );
 
-            ExplosionEffect effect = explosion.GetComponent<ExplosionEffect>();
+            ExplosionEffect effect =
+                explosion.GetComponent<ExplosionEffect>();
 
             if (effect != null)
             {
                 effect.Initialize(data);
             }
         }
+
         Destroy(gameObject);
     }
 }

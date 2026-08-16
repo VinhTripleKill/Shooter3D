@@ -25,15 +25,16 @@ private float nextUpdatePathTime;
     [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón
     [Header("Gizmos")]
     [SerializeField] private Color gizmoColor = new Color(1f, 0.2f, 0f, 0.35f);
-    [Header("Reward")]
+[Header("Reward")]
+[SerializeField] protected int expReward = 200;
+[SerializeField] protected int coinReward = 1;
+[SerializeField] protected GameObject coinPrefab;
 
 private bool shouldGiveExp = true;
     protected EnemyState currentState;
     protected Transform player;
     protected bool isAttacking;
 
-    [Header("Reward")]
-    [SerializeField] protected int expReward = 200;
 
     protected EnemyAnim enemyAnim;
     protected NavMeshAgent agent;
@@ -291,9 +292,15 @@ protected override void Die()
     StopAllCoroutines();
 
     isAttacking = false;
-    currentState = EnemyState.Dead;
+
+    currentState =
+        EnemyState.Dead;
 
     DisableCollision();
+
+    // =====================================================
+    // STOP NAVMESH
+    // =====================================================
 
     if (agent != null)
     {
@@ -301,25 +308,86 @@ protected override void Die()
         agent.enabled = false;
     }
 
-   if (shouldGiveExp && player != null)
-{
-    PlayerProgress pp =
-        player.GetComponent<PlayerProgress>();
+    // =====================================================
+    // REWARD
+    // =====================================================
 
-    pp?.AddExp(expReward);
+    if (shouldGiveExp && player != null)
+    {
+        PlayerProgress pp =
+            player.GetComponent<PlayerProgress>();
 
-  
-}
-else
-{
-    Debug.Log("[ENEMY] Enemy tự động chết do hết thời gian -> Không nhận EXP");
-}
+        if (pp != null)
+        {
+            // EXP
+            pp.AddExp(expReward);
+        }
+
+        // COIN
+        SpawnCoinReward();
+    }
+    else
+    {
+        Debug.Log(
+            "[ENEMY] Enemy tự động chết " +
+            "-> Không nhận EXP / COIN"
+        );
+    }
+
+    // =====================================================
+    // WAVE
+    // =====================================================
+
     waveManager?.OnEnemyDied(this);
 
     AllEnemies.Remove(this);
 
     AutoAimManager.Unregister(this);
 
-    enemyAnim.PlayDead(() => Destroy(gameObject));
+    // =====================================================
+    // DEAD ANIMATION
+    // =====================================================
+
+    enemyAnim.PlayDead(
+        () => Destroy(gameObject)
+    );
 }
+protected virtual void SpawnCoinReward()
+{
+    if (coinPrefab == null)
+    {
+        Debug.LogWarning(
+            $"[{name}] Chưa gán Coin Prefab."
+        );
+
+        return;
+    }
+
+    if (coinReward <= 0)
+        return;
+
+    GameObject coinObject =
+        Instantiate(
+            coinPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+
+    ItemCoin coin =
+        coinObject.GetComponent<ItemCoin>();
+
+    if (coin == null)
+    {
+        Debug.LogError(
+            $"[{name}] Coin Prefab không có ItemCoin."
+        );
+
+        Destroy(coinObject);
+        return;
+    }
+
+    coin.SetCoinValue(coinReward);
+}
+
+
 }
