@@ -129,7 +129,7 @@ public class GrenadeIndicatorUI : MonoBehaviour
             Vector3.down,
             out RaycastHit hit,
             100f,
-            grenadeSkillData.hitMask,
+            grenadeSkillData.groundMask,
             QueryTriggerInteraction.Ignore))
         {
             groundPosition = hit.point;

@@ -14,19 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrenadeSkillData
   skillName: BurnGre
   icon: {fileID: 21300000, guid: 16d65627c4f862948beec3e8e9a1f2df, type: 3}
-  cooldown: 8
-  maxStack: 2
+  cooldown: 0.5
+  maxStack: 3
   rangeRadius: 8
   skillBehaviourPrefab: {fileID: -7539789986821043711, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
   grenadePrefab: {fileID: 8504079749979510124, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 784b59333981b0f419b9afd90b3dc395, type: 3}
-  arcHeightPerMeter: 0.3
-  minArcHeight: 0
-  speedGrenadeMove: 2
+  moveSpeed: 8
+  arriveDistance: 0.1
+  arcHeightNear: 0.2
+  arcHeightFar: 4
+  distanceForMaxArc: 15
+  speedRotX: 30
+  speedRotY: 60
+  speedRotZ: 90
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  wallBounceForce: 1
+  wallUpwardForce: 0.2
+  minimumBounceSpeed: 9
   hitMask:
     serializedVersion: 2
-    m_Bits: 648
-  explodeDelay: 5
+    m_Bits: 8
+  explodeDelay: 3
   explodeRadius: 3
   damage: 25
   effectMask:

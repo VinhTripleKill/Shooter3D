@@ -103,7 +103,8 @@ MonoBehaviour:
   rotateSpeed: 90
   floatAmplitude: 0.2
   floatSpeed: 2
-  mode: 0
+  coinValue: 1
+  mode: 1
   rangeChasePlayer: 10
   chaseSpeed: 10
   checkTargetInterval: 0.1

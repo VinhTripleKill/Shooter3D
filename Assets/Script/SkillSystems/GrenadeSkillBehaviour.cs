@@ -5,171 +5,137 @@ public class GrenadeSkillBehaviour : SkillBehaviour
     [SerializeField]
     private GrenadeSkillData skillData;
 
-   public override bool Execute(PlayerSkill playerSkill)
-{
-    if (skillData == null)
-        return false;
-
-    if (skillData.grenadePrefab == null)
+    public override bool Execute(PlayerSkill playerSkill)
     {
-        Debug.LogWarning(
-            "GrenadeSkill: grenadePrefab chưa được gán!"
-        );
-
-        return false;
-    }
-
-    Transform firePoint =
-        playerSkill.GetFirePoint();
-
-    if (firePoint == null)
-    {
-        Debug.LogWarning(
-            "GrenadeSkill: PlayerSkill chưa có FirePoint!"
-        );
-
-        return false;
-    }
-
-    // =========================================================
-    // AIM MODE
-    // =========================================================
-
-    bool autoAim =
-        playerSkill.IsAutoAim();
-
-    Vector3 targetPosition;
-
-    // =========================================================
-    // AUTO AIM
-    //
-    // Chỉ được phép auto nếu có enemy trong range.
-    //
-    // KHÔNG CÓ ENEMY:
-    // -> Không ném
-    // -> Không fallback ra phía trước
-    // =========================================================
-
-    if (autoAim)
-    {
-        Transform target =
-            CombatTargetFinder.GetNearestTarget(
-                firePoint.position,
-                skillData.rangeRadius
-            );
-
-        if (target == null)
-        {
-            Debug.Log(
-                "No enemy in skill range"
-            );
-
+        if (skillData == null)
             return false;
-        }
 
-        targetPosition =
-            target.position;
-
-        Debug.Log(
-            $"[GRENADE] AUTO AIM -> " +
-            $"Target: {target.name} | " +
-            $"Position: {targetPosition}"
-        );
-    }
-
-    // =========================================================
-    // MANUAL AIM
-    //
-    // Bắt buộc lấy vị trí grenadeIndicator.
-    //
-    // TUYỆT ĐỐI KHÔNG:
-    //
-    // direction * rangeRadius
-    //
-    // Vì khoảng cách thực tế phụ thuộc vào joystick.
-    // =========================================================
-
-    else
-    {
-        if (!playerSkill.TryGetSkillTargetPosition(
-                out Vector3 selectedTarget))
+        if (skillData.grenadePrefab == null)
         {
             Debug.LogWarning(
-                "[GRENADE] Manual aim nhưng " +
-                "không có target position!"
+                "GrenadeSkill: grenadePrefab chưa được gán!"
             );
 
             return false;
         }
 
-        targetPosition =
-            selectedTarget;
+        Transform firePoint =
+            playerSkill.GetFirePoint();
 
-        Debug.Log(
-            $"[GRENADE] MANUAL AIM -> " +
-            $"Selected Target: {targetPosition}"
-        );
-    }
+        if (firePoint == null)
+        {
+            Debug.LogWarning(
+                "GrenadeSkill: PlayerSkill chưa có FirePoint!"
+            );
 
-    // =========================================================
-    // GROUND
-    // =========================================================
+            return false;
+        }
 
-    if (!TryFindGroundPosition(
-            targetPosition,
-            out Vector3 groundPosition))
-    {
-        Debug.LogWarning(
-            "[GRENADE] Không tìm thấy Ground tại target position!"
-        );
+        bool autoAim =
+            playerSkill.IsAutoAim();
 
-        return false;
-    }
+        Vector3 targetPosition;
 
-    // =========================================================
-    // PLAYER QUAY VỀ HƯỚNG GRENADE
-    // =========================================================
+        // =========================================================
+        // AUTO AIM
+        // =========================================================
 
-    Vector3 lookDirection =
-        groundPosition -
-        playerSkill.transform.position;
+        if (autoAim)
+        {
+            Transform target =
+                CombatTargetFinder.GetNearestTarget(
+                    firePoint.position,
+                    skillData.rangeRadius
+                );
 
-    lookDirection.y = 0f;
+            if (target == null)
+            {
+                return false;
+            }
 
-    if (lookDirection.sqrMagnitude > 0.001f)
-    {
-        playerSkill.transform.forward =
-            lookDirection.normalized;
-    }
+            targetPosition =
+                target.position;
+        }
 
+        // =========================================================
+        // MANUAL AIM
+        // =========================================================
 
-    GameObject grenade =
-        Instantiate(
-            skillData.grenadePrefab,
+        else
+        {
+            if (!playerSkill.TryGetSkillTargetPosition(
+                    out Vector3 selectedTarget))
+            {
+                return false;
+            }
+
+            targetPosition =
+                selectedTarget;
+        }
+
+        // =========================================================
+        // TARGET -> GROUND
+        // =========================================================
+
+        if (!TryFindGroundPosition(
+                targetPosition,
+                out Vector3 groundPosition))
+        {
+            return false;
+        }
+
+        // =========================================================
+        // PLAYER FACE TARGET
+        // =========================================================
+
+        Vector3 lookDirection =
+            groundPosition -
+            playerSkill.transform.position;
+
+        lookDirection.y = 0f;
+
+        if (lookDirection.sqrMagnitude > 0.001f)
+        {
+            playerSkill.transform.forward =
+                lookDirection.normalized;
+        }
+
+        // =========================================================
+        // CREATE GRENADE
+        // =========================================================
+
+        GameObject grenade =
+            Instantiate(
+                skillData.grenadePrefab,
+                firePoint.position,
+                firePoint.rotation
+            );
+
+        GrenadeProjectile projectile =
+            grenade.GetComponent<GrenadeProjectile>();
+
+        if (projectile == null)
+        {
+            Destroy(grenade);
+            return false;
+        }
+
+        // =========================================================
+        // INITIALIZE
+        // =========================================================
+
+        projectile.Initialize(
+            skillData,
             firePoint.position,
-            Quaternion.identity
+            groundPosition
         );
 
-
-    GrenadeProjectile projectile =
-        grenade.GetComponent<GrenadeProjectile>();
-
-    if (projectile == null)
-    {
-        Destroy(grenade);
-
-        return false;
+        return true;
     }
 
-
-    projectile.Initialize(
-        skillData,
-        firePoint.position,
-        groundPosition
-    );
-
-    return true;
-}
+    // =============================================================
+    // TARGET -> GROUND RAYCAST
+    // =============================================================
 
     private bool TryFindGroundPosition(
         Vector3 targetPosition,
@@ -187,15 +153,17 @@ public class GrenadeSkillBehaviour : SkillBehaviour
                 Vector3.down,
                 out RaycastHit hit,
                 rayDistance,
-                skillData.hitMask,
+                skillData.groundMask,
                 QueryTriggerInteraction.Ignore))
         {
-            groundPosition = hit.point;
+            groundPosition =
+                hit.point;
 
             return true;
         }
 
-        groundPosition = targetPosition;
+        groundPosition =
+            targetPosition;
 
         return false;
     }

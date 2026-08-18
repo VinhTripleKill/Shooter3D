@@ -698,6 +698,7 @@ MonoBehaviour:
   maxLevel: 20
   currentLevel: 0
   currentExp: 0
+  currentCoins: 0
 --- !u!114 &2959926364516746955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -792,7 +793,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.1}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3337788204719771237
@@ -5962,7 +5963,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrenadeIndicatorUI
   grenadeIndicator: {fileID: 3365994818700341929}
-  grenadeIndicatorYOffset: 0.1
+  grenadeIndicatorYOffset: 0
 --- !u!1 &7093226702076931842
 GameObject:
   m_ObjectHideFlags: 0
