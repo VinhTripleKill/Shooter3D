@@ -9,7 +9,7 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [Header("Aim")]
     public float timeAuto = 0.2f;
-
+    private BasePlayer basePlayer;
     private bool useAutoAim = true;
     private SkillBehaviour currentSkillInstance; // chỉ dùng khi cần
     private SkillData currentSkillData;
@@ -25,13 +25,15 @@ public class PlayerSkill : MonoBehaviour
     private bool hasSkillTargetPosition;
     public Vector3 GetAimDirection()=> aimDirection;
 
-    private void Awake()
-    {
-        playerController = GetComponent<PlayerController>();
-        var playerInput = GetComponent<PlayerInput>();
-        if (playerInput != null)
-            skillAction = playerInput.actions["Skill"];
-    }
+private void Awake()
+{
+    playerController = GetComponent<PlayerController>();
+    basePlayer = GetComponent<BasePlayer>();
+
+    var playerInput = GetComponent<PlayerInput>();
+    if (playerInput != null)
+        skillAction = playerInput.actions["Skill"];
+}
 
     public void SetSkillTargetPosition(Vector3 targetPosition)
     {
@@ -146,28 +148,75 @@ public class PlayerSkill : MonoBehaviour
 
     private void UseSkill() => SkillPerformed(default);
 
-    private void SkillPerformed(InputAction.CallbackContext ctx)
-    {
-        if (playerController.IsDead() || currentSkillData == null || currentStack <= 0) return;
-        
-        if (currentSkillData.skillBehaviourPrefab != null)
-        {
-            SkillBehaviour tempSkill = Instantiate(currentSkillData.skillBehaviourPrefab);
-            bool success = tempSkill.Execute(this);
-            Destroy(tempSkill.gameObject); // Xóa ngay sau khi dùng
+private void SkillPerformed(InputAction.CallbackContext ctx)
+{
+    if (playerController == null || playerController.IsDead())
+        return;
 
-            if (success)
-            {
-                currentStack--;
-                gameplayUI?.UpdateSkillStack(currentStack);
-                gameplayUI?.ShowSkillCooldown(currentStack < currentSkillData.maxStack);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("SkillBehaviourPrefab chưa được gán trong SkillData!");
-        }
+    if (currentSkillData == null)
+        return;
+
+    // Không còn stack
+    if (currentStack <= 0)
+    {
+        Debug.Log("Không thể sử dụng skill: hết stack!");
+        return;
     }
+
+    if (basePlayer == null)
+    {
+        Debug.LogError("PlayerSkill: Không tìm thấy BasePlayer!");
+        return;
+    }
+
+    // Kiểm tra mana trước khi thực hiện skill
+    float manaCost = currentSkillData.skillCostMana;
+
+    if (basePlayer.GetCurrentMana() < manaCost)
+    {
+        Debug.Log(
+            $"Không đủ mana để dùng skill {currentSkillData.skillName}! " +
+            $"Cần: {manaCost}, hiện tại: {basePlayer.GetCurrentMana()}"
+        );
+
+        return;
+    }
+
+    if (currentSkillData.skillBehaviourPrefab == null)
+    {
+        Debug.LogWarning("SkillBehaviourPrefab chưa được gán trong SkillData!");
+        return;
+    }
+
+    // Tạo skill
+    SkillBehaviour tempSkill =
+        Instantiate(currentSkillData.skillBehaviourPrefab);
+
+    // Thực thi skill
+    bool success = tempSkill.Execute(this);
+
+    Destroy(tempSkill.gameObject);
+
+    // Chỉ trừ stack + mana khi skill thực sự thành công
+    if (success)
+    {
+        currentStack--;
+
+        // Trừ mana
+        basePlayer.ConsumeMana(manaCost);
+
+        gameplayUI?.UpdateSkillStack(currentStack);
+        gameplayUI?.ShowSkillCooldown(
+            currentStack < currentSkillData.maxStack
+        );
+
+        Debug.Log(
+            $"Đã sử dụng skill: {currentSkillData.skillName} | " +
+            $"Stack: {currentStack}/{currentSkillData.maxStack} | " +
+            $"Mana: {basePlayer.GetCurrentMana()}"
+        );
+    }
+}
 
     public void TryUseSkill()
     {

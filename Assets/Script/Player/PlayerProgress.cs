@@ -19,12 +19,14 @@ public class PlayerProgress : MonoBehaviour
     private int requiredExp;
 
     [Header("Coin")]
-    [SerializeField] private int currentCoins;
+    [SerializeField] private int currentCoins = 0;
 
     private void Awake()
     {
-        requiredExp = CalculateRequiredExp(currentLevel);
 
+        currentCoins = 0;
+        requiredExp = CalculateRequiredExp(currentLevel);
+        
         OnExpChanged?.Invoke(this);
         OnLevelChanged?.Invoke(this);
         OnCoinChanged?.Invoke(this);

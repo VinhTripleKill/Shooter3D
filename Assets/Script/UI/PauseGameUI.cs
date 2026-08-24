@@ -1,10 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 public class PauseGameUI : MonoBehaviour
 {
     [Header("Buttons")]
-    [SerializeField] private Button pauseB;
     [SerializeField] private Button resumeB;
     [SerializeField] private Button replayB;
     [SerializeField] private Button exitB;
@@ -13,7 +12,6 @@ public class PauseGameUI : MonoBehaviour
     [SerializeField] private CoreGameUI coreGameUI;
     [SerializeField] private PlayerSpawn playerSpawn;
 
-    [SerializeField] private GameObject pauseGameUI;
 
     private void Start()
     {
@@ -60,11 +58,7 @@ public class PauseGameUI : MonoBehaviour
     }
     private void OnReplayClicked()
     {
-        if (pauseGameUI != null)
-        {
-            pauseGameUI.SetActive(false);
-            pauseB.gameObject.SetActive(true);
-        }
+        gameObject.SetActive(false);
         if (playerSpawn != null)
         {
             playerSpawn.ReplayGame();
@@ -72,10 +66,8 @@ public class PauseGameUI : MonoBehaviour
     }
     private void OnExitClicked()
     {
-        if (pauseGameUI != null)
-        {
-            pauseGameUI.SetActive(false);
-        }
+        gameObject.SetActive(false);
         Time.timeScale = 1f;
+        SceneManager.LoadScene("GameModeListScene");
     }
 }

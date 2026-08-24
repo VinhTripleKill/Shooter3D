@@ -17,15 +17,16 @@ MonoBehaviour:
   cooldown: 5
   maxStack: 3
   rangeRadius: 10
+  skillCostMana: 20
   skillBehaviourPrefab: {fileID: 7897214159764592600, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   grenadePrefab: {fileID: 4116265864312067926, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 00f29969904a6024990a6dcf6f674ab9, type: 3}
   moveSpeed: 8
   arriveDistance: 0.01
-  arcHeightNear: 0.2
+  arcHeightNear: 0.1
   arcHeightFar: 4
   distanceForMaxArc: 15
-  speedRotX: 30
+  speedRotX: 360
   speedRotY: 60
   speedRotZ: 90
   wallMask:
@@ -34,10 +35,10 @@ MonoBehaviour:
   wallBounceForce: 1
   wallUpwardForce: 0.25
   minimumBounceSpeed: 1
-  hitMask:
+  groundMask:
     serializedVersion: 2
     m_Bits: 8
-  explodeDelay: 5
+  explodeDelay: 3
   explodeRadius: 3
   damage: 20
   effectMask:

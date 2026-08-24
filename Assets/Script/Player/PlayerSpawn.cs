@@ -167,37 +167,46 @@ public class PlayerSpawn : MonoBehaviour
 
 
 
-
-PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
-
-if (skillComp != null)
-{
-    skillComp.SetSelectedSkill(selectedSkill);
-    skillComp.SetGameplayUI(sceneGamePlayUI);
-}
-
-if (skillNav != null && skillComp != null)
-{
-    skillNav.SetPlayerSkill(skillComp);
-    skillNav.SetCurrentSkill(selectedSkill);
-
-    SkillIndicatorUI skillIndicator =
-        player.GetComponentInChildren<SkillIndicatorUI>(true);
-
-    if (skillIndicator != null)
+    
+    PlayerSkill skillComp = player.GetComponent<PlayerSkill>();
+    
+    if (skillComp != null)
     {
-        if (skillIndicator != null)
-{
-    skillNav.SetSkillIndicator(skillIndicator);
-    skillIndicator.SetPlayerTransform(player.transform);
-    skillIndicator.SetSkillData(selectedSkill);
-    skillNav.SetJoystickHandle(joystickHandle);
-    joystickHandle?.SetIndicator(skillIndicator);
-}
+        skillComp.SetSelectedSkill(selectedSkill);
+        skillComp.SetGameplayUI(sceneGamePlayUI);
     }
-
-    Debug.Log($"PlayerSpawn | Skill = {selectedSkill?.skillName}");
-}
+    PlayerProgress progress = player.GetComponent<PlayerProgress>();
+    
+    if (progress != null && sceneGamePlayUI != null)
+    {
+        sceneGamePlayUI.SetPlayerProgress(progress);
+    
+        Debug.Log(
+            $"PlayerSpawn | Coin = {progress.CurrentCoins}"
+        );
+    }
+    if (skillNav != null && skillComp != null)
+    {
+        skillNav.SetPlayerSkill(skillComp);
+        skillNav.SetCurrentSkill(selectedSkill);
+    
+        SkillIndicatorUI skillIndicator =
+            player.GetComponentInChildren<SkillIndicatorUI>(true);
+    
+        if (skillIndicator != null)
+        {
+            if (skillIndicator != null)
+    {
+        skillNav.SetSkillIndicator(skillIndicator);
+        skillIndicator.SetPlayerTransform(player.transform);
+        skillIndicator.SetSkillData(selectedSkill);
+        skillNav.SetJoystickHandle(joystickHandle);
+        joystickHandle?.SetIndicator(skillIndicator);
+    }
+        }
+    
+        Debug.Log($"PlayerSpawn | Skill = {selectedSkill?.skillName}");
+    }
 
 
         PlayerSprint sprint = player.GetComponent<PlayerSprint>();

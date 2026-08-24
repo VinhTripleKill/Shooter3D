@@ -14,23 +14,23 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     [SerializeField] protected float atkCD = 2f;
     [SerializeField] protected float atkTimeAnim = 1.2f;
     [Header("NavMesh Optimize")]
-[SerializeField] private float nearUpdateRate = 0.1f;
-[SerializeField] private float mediumUpdateRate = 0.25f;
-[SerializeField] private float farUpdateRate = 0.5f;
-[SerializeField] private float veryFarUpdateRate = 1f;
-
-private float nextUpdatePathTime;
+    [SerializeField] private float nearUpdateRate = 0.1f;
+    [SerializeField] private float mediumUpdateRate = 0.25f;
+    [SerializeField] private float farUpdateRate = 0.5f;
+    [SerializeField] private float veryFarUpdateRate = 1f;
+    
+    private float nextUpdatePathTime;
     public float attackHeightOffset;
     [Header("Cone Attack")]
-    [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón
+    [SerializeField, Range(0f, 360f)] protected float attackAngle = 90f;  // Góc mở hình nón 1/4 circle
     [Header("Gizmos")]
     [SerializeField] private Color gizmoColor = new Color(1f, 0.2f, 0f, 0.35f);
-[Header("Reward")]
-[SerializeField] protected int expReward = 200;
-[SerializeField] protected int coinReward = 1;
-[SerializeField] protected GameObject coinPrefab;
-
-private bool shouldGiveExp = true;
+    [Header("Reward")]
+    [SerializeField] protected int expReward = 200;
+    [SerializeField] protected int coinReward = 1;
+    [SerializeField] protected GameObject coinPrefab;
+    
+    private bool shouldGiveExp = true;
     protected EnemyState currentState;
     protected Transform player;
     protected bool isAttacking;

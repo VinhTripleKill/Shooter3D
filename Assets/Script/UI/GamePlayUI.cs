@@ -21,6 +21,7 @@ public class GamePlayUI : MonoBehaviour
     
     [Header("Coin")]
     [SerializeField] private TextMeshProUGUI coinText;
+    private PlayerProgress playerProgress;
     [Header("Ammo")]
     [SerializeField] private Image statusAmmo;
     [SerializeField] private Image ammoI;
@@ -48,17 +49,37 @@ public class GamePlayUI : MonoBehaviour
         ammoI.rectTransform.Rotate( 0f,0f,-reloadRotateSpeed * Time.deltaTime);
     }
     public void UpdateHpBar(float currentHp, float maxHp)
-    {
-        hpBar.fillAmount = currentHp / maxHp;
+{
+    hpBar.fillAmount = maxHp > 0f
+        ? currentHp / maxHp
+        : 0f;
 
-        hpText.text = $"{Mathf.CeilToInt(currentHp)}/{Mathf.CeilToInt(maxHp)}";
+    hpText.text =
+        $"{FormatStatValue(currentHp)}/{FormatStatValue(maxHp)}";
+}
+
+public void UpdateManaBar(float currentMana, float maxMana)
+{
+    manaBar.fillAmount = maxMana > 0f
+        ? currentMana / maxMana
+        : 0f;
+
+    manaText.text =
+        $"{FormatStatValue(currentMana)}/{FormatStatValue(maxMana)}";
+}
+
+    private string FormatStatValue(float value)
+{
+    // Nếu là số nguyên thì không hiển thị phần thập phân
+    if (Mathf.Approximately(value, Mathf.Round(value)))
+    {
+        return Mathf.RoundToInt(value).ToString();
     }
 
-    public void UpdateManaBar(float currentMana, float maxMana)
-    {
-        manaBar.fillAmount = currentMana / maxMana;
-        manaText.text = $"{Mathf.CeilToInt(currentMana)}/{Mathf.CeilToInt(maxMana)}";
-    }
+    // Nếu có phần thập phân thì hiển thị tối đa 2 chữ số
+    return value.ToString("0.##");
+}
+
     public void ShowPickUp()
     {
         pickUp.gameObject.SetActive(true);
@@ -207,4 +228,34 @@ public void ShowSkillCooldown(bool show)
     
         levelBarProgress.fillAmount = (float)progress.CurrentExp / progress.RequiredExp;
     }
+public void SetPlayerProgress(PlayerProgress progress)
+{
+    // Hủy đăng ký Player cũ
+    if (playerProgress != null)
+    {
+        playerProgress.OnCoinChanged -= UpdateCoinUI;
+    }
+
+    playerProgress = progress;
+
+    if (playerProgress == null)
+    {
+        coinText.text = "0";
+        return;
+    }
+
+    // Đăng ký Player mới
+    playerProgress.OnCoinChanged += UpdateCoinUI;
+
+    // Cập nhật ngay giá trị hiện tại
+    UpdateCoinUI(playerProgress);
+}
+
+private void UpdateCoinUI(PlayerProgress progress)
+{
+    if (progress == null)
+        return;
+
+    coinText.text = progress.CurrentCoins.ToString();
+}
 }

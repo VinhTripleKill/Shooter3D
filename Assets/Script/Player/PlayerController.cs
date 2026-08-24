@@ -153,22 +153,17 @@ public class PlayerController : BasePlayer
         playerAnim.SetSpeed(animSpeed);
     }
 
-    public bool IsMoving()
-    {
-        return moveInput.sqrMagnitude > 0.01f;
-    }
+    public bool IsMoving() => moveInput.sqrMagnitude > 0.01f;
+    
 
-    private bool IsSprinting()
-    {
-        return playerSprint?.IsSprinting() ?? false;
-    }
+    private bool IsSprinting() => playerSprint?.IsSprinting() ?? false;
+    
 
     protected override void Die()
     {
         Debug.Log("Player has die");
         canMove = false;
         playerAnim.PlayDead();
-    
         enemyWaveSpawn?.GameOver();
         coreGameUI?.StopTimer();
     }
@@ -188,8 +183,7 @@ public class PlayerController : BasePlayer
 
     public bool StartDash(Vector3 direction,float dashDistance,float dashTime,float nextDashTime,LayerMask obstacleMask)
     {
-        if (isDashing || !canDash)
-            return false;
+        if (isDashing || !canDash) return false;
     
         direction.y = 0f;
     
@@ -228,10 +222,6 @@ public class PlayerController : BasePlayer
         direction.Normalize();
     
         transform.forward = direction;
-    
-        // ==========================================
-        // TÍNH KHOẢNG CÁCH DASH THỰC TẾ
-        // ==========================================
     
         float actualDistance =
             CalculateDashDistance(

@@ -17,6 +17,7 @@ MonoBehaviour:
   cooldown: 2
   maxStack: 2
   rangeRadius: 5
+  skillCostMana: 15
   skillBehaviourPrefab: {fileID: 7192575363007486831, guid: e91af1b8f33bdcc4592a97485876e86a, type: 3}
   dashDistance: 5
   timeDash: 0.2

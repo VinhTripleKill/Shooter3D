@@ -15,7 +15,8 @@ public class CoreGameUI : MonoBehaviour
     [Header("Pause Game")]
     [SerializeField] private GameObject pauseGameUI;
     [SerializeField] private Button pauseB;
-
+    [Header("Result Game")]
+    [SerializeField] private GameObject resultGameUI;
     private PlayerInput playerInput;
     private InputAction pauseGame;
 
@@ -33,6 +34,8 @@ public class CoreGameUI : MonoBehaviour
 
         if (pauseGameUI != null)
             pauseGameUI.SetActive(false);
+        if ( resultGameUI != null)
+             resultGameUI.SetActive(false);
 
         if (pauseB != null)
         {
@@ -48,17 +51,11 @@ public class CoreGameUI : MonoBehaviour
         if (pauseB != null)
             pauseB.onClick.RemoveListener(PauseGame);
 
-        // Đảm bảo game không bị kẹt pause
         Time.timeScale = 1f;
     }
 
-    // =====================================================
-    // ĐĂNG KÝ PLAYER INPUT
-    // =====================================================
-
     public void RegisterPlayerInput(PlayerInput input)
     {
-        // Nếu trước đó đã có input cũ thì hủy đăng ký
         UnregisterPauseInput();
 
         playerInput = input;
@@ -71,14 +68,8 @@ public class CoreGameUI : MonoBehaviour
 
         pauseGame = playerInput.actions["Pause&ResumeGame"];
 
-        if (pauseGame == null)
-        {
-            Debug.LogError(
-                "Không tìm thấy Action 'Pause&ResumeGame' trong Input Actions!"
-            );
-
-            return;
-        }
+        if (pauseGame == null) return;
+        
 
         pauseGame.performed += OnPausePerformed;
 
@@ -101,14 +92,10 @@ public class CoreGameUI : MonoBehaviour
         TogglePause();
     }
 
-    // =====================================================
-    // TOGGLE PAUSE / RESUME
-    // =====================================================
 
     private void TogglePause()
     {
-        if (gameEnded)
-            return;
+        if (gameEnded) return;
 
         if (Time.timeScale > 0f)
         {
@@ -122,8 +109,7 @@ public class CoreGameUI : MonoBehaviour
 
     public void PauseGame()
     {
-        if (gameEnded)
-            return;
+        if (gameEnded) return;
 
         Time.timeScale = 0f;
 
@@ -135,8 +121,6 @@ public class CoreGameUI : MonoBehaviour
 
         if (playerController != null)
             playerController.SetCanMove(false);
-
-        Debug.Log("GAME PAUSED");
     }
 
     public void ResumeGame()
@@ -152,16 +136,10 @@ public class CoreGameUI : MonoBehaviour
         if (playerController != null)
             playerController.SetCanMove(true);
 
-        Debug.Log("GAME RESUMED");
     }
 
-    // =====================================================
-    // INITIALIZE
-    // =====================================================
 
-    public void Initialize(
-        EnemyWaveSpawn waveSpawnManager,
-        PlayerController playerCtrl)
+    public void Initialize( EnemyWaveSpawn waveSpawnManager, PlayerController playerCtrl)
     {
         waveManager = waveSpawnManager;
         playerController = playerCtrl;
@@ -172,20 +150,14 @@ public class CoreGameUI : MonoBehaviour
 
     private void Update()
     {
-        if (gameEnded)
-            return;
+        if (gameEnded) return;
 
         UpdateTimer();
     }
 
-    // =====================================================
-    // WAVE UI
-    // =====================================================
-
     private void UpdateWaveUI()
     {
-        if (waveManager == null)
-            return;
+        if (waveManager == null) return;
 
         int currentWave = waveManager.GetCurrentWave();
         int remaining = waveManager.GetRemainingEnemiesInWave();
@@ -209,14 +181,9 @@ public class CoreGameUI : MonoBehaviour
         UpdateWaveUI();
     }
 
-    // =====================================================
-    // TIMER
-    // =====================================================
-
     private void UpdateTimer()
     {
-        if (!isTimerRunning)
-            return;
+        if (!isTimerRunning) return;
 
         currentTime -= Time.deltaTime;
 
@@ -229,40 +196,57 @@ public class CoreGameUI : MonoBehaviour
         int minutes = Mathf.FloorToInt(currentTime / 60);
         int seconds = Mathf.FloorToInt(currentTime % 60);
 
-        timeText.text = string.Format(
-            "{0:00}:{1:00}",
-            minutes,
-            seconds
-        );
+        timeText.text = string.Format( "{0:00}:{1:00}", minutes, seconds );
     }
 
-    public void StartTimer()
-    {
-        currentTime = 120f;
-        isTimerRunning = true;
+public void StartTimer()
+{
+    // Reset trạng thái game
+    gameEnded = false;
+    isTimerRunning = true;
+
+    // Reset thời gian
+    currentTime = 120f;
+
+    // Reset UI
+    if (timeText != null)
         timeText.text = "02:00";
-    }
+
+    // Hiện lại nút Pause
+    if (pauseB != null)
+        pauseB.gameObject.SetActive(true);
+
+    // Ẩn Pause UI
+    if (pauseGameUI != null)
+        pauseGameUI.SetActive(false);
+
+    // Ẩn Result UI
+    if (resultGameUI != null)
+        resultGameUI.SetActive(false);
+
+    // Đảm bảo game chạy
+    Time.timeScale = 1f;
+
+    // Cho Player di chuyển lại
+    if (playerController != null)
+        playerController.SetCanMove(true);
+
+    Debug.Log("CoreGameUI: Timer đã Reset và bắt đầu lại.");
+}
 
     private void EndGame(string reason)
-{
-    gameEnded = true;
-    isTimerRunning = false;
-
-    int currentWave =
-        waveManager != null
-        ? waveManager.GetCurrentWave()
-        : 1;
-
-    Debug.Log(
-        $"Kết thúc tại wave {currentWave} - Lý do: {reason}"
-    );
-
-    // Dừng toàn bộ spawn
-    if (waveManager != null)
     {
-        waveManager.GameOver();
+        gameEnded = true;
+        isTimerRunning = false;
+        resultGameUI.SetActive(true);
+        int currentWave = waveManager != null ? waveManager.GetCurrentWave() : 1;
+        Debug.Log($"Kết thúc tại wave {currentWave} - Lý do: {reason}");
+        if (waveManager != null)
+        {
+            waveManager.GameOver();
+        }
+        
     }
-}
 
     public void StopTimer()
     {

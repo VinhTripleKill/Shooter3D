@@ -16,8 +16,7 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     private int currentWave = 1;
 
-    private List<BaseEnemy> currentWaveEnemies =
-        new List<BaseEnemy>();
+    private List<BaseEnemy> currentWaveEnemies = new List<BaseEnemy>();
 
     private bool isSpawning = false;
     private bool waveInProgress = false;
@@ -32,25 +31,19 @@ public class EnemyWaveSpawn : MonoBehaviour
     {
         currentWave = startingWave;
 
-        StartCoroutine(
-            WaitForPlayerAndStartWave()
-        );
+        StartCoroutine(WaitForPlayerAndStartWave() );
     }
 
     private IEnumerator WaitForPlayerAndStartWave()
     {
         yield return new WaitForSeconds(0.5f);
 
-        while (
-            GameObject.FindGameObjectWithTag("Player") == null
-        )
+        while (GameObject.FindGameObjectWithTag("Player") == null)
         {
             yield return new WaitForSeconds(0.2f);
         }
 
-        yield return new WaitForSeconds(
-            delayBeforeFirstWave
-        );
+        yield return new WaitForSeconds( delayBeforeFirstWave );
 
         StartNextWave();
     }
@@ -61,33 +54,22 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     public void StartNextWave()
     {
-        if (isSpawning)
-            return;
+        if (isSpawning) return;
 
-        if (waveInProgress)
-            return;
+        if (waveInProgress) return;
 
-        if (gameOver)
-            return;
+        if (gameOver) return;
 
         waveInProgress = true;
         currentWaveEnemies.Clear();
 
         int enemyCount = currentWave;
 
-        Debug.Log(
-            $"=== WAVE {currentWave} BẮT ĐẦU - SPAWN {enemyCount} ZOMBIE ==="
-        );
+        Debug.Log( $"=== WAVE {currentWave} BẮT ĐẦU - SPAWN {enemyCount} ZOMBIE ===" );
 
-        spawnCoroutine =
-            StartCoroutine(
-                SpawnWaveCoroutine(enemyCount)
-            );
+        spawnCoroutine = StartCoroutine( SpawnWaveCoroutine(enemyCount) );
     }
 
-    // =====================================================
-    // SPAWN ENEMY
-    // =====================================================
 
     private IEnumerator SpawnWaveCoroutine(int count)
     {
@@ -104,31 +86,17 @@ public class EnemyWaveSpawn : MonoBehaviour
 
             if (spawnPoints.Count == 0)
             {
-                Debug.LogError(
-                    "Chưa gán Spawn Points!"
-                );
+                Debug.LogError("Chưa gán Spawn Points!");
 
                 isSpawning = false;
                 yield break;
             }
 
-            Transform spawnPoint =
-                spawnPoints[
-                    Random.Range(
-                        0,
-                        spawnPoints.Count
-                    )
-                ];
+            Transform spawnPoint = spawnPoints[Random.Range( 0, spawnPoints.Count) ];
 
-            GameObject enemyObj =
-                Instantiate(
-                    zombiePrefab,
-                    spawnPoint.position,
-                    spawnPoint.rotation
-                );
+            GameObject enemyObj = Instantiate( zombiePrefab, spawnPoint.position, spawnPoint.rotation );
 
-            BaseEnemy enemy =
-                enemyObj.GetComponent<BaseEnemy>();
+            BaseEnemy enemy = enemyObj.GetComponent<BaseEnemy>();
 
             if (enemy != null)
             {
@@ -144,7 +112,6 @@ public class EnemyWaveSpawn : MonoBehaviour
 
         isSpawning = false;
         spawnCoroutine = null;
-
         coreGameUI?.OnWaveChanged();
     }
 
@@ -154,8 +121,7 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     public void OnEnemyDied(BaseEnemy enemy)
     {
-        if (enemy == null)
-            return;
+        if (enemy == null) return;
 
         currentWaveEnemies.Remove(enemy);
 
@@ -168,20 +134,13 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     private void Update()
     {
-        if (gameOver)
-            return;
+        if (gameOver) return;
 
-        if (!waveInProgress)
-            return;
+        if (!waveInProgress) return;
 
-        currentWaveEnemies.RemoveAll(
-            enemy => enemy == null
-        );
+        currentWaveEnemies.RemoveAll( enemy => enemy == null);
 
-        if (
-            currentWaveEnemies.Count == 0 &&
-            !isSpawning
-        )
+        if (currentWaveEnemies.Count == 0 &&!isSpawning )
         {
             waveInProgress = false;
 
@@ -189,10 +148,7 @@ public class EnemyWaveSpawn : MonoBehaviour
 
             currentWave++;
 
-            nextWaveCoroutine =
-                StartCoroutine(
-                    NextWaveDelay()
-                );
+            nextWaveCoroutine = StartCoroutine(NextWaveDelay() );
         }
     }
 
@@ -265,21 +221,13 @@ public class EnemyWaveSpawn : MonoBehaviour
     {
         // Tạo bản sao để tránh lỗi
         // khi danh sách bị thay đổi trong lúc Die()
-        List<BaseEnemy> enemiesToKill =
-            new List<BaseEnemy>(
-                BaseEnemy.AllEnemies
-            );
+        List<BaseEnemy> enemiesToKill = new List<BaseEnemy>( BaseEnemy.AllEnemies );
 
-        foreach (
-            BaseEnemy enemy
-            in enemiesToKill
-        )
+        foreach ( BaseEnemy enemy in enemiesToKill )
         {
-            if (enemy == null)
-                continue;
+            if (enemy == null) continue;
 
-            if (enemy.IsDead())
-                continue;
+            if (enemy.IsDead()) continue;
 
             enemy.ForceKill();
         }
@@ -306,13 +254,11 @@ public class EnemyWaveSpawn : MonoBehaviour
     waveInProgress = false;
 
     // Tạo bản sao để tránh lỗi khi enemy bị Destroy
-    List<BaseEnemy> enemiesToDestroy =
-        new List<BaseEnemy>(BaseEnemy.AllEnemies);
+    List<BaseEnemy> enemiesToDestroy = new List<BaseEnemy>(BaseEnemy.AllEnemies);
 
     foreach (BaseEnemy enemy in enemiesToDestroy)
     {
-        if (enemy == null)
-            continue;
+        if (enemy == null) continue;
 
         Destroy(enemy.gameObject);
     }
@@ -331,9 +277,7 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     public int GetRemainingEnemiesInWave()
     {
-        currentWaveEnemies.RemoveAll(
-            enemy => enemy == null
-        );
+        currentWaveEnemies.RemoveAll( enemy => enemy == null );
 
         return currentWaveEnemies.Count;
     }

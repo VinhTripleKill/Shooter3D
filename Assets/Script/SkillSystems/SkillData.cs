@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public abstract class SkillData : ScriptableObject
@@ -11,12 +10,8 @@ public abstract class SkillData : ScriptableObject
     public float cooldown;
     public int maxStack;
     public float rangeRadius;
+    public float skillCostMana; // Mana cần để sử dụng skill
     
     [Header("Behaviour")]
-    public SkillBehaviour skillBehaviourPrefab;   // ← Thêm cái này
+    public SkillBehaviour skillBehaviourPrefab;
 }
-
-
-
-
-
