@@ -160,13 +160,16 @@ public class PlayerController : BasePlayer
     
 
     protected override void Die()
-    {
-        Debug.Log("Player has die");
-        canMove = false;
-        playerAnim.PlayDead();
-        enemyWaveSpawn?.GameOver();
-        coreGameUI?.StopTimer();
-    }
+{
+    Debug.Log("Player has die");
+
+    canMove = false;
+
+    playerAnim.PlayDead();
+
+    // CoreGameUI xác nhận gameEnd
+    coreGameUI?.EndGame("Player Died");
+}
 
     
     public Vector3 GetMoveDirection()

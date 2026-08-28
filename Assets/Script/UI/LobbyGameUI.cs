@@ -10,7 +10,7 @@ public class LobbyGameUI : MonoBehaviour
         if(BattleB!=null)
             BattleB.onClick.AddListener(GoToBattle);
     }
-    void ODestroy()
+    void OnDestroy()
     {
         if(BattleB!=null)
             BattleB.onClick.RemoveListener(GoToBattle);

@@ -15,7 +15,7 @@ public class EnemyWaveSpawn : MonoBehaviour
     [SerializeField] private CoreGameUI coreGameUI;
 
     private int currentWave = 1;
-
+    private int playerKillCount = 0;
     private List<BaseEnemy> currentWaveEnemies = new List<BaseEnemy>();
 
     private bool isSpawning = false;
@@ -24,8 +24,6 @@ public class EnemyWaveSpawn : MonoBehaviour
 
     private Coroutine spawnCoroutine;
     private Coroutine nextWaveCoroutine;
-
-    [SerializeField] private PlayerSpawn playerSpawn;
 
     private void Start()
     {
@@ -171,51 +169,35 @@ public class EnemyWaveSpawn : MonoBehaviour
     // =====================================================
 
     public void GameOver()
+{
+    if (gameOver)
+        return;
+
+    gameOver = true;
+
+    Debug.Log(
+        "EnemyWaveSpawn: GAME OVER - DỪNG TOÀN BỘ SPAWN"
+    );
+
+    if (spawnCoroutine != null)
     {
-        if (gameOver)
-            return;
-
-        gameOver = true;
-
-        Debug.Log(
-            "EnemyWaveSpawn: GAME OVER - DỪNG TOÀN BỘ SPAWN"
-        );
-
-        // -----------------------------------------
-        // 1. Dừng coroutine spawn hiện tại
-        // -----------------------------------------
-
-        if (spawnCoroutine != null)
-        {
-            StopCoroutine(spawnCoroutine);
-            spawnCoroutine = null;
-        }
-
-        // -----------------------------------------
-        // 2. Dừng chờ wave tiếp theo
-        // -----------------------------------------
-
-        if (nextWaveCoroutine != null)
-        {
-            StopCoroutine(nextWaveCoroutine);
-            nextWaveCoroutine = null;
-        }
-
-        isSpawning = false;
-        waveInProgress = false;
-
-        // -----------------------------------------
-        // 3. Kill toàn bộ enemy đang tồn tại
-        // -----------------------------------------
-
-        KillAllEnemies();
-
-        // -----------------------------------------
-        // 4. Cập nhật UI
-        // -----------------------------------------
-
-        coreGameUI?.OnWaveChanged();
+        StopCoroutine(spawnCoroutine);
+        spawnCoroutine = null;
     }
+
+    if (nextWaveCoroutine != null)
+    {
+        StopCoroutine(nextWaveCoroutine);
+        nextWaveCoroutine = null;
+    }
+
+    isSpawning = false;
+    waveInProgress = false;
+
+    KillAllEnemies();
+
+    coreGameUI?.OnWaveChanged();
+}
 
     private void KillAllEnemies()
     {
@@ -298,6 +280,30 @@ public class EnemyWaveSpawn : MonoBehaviour
     spawnCoroutine = null;
     nextWaveCoroutine = null;
 
-    Debug.Log("EnemyWaveSpawn đã Reset hoàn toàn.");
+    // RESET PLAYER KILL
+    playerKillCount = 0;
+
+    Debug.Log(
+        "EnemyWaveSpawn đã Reset hoàn toàn."
+    );
+}
+public int GetPlayerKillCount()
+{
+    return playerKillCount;
+}
+
+public void RegisterPlayerKill(BaseEnemy enemy)
+{
+    if (gameOver)
+        return;
+
+    if (enemy == null)
+        return;
+
+    playerKillCount++;
+
+    Debug.Log(
+        $"PLAYER KILL +1 | TOTAL = {playerKillCount}"
+    );
 }
 }

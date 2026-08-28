@@ -26,10 +26,7 @@ public class GrenadeProjectile : MonoBehaviour
     // INITIALIZE
     // =============================================================
 
-    public void Initialize(
-        GrenadeSkillData skillData,
-        Vector3 start,
-        Vector3 target)
+    public void Initialize( GrenadeSkillData skillData, Vector3 start, Vector3 target)
     {
         data = skillData;
 
@@ -64,31 +61,16 @@ public class GrenadeProjectile : MonoBehaviour
         // TÍNH PARABOLA
         // =========================================================
 
-        float distance =
-            Vector3.Distance(
-                startPoint,
-                targetPoint
-            );
+        float distance = Vector3.Distance( startPoint, targetPoint );
 
-        float distance01 =
-            Mathf.Clamp01(
-                distance / Mathf.Max(
-                    data.distanceForMaxArc,
-                    0.01f
-                )
-            );
+        float distance01 = Mathf.Clamp01( distance / Mathf.Max(data.distanceForMaxArc, 0.01f ) );
 
-        arcHeight =
-            Mathf.Lerp(
-                data.arcHeightNear,
-                data.arcHeightFar,
-                distance01
-            );
+        arcHeight = Mathf.Lerp( data.arcHeightNear, data.arcHeightFar, distance01 );
 
         // =========================================================
         // THỜI GIAN BAY
         // =========================================================
-        //
+     
         // Không ép grenade phải tới target trong 1s / 2s.
         //
         // Khoảng cách càng xa -> thời gian càng lâu.
@@ -100,20 +82,11 @@ public class GrenadeProjectile : MonoBehaviour
         // Quỹ đạo vẫn giữ nguyên.
         // =========================================================
 
-        float speed =
-            Mathf.Max(
-                data.moveSpeed,
-                0.01f
-            );
+        float speed = Mathf.Max( data.moveSpeed, 0.01f );
 
-        flightDuration =
-            distance / speed;
+        flightDuration = distance / speed;
 
-        flightDuration =
-            Mathf.Max(
-                flightDuration,
-                0.01f
-            );
+        flightDuration = Mathf.Max( flightDuration, 0.01f );
 
         fireTime = Time.time;
         progress = 0f;
@@ -122,9 +95,7 @@ public class GrenadeProjectile : MonoBehaviour
         // EXPLOSION DELAY
         // =========================================================
 
-        StartCoroutine(
-            ExplodeDelayRoutine()
-        );
+        StartCoroutine( ExplodeDelayRoutine() );
     }
 
     // =============================================================
@@ -133,35 +104,21 @@ public class GrenadeProjectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!initialized)
-            return;
+        if (!initialized) return;
 
-        float previousProgress =
-            progress;
+        float previousProgress = progress;
 
-        progress +=
-            Time.fixedDeltaTime /
-            flightDuration;
+        progress += Time.fixedDeltaTime / flightDuration;
 
-        progress =
-            Mathf.Clamp01(progress);
+        progress = Mathf.Clamp01(progress);
 
-        Vector3 previousPosition =
-            GetParabolaPosition(
-                previousProgress
-            );
+        Vector3 previousPosition = GetParabolaPosition( previousProgress );
 
-        Vector3 nextPosition =
-            GetParabolaPosition(
-                progress
-            );
+        Vector3 nextPosition = GetParabolaPosition( progress );
 
-        Vector3 movement =
-            nextPosition -
-            previousPosition;
+        Vector3 movement = nextPosition - previousPosition;
 
-        float distance =
-            movement.magnitude;
+        float distance = movement.magnitude;
 
         // =========================================================
         // WALL CHECK
@@ -177,10 +134,7 @@ public class GrenadeProjectile : MonoBehaviour
                     data.wallMask,
                     QueryTriggerInteraction.Ignore))
             {
-                HitWall(
-                    wallHit,
-                    movement.normalized
-                );
+                HitWall( wallHit, movement.normalized );
 
                 return;
             }
@@ -190,9 +144,7 @@ public class GrenadeProjectile : MonoBehaviour
         // MOVE
         // =========================================================
 
-        rb.MovePosition(
-            nextPosition
-        );
+        rb.MovePosition( nextPosition );
 
         // =========================================================
         // ROTATION
@@ -226,8 +178,7 @@ public class GrenadeProjectile : MonoBehaviour
     // PARABOLA
     // =============================================================
 
-    private Vector3 GetParabolaPosition(
-        float t)
+    private Vector3 GetParabolaPosition(float t)
     {
         Vector3 position =
             Vector3.Lerp(
@@ -249,11 +200,7 @@ public class GrenadeProjectile : MonoBehaviour
          * Target -> chính xác
          */
 
-        float height =
-            4f *
-            t *
-            (1f - t) *
-            arcHeight;
+        float height = 4f * t * (1f - t) * arcHeight;
 
         position.y += height;
 
@@ -288,8 +235,7 @@ public class GrenadeProjectile : MonoBehaviour
         RaycastHit wallHit,
         Vector3 direction)
     {
-        if (exploded)
-            return;
+        if (exploded) return;
 
         /*
          * Từ đây grenade không còn đi theo

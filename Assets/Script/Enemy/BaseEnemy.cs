@@ -279,12 +279,16 @@ protected virtual void UpdateAttack(float distance)
 
 public void ForceKill()
 {
-    if (isDead) return;
+    if (isDead)
+        return;
 
+    // Enemy bị hệ thống ép chết
+    // => KHÔNG tính là player kill
     shouldGiveExp = false;
 
     Die();
 }
+
 protected override void Die()
 {
     base.Die();
@@ -293,8 +297,7 @@ protected override void Die()
 
     isAttacking = false;
 
-    currentState =
-        EnemyState.Dead;
+    currentState = EnemyState.Dead;
 
     DisableCollision();
 
@@ -319,19 +322,35 @@ protected override void Die()
 
         if (pp != null)
         {
-            // EXP
             pp.AddExp(expReward);
         }
 
-        // COIN
         SpawnCoinReward();
     }
     else
     {
         Debug.Log(
-            "[ENEMY] Enemy tự động chết " +
+            $"[{name}] Enemy tự động chết / ForceKill " +
             "-> Không nhận EXP / COIN"
         );
+    }
+
+    // =====================================================
+    // PLAYER KILL COUNT
+    // =====================================================
+
+    /*
+     * shouldGiveExp == true
+     * => đây là một enemy chết bình thường
+     * và được phép tính là player kill.
+     *
+     * ForceKill() luôn set shouldGiveExp = false
+     * nên enemy bị kill khi GameOver sẽ không được tính.
+     */
+
+    if (shouldGiveExp)
+    {
+        waveManager?.RegisterPlayerKill(this);
     }
 
     // =====================================================
@@ -348,9 +367,16 @@ protected override void Die()
     // DEAD ANIMATION
     // =====================================================
 
-    enemyAnim.PlayDead(
-        () => Destroy(gameObject)
-    );
+    if (enemyAnim != null)
+    {
+        enemyAnim.PlayDead(
+            () => Destroy(gameObject)
+        );
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
 }
 protected virtual void SpawnCoinReward()
 {

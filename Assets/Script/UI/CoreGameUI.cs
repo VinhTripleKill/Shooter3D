@@ -2,12 +2,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.InputSystem;
-
+[System.Serializable]
+public class GameResultData
+{
+    public float playTime;
+    public int survivedWave;
+    public int enemyKilled;
+}
 public class CoreGameUI : MonoBehaviour
 {
+    public GameResultData ResultData { get; private set; }
+
+public bool IsGameEnded => gameEnded;
     [Header("Wave Enemy")]
     [SerializeField] private TextMeshProUGUI waveText;
-    [SerializeField] private Image waveBarProgress;
+    [SerializeField] private TextMeshProUGUI amountEnemyInWave;
 
     [Header("Time")]
     [SerializeField] private TextMeshProUGUI timeText;
@@ -15,27 +24,41 @@ public class CoreGameUI : MonoBehaviour
     [Header("Pause Game")]
     [SerializeField] private GameObject pauseGameUI;
     [SerializeField] private Button pauseB;
+
     [Header("Result Game")]
     [SerializeField] private GameObject resultGameUI;
+
     private PlayerInput playerInput;
     private InputAction pauseGame;
 
     private EnemyWaveSpawn waveManager;
     private PlayerController playerController;
 
-    private float currentTime = 120f;
-    private bool isTimerRunning = false;
-    private bool gameEnded = false;
+private const float GAME_DURATION = 120f;
+
+private float elapsedPlayTime = 0f;
+
+private bool isTimerRunning = false;
+private bool gameEnded = false;
+
+public float ElapsedPlayTime => elapsedPlayTime;
 
     private void Start()
     {
-        waveBarProgress.fillAmount = 0f;
-        timeText.text = "02:00";
+        if (waveText != null)
+            waveText.text = "WAVE 1";
+
+        if (amountEnemyInWave != null)
+            amountEnemyInWave.text = "0";
+
+        if (timeText != null)
+            timeText.text = "02:00";
 
         if (pauseGameUI != null)
             pauseGameUI.SetActive(false);
-        if ( resultGameUI != null)
-             resultGameUI.SetActive(false);
+
+        if (resultGameUI != null)
+            resultGameUI.SetActive(false);
 
         if (pauseB != null)
         {
@@ -54,6 +77,10 @@ public class CoreGameUI : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    // =====================================================
+    // PLAYER INPUT
+    // =====================================================
+
     public void RegisterPlayerInput(PlayerInput input)
     {
         UnregisterPauseInput();
@@ -62,18 +89,30 @@ public class CoreGameUI : MonoBehaviour
 
         if (playerInput == null)
         {
-            Debug.LogWarning("CoreGameUI: PlayerInput bị null!");
+            Debug.LogWarning(
+                "CoreGameUI: PlayerInput bị null!"
+            );
+
             return;
         }
 
-        pauseGame = playerInput.actions["Pause&ResumeGame"];
+        pauseGame =
+            playerInput.actions["Pause&ResumeGame"];
 
-        if (pauseGame == null) return;
-        
+        if (pauseGame == null)
+        {
+            Debug.LogWarning(
+                "CoreGameUI: Không tìm thấy Action Pause&ResumeGame!"
+            );
+
+            return;
+        }
 
         pauseGame.performed += OnPausePerformed;
 
-        Debug.Log("CoreGameUI: Đã đăng ký Pause&ResumeGame");
+        Debug.Log(
+            "CoreGameUI: Đã đăng ký Pause&ResumeGame"
+        );
     }
 
     private void UnregisterPauseInput()
@@ -87,15 +126,20 @@ public class CoreGameUI : MonoBehaviour
         playerInput = null;
     }
 
-    private void OnPausePerformed(InputAction.CallbackContext context)
+    private void OnPausePerformed(
+        InputAction.CallbackContext context)
     {
         TogglePause();
     }
 
+    // =====================================================
+    // PAUSE
+    // =====================================================
 
     private void TogglePause()
     {
-        if (gameEnded) return;
+        if (gameEnded)
+            return;
 
         if (Time.timeScale > 0f)
         {
@@ -109,7 +153,8 @@ public class CoreGameUI : MonoBehaviour
 
     public void PauseGame()
     {
-        if (gameEnded) return;
+        if (gameEnded)
+            return;
 
         Time.timeScale = 0f;
 
@@ -135,11 +180,15 @@ public class CoreGameUI : MonoBehaviour
 
         if (playerController != null)
             playerController.SetCanMove(true);
-
     }
 
+    // =====================================================
+    // INITIALIZE
+    // =====================================================
 
-    public void Initialize( EnemyWaveSpawn waveSpawnManager, PlayerController playerCtrl)
+    public void Initialize(
+        EnemyWaveSpawn waveSpawnManager,
+        PlayerController playerCtrl)
     {
         waveManager = waveSpawnManager;
         playerController = playerCtrl;
@@ -148,31 +197,45 @@ public class CoreGameUI : MonoBehaviour
             UpdateWaveUI();
     }
 
+    // =====================================================
+    // UPDATE
+    // =====================================================
+
     private void Update()
     {
-        if (gameEnded) return;
+        if (gameEnded)
+            return;
 
         UpdateTimer();
     }
 
+    // =====================================================
+    // WAVE UI
+    // =====================================================
+
     private void UpdateWaveUI()
     {
-        if (waveManager == null) return;
+        if (waveManager == null)
+            return;
 
-        int currentWave = waveManager.GetCurrentWave();
-        int remaining = waveManager.GetRemainingEnemiesInWave();
-        int total = currentWave;
+        int currentWave =
+            waveManager.GetCurrentWave();
 
-        waveText.text = $"WAVE {currentWave}";
+        int remaining =
+            waveManager.GetRemainingEnemiesInWave();
 
-        if (total > 0)
+        // Hiển thị Wave
+        if (waveText != null)
         {
-            float progress = (float)remaining / total;
-            waveBarProgress.fillAmount = progress;
+            waveText.text =
+                $"WAVE {currentWave}";
         }
-        else
+
+        // Hiển thị số Enemy còn lại
+        if (amountEnemyInWave != null)
         {
-            waveBarProgress.fillAmount = 0f;
+            amountEnemyInWave.text =
+                remaining.ToString();
         }
     }
 
@@ -181,73 +244,195 @@ public class CoreGameUI : MonoBehaviour
         UpdateWaveUI();
     }
 
-    private void UpdateTimer()
+    // =====================================================
+    // TIMER
+    // =====================================================
+
+private void UpdateTimeText()
+{
+    float timeLeft =
+        Mathf.Max(
+            GAME_DURATION - elapsedPlayTime,
+            0f
+        );
+
+    int minutes =
+        Mathf.FloorToInt(timeLeft / 60f);
+
+    int seconds =
+        Mathf.FloorToInt(timeLeft % 60f);
+
+    if (timeText != null)
     {
-        if (!isTimerRunning) return;
-
-        currentTime -= Time.deltaTime;
-
-        if (currentTime <= 0f)
-        {
-            currentTime = 0f;
-            EndGame("Time Out");
-        }
-
-        int minutes = Mathf.FloorToInt(currentTime / 60);
-        int seconds = Mathf.FloorToInt(currentTime % 60);
-
-        timeText.text = string.Format( "{0:00}:{1:00}", minutes, seconds );
+        timeText.text =
+            string.Format(
+                "{0:00}:{1:00}",
+                minutes,
+                seconds
+            );
     }
+}
+private void UpdateTimer()
+{
+    if (!isTimerRunning)
+        return;
+
+    elapsedPlayTime += Time.deltaTime;
+
+    if (elapsedPlayTime >= GAME_DURATION)
+    {
+        elapsedPlayTime = GAME_DURATION;
+
+        UpdateTimeText();
+
+        EndGame("Time Out");
+
+        return;
+    }
+
+    UpdateTimeText();
+}
+
+    // =====================================================
+    // START TIMER
+    // =====================================================
 
 public void StartTimer()
 {
-    // Reset trạng thái game
     gameEnded = false;
     isTimerRunning = true;
 
-    // Reset thời gian
-    currentTime = 120f;
+    elapsedPlayTime = 0f;
 
-    // Reset UI
+    ResultData = new GameResultData();
+
     if (timeText != null)
         timeText.text = "02:00";
 
-    // Hiện lại nút Pause
     if (pauseB != null)
         pauseB.gameObject.SetActive(true);
 
-    // Ẩn Pause UI
     if (pauseGameUI != null)
         pauseGameUI.SetActive(false);
 
-    // Ẩn Result UI
     if (resultGameUI != null)
         resultGameUI.SetActive(false);
 
-    // Đảm bảo game chạy
     Time.timeScale = 1f;
 
-    // Cho Player di chuyển lại
     if (playerController != null)
         playerController.SetCanMove(true);
 
-    Debug.Log("CoreGameUI: Timer đã Reset và bắt đầu lại.");
+    UpdateWaveUI();
+
+    Debug.Log(
+        "CoreGameUI | Game bắt đầu. Timer = 120 giây"
+    );
 }
 
-    private void EndGame(string reason)
+
+
+public void EndGame(string reason)
+{
+    if (gameEnded)
+        return;
+
+    // =========================================
+    // GAME END
+    // =========================================
+
+    gameEnded = true;
+    isTimerRunning = false;
+
+    Time.timeScale = 1f;
+
+    // =========================================
+    // SNAPSHOT TIME
+    // =========================================
+
+    float finalPlayTime =
+        Mathf.Clamp(
+            elapsedPlayTime,
+            0f,
+            GAME_DURATION
+        );
+
+    // =========================================
+    // SNAPSHOT WAVE
+    // =========================================
+
+    int finalWave =
+        waveManager != null
+            ? waveManager.GetCurrentWave()
+            : 1;
+
+    // =========================================
+    // SNAPSHOT KILL
+    // =========================================
+
+    int finalKills =
+        waveManager != null
+            ? waveManager.GetPlayerKillCount()
+            : 0;
+
+    // =========================================
+    // SAVE RESULT
+    // =========================================
+
+    ResultData = new GameResultData
     {
-        gameEnded = true;
-        isTimerRunning = false;
+        playTime = finalPlayTime,
+        survivedWave = finalWave,
+        enemyKilled = finalKills
+    };
+
+    Debug.Log(
+        $"GAME END | " +
+        $"Reason = {reason} | " +
+        $"Time = {finalPlayTime:F2}s | " +
+        $"Wave = {finalWave} | " +
+        $"Kills = {finalKills}"
+    );
+
+    // =========================================
+    // STOP ENEMY
+    // =========================================
+
+    if (waveManager != null)
+        waveManager.GameOver();
+
+    // =========================================
+    // RESULT UI
+    // =========================================
+
+    if (resultGameUI != null)
         resultGameUI.SetActive(true);
-        int currentWave = waveManager != null ? waveManager.GetCurrentWave() : 1;
-        Debug.Log($"Kết thúc tại wave {currentWave} - Lý do: {reason}");
-        if (waveManager != null)
-        {
-            waveManager.GameOver();
-        }
-        
+
+    // =========================================
+    // UPDATE RESULT UI
+    // =========================================
+
+    ResultGameUI resultUI =
+        resultGameUI != null
+            ? resultGameUI.GetComponent<ResultGameUI>()
+            : null;
+
+    if (resultUI != null)
+    {
+        resultUI.ShowResult(ResultData);
     }
 
+    // =========================================
+    // PAUSE BUTTON
+    // =========================================
+
+    if (pauseB != null)
+        pauseB.gameObject.SetActive(false);
+
+    Debug.Log(
+        "CoreGameUI | gameEnd = TRUE"
+    );
+}
     public void StopTimer()
     {
         isTimerRunning = false;
