@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class ZombieEnemy :
-    BaseEnemy, IAutoAimTarget
+public class ZombieEnemy :BaseEnemy
 {
    
 }

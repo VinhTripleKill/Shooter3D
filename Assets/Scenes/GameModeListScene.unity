@@ -474,6 +474,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CoopModeCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 2992120834191049795, guid: 7df424b127954404fb15de0869f8cfd0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5867923134231715882, guid: 7df424b127954404fb15de0869f8cfd0, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -567,14 +571,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1122800369227910819, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 2537307682712618232, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
       propertyPath: m_Name
       value: GamemodeCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537307682712618232, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3841867458457828295, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4639969070052824949, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 7478249993841200571}
+    - target: {fileID: 5879646366137097209, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6382510911982344113, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -653,6 +673,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6382510911982344113, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7580486169392657936, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_text
+      value: Challege Mode
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878650806431592079, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779114893471365847, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9130827976910909679, guid: 3c4b743affab71b4bbcd6e40aeccd028, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -773,6 +809,6 @@ SceneRoots:
   - {fileID: 2030289175}
   - {fileID: 1368545042}
   - {fileID: 4373484423168613380}
-  - {fileID: 1260725278150059506}
   - {fileID: 6787877931577268912}
+  - {fileID: 1260725278150059506}
   - {fileID: 677576398}

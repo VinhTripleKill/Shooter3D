@@ -13,22 +13,26 @@ public class EnemyAnim : MonoBehaviour
     {
         animator.SetFloat(
             "SpeedMagnitude",
-            speed);
+            speed
+        );
     }
 
     public void PlayAttack()
     {
         animator.SetTrigger(
-            "isAttack");
+            "isAttack"
+        );
     }
 
     public void PlayDead(Action onFinished)
     {
         animator.SetTrigger(
-            "isDead");
+            "isDead"
+        );
 
         StartCoroutine(
-            WaitDeathAnim(onFinished));
+            WaitDeathAnim(onFinished)
+        );
     }
 
     private IEnumerator WaitDeathAnim(
@@ -39,7 +43,10 @@ public class EnemyAnim : MonoBehaviour
         onFinished?.Invoke();
     }
 
-    // gọi từ Animation Event
+    // =========================================================
+    // ANIMATION EVENT
+    // =========================================================
+
     public void AttackHitEvent()
     {
         OnAttackHit?.Invoke();
