@@ -10,10 +10,14 @@ public class EnemyAnim : MonoBehaviour
     public event Action OnAttackHit;
 
     public event Action OnExplosionHit;
-
+    public event Action OnEnemyShoot;
     // =========================================================
     // MOVEMENT
     // =========================================================
+    public void EnemyShootEvent()
+    {
+        OnEnemyShoot?.Invoke();
+    }
 
     public void SetSpeed(float speed)
     {

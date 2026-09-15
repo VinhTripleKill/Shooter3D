@@ -17,35 +17,7 @@ public class EnemyMelee : EnemyAttack
         if (player == null)
             return;
 
-        FacePlayer();
-
-        if (!CanAttack)
-            return;
-
-        StartAttack();
-    }
-
-    // =========================================================
-    // FACE PLAYER
-    // =========================================================
-
-    private void FacePlayer()
-    {
-        Vector3 lookPosition =
-            new Vector3(
-                player.position.x,
-                transform.position.y,
-                player.position.z
-            );
-
-        Vector3 direction =
-            lookPosition -
-            transform.position;
-
-        if (direction.sqrMagnitude <= 0.001f)
-            return;
-
-        transform.LookAt(lookPosition);
+        base.UpdateAttack();
     }
 
     // =========================================================
@@ -130,7 +102,8 @@ public class EnemyMelee : EnemyAttack
 
         if (this.enemyAnim != null)
         {
-            this.enemyAnim.OnAttackHit -= PerformMeleeDamage;
+            this.enemyAnim.OnAttackHit -=
+                PerformMeleeDamage;
 
             this.enemyAnim.OnAttackHit +=
                 PerformMeleeDamage;

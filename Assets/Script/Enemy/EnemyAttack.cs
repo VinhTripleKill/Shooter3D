@@ -2,10 +2,20 @@ using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
 {
+    public enum TypeFace
+    {
+        FaceFollow,
+        NoFaceFollow
+    }
+
     [Header("Attack Settings")]
     [SerializeField] protected float atkRange = 4f;
     [SerializeField] protected float atkDamage = 10f;
     [SerializeField] protected float atkCD = 2f;
+
+    [Header("Face Settings")]
+    [SerializeField] protected TypeFace typeFace =
+        TypeFace.NoFaceFollow;
 
     protected EnemyBehaviour behaviour;
     protected EnemyAnim enemyAnim;
@@ -17,6 +27,8 @@ public class EnemyAttack : MonoBehaviour
     public float AttackRange => atkRange;
     public float AttackDamage => atkDamage;
     public float AttackCooldown => atkCD;
+
+    public TypeFace FaceType => typeFace;
 
     public bool CanAttack =>
         Time.time >= nextAttackTime;
@@ -50,6 +62,10 @@ public class EnemyAttack : MonoBehaviour
         this.enemyAnim = enemyAnim;
     }
 
+    // =========================================================
+    // SET PLAYER
+    // =========================================================
+
     public virtual void SetPlayer(
         Transform player)
     {
@@ -65,10 +81,69 @@ public class EnemyAttack : MonoBehaviour
         if (player == null)
             return;
 
+        // =====================================================
+        // FACE PLAYER
+        // =====================================================
+
+        UpdateFacePlayer();
+
+        // =====================================================
+        // ATTACK COOLDOWN
+        // =====================================================
+
         if (!CanAttack)
             return;
 
         StartAttack();
+    }
+
+    // =========================================================
+    // FACE PLAYER
+    // =========================================================
+    //
+    // Nếu:
+    //
+    // FaceFollow
+    //      => luôn quay mặt về Player
+    //
+    // NoFaceFollow
+    //      => không tự xoay
+    //
+    // =========================================================
+
+    protected virtual void UpdateFacePlayer()
+    {
+        if (typeFace != TypeFace.FaceFollow)
+            return;
+
+        if (player == null)
+            return;
+
+        FacePlayer();
+    }
+
+    // =========================================================
+    // FACE PLAYER
+    // =========================================================
+
+    protected void FacePlayer()
+    {
+        Vector3 lookPosition =
+            new Vector3(
+                player.position.x,
+                transform.position.y,
+                player.position.z
+            );
+
+        Vector3 direction =
+            lookPosition -
+            transform.position;
+
+        if (direction.sqrMagnitude <= 0.001f)
+            return;
+
+        transform.rotation =
+            Quaternion.LookRotation(direction);
     }
 
     // =========================================================
@@ -93,6 +168,10 @@ public class EnemyAttack : MonoBehaviour
     public virtual void StopAttack()
     {
     }
+
+    // =========================================================
+    // DISABLE
+    // =========================================================
 
     protected virtual void OnDisable()
     {

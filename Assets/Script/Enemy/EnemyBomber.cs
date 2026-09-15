@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class EnemyBomber : EnemyAttack
@@ -7,7 +6,9 @@ public class EnemyBomber : EnemyAttack
     [SerializeField] private float explosionRange = 5f;
     [SerializeField] private float explosionDelay = 1f;
     [SerializeField] private float explosionCommit = 0.8f;
+
     private EnemyExplosionVisual explosionVisual;
+
     // Không cần SerializeField
     private float explosionTimer;
 
@@ -17,9 +18,11 @@ public class EnemyBomber : EnemyAttack
 
     private BaseEnemy baseEnemy;
 
-    public float ExplosionRange => explosionRange;
+    public float ExplosionRange =>
+        explosionRange;
 
-    public float ExplosionTimer => explosionTimer;
+    public float ExplosionTimer =>
+        explosionTimer;
 
     public bool IsExplosionCommitted =>
         isExplosionCommitted;
@@ -40,38 +43,51 @@ public class EnemyBomber : EnemyAttack
     // INITIALIZE
     // =========================================================
 
-public override void Initialize(
-    EnemyBehaviour behaviour,
-    EnemyAnim enemyAnim)
-{
-    base.Initialize(
-        behaviour,
-        enemyAnim
-    );
-
-    baseEnemy = GetComponent<BaseEnemy>();
-
-    explosionVisual =
-        GetComponentInChildren<EnemyExplosionVisual>();
-
-    if (explosionVisual != null)
+    public override void Initialize(
+        EnemyBehaviour behaviour,
+        EnemyAnim enemyAnim)
     {
-        explosionVisual.Initialize(
-            explosionRange,
-            explosionDelay
+        base.Initialize(
+            behaviour,
+            enemyAnim
         );
+
+        baseEnemy =
+            GetComponent<BaseEnemy>();
+
+        explosionVisual =
+            GetComponentInChildren<EnemyExplosionVisual>();
+
+        if (explosionVisual != null)
+        {
+            explosionVisual.Initialize(
+                explosionRange,
+                explosionDelay
+            );
+        }
+
+        if (this.enemyAnim != null)
+        {
+            this.enemyAnim.OnExplosionHit -=
+                ExplosionHitEvent;
+
+            this.enemyAnim.OnExplosionHit +=
+                ExplosionHitEvent;
+        }
     }
 
-    if (this.enemyAnim != null)
+
+    private void Update()
     {
-        this.enemyAnim.OnExplosionHit -= ExplosionHitEvent;
-        this.enemyAnim.OnExplosionHit += ExplosionHitEvent;
-    }
-}
+        if (baseEnemy == null)
+            return;
 
-    // =========================================================
-    // ATTACK UPDATE
-    // =========================================================
+        if (baseEnemy.IsDead())
+        {
+            HideExplosionVisual();
+        }
+    }
+
 
     public override void UpdateAttack()
     {
@@ -81,10 +97,14 @@ public override void Initialize(
         if (hasExploded)
             return;
 
-        float distance = Vector3.Distance(
-            transform.position,
-            player.position
-        );
+
+        UpdateFacePlayer();
+
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                player.position
+            );
 
         // =====================================================
         // CHƯA BẮT ĐẦU COUNTDOWN
@@ -104,24 +124,18 @@ public override void Initialize(
         // ĐANG COUNTDOWN
         // =====================================================
 
-        explosionTimer += Time.deltaTime;
-if (explosionVisual != null)
-{
-    explosionVisual.UpdateCountdown(
-        explosionTimer
-    );
-}
+        explosionTimer +=
+            Time.deltaTime;
+
+        if (explosionVisual != null)
+        {
+            explosionVisual.UpdateCountdown(
+                explosionTimer
+            );
+        }
+
         // =====================================================
-        // TRƯỜNG HỢP COMMIT NHỎ HƠN DELAY
-        // =====================================================
-        //
-        // Ví dụ:
-        // Commit = 0.8
-        // Delay  = 1.0
-        //
-        // Đạt 0.8 => COMMIT
-        // Từ đây Player chạy đi cũng không cancel.
-        //
+        // TRƯỜNG HỢP COMMIT < DELAY
         // =====================================================
 
         if (!isExplosionCommitted &&
@@ -140,13 +154,13 @@ if (explosionVisual != null)
         if (!isExplosionCommitted)
         {
             // -------------------------------------------------
-            // CHƯA ĐẾN EXPLOSION DELAY
+            // CHƯA ĐẾN DELAY
             // -------------------------------------------------
 
             if (explosionTimer <= explosionDelay)
             {
                 // Player chạy ra ngoài AttackRange
-                // => Cancel và quay lại Chase.
+                // => Cancel countdown
                 if (distance > AttackRange)
                 {
                     CancelExplosion();
@@ -156,16 +170,10 @@ if (explosionVisual != null)
             }
 
             // -------------------------------------------------
-            // ĐÃ VƯỢT EXPLOSION DELAY
+            // COMMIT >= DELAY
             // -------------------------------------------------
             //
-            // Trường hợp:
-            //
-            // explosionCommit >= explosionDelay
-            //
-            // Bomber KHÔNG được tự động nổ chỉ vì timer đủ.
-            //
-            // Player bắt buộc phải còn trong AttackRange.
+            // Chỉ nổ nếu Player vẫn còn trong AttackRange.
             //
             // -------------------------------------------------
 
@@ -181,14 +189,6 @@ if (explosionVisual != null)
             return;
         }
 
-        // =====================================================
-        // ĐÃ COMMIT
-        // =====================================================
-        //
-        // Player có chạy ra ngoài AttackRange
-        // cũng KHÔNG được cancel.
-        //
-        // =====================================================
 
         if (explosionTimer > explosionDelay)
         {
@@ -200,112 +200,217 @@ if (explosionVisual != null)
     // START COUNTDOWN
     // =========================================================
 
-private void StartExplosionCountdown()
-{
-    isCountingExplosion = true;
-
-    explosionTimer = 0f;
-    isExplosionCommitted = false;
-
-    // =====================================================
-    // START EXPLOSION VISUAL
-    // =====================================================
-
-    if (explosionVisual != null)
+    private void StartExplosionCountdown()
     {
-        explosionVisual.StartCountdown();
+        isCountingExplosion = true;
+
+        explosionTimer = 0f;
+
+        isExplosionCommitted = false;
+
+        // =====================================================
+        // START VISUAL
+        // =====================================================
+
+        if (explosionVisual != null)
+        {
+            explosionVisual.StartCountdown();
+        }
     }
-}
 
     // =========================================================
     // CANCEL
     // =========================================================
 
-private void CancelExplosion()
-{
-    isCountingExplosion = false;
-
-    explosionTimer = 0f;
-
-    isExplosionCommitted = false;
-
-    if (explosionVisual != null)
+    private void CancelExplosion()
     {
-        explosionVisual.Hide();
-    }
-}
+        isCountingExplosion = false;
 
-  private void Explode()
-{
-    if (hasExploded)
-        return;
+        explosionTimer = 0f;
 
-    if (baseEnemy != null &&
-        baseEnemy.IsDead())
-    {
-        return;
+        isExplosionCommitted = false;
+
+        // =====================================================
+        // HIDE VISUAL
+        // =====================================================
+
+        HideExplosionVisual();
     }
 
-    hasExploded = true;
+    // =========================================================
+    // EXPLODE
+    // =========================================================
 
-    isCountingExplosion = false;
-    isExplosionCommitted = true;
-
-
-    if (explosionVisual != null)
+    private void Explode()
     {
-        explosionVisual.Hide();
+        if (hasExploded)
+            return;
+
+        if (baseEnemy != null &&
+            baseEnemy.IsDead())
+        {
+            HideExplosionVisual();
+            return;
+        }
+
+        hasExploded = true;
+
+        isCountingExplosion = false;
+
+        isExplosionCommitted = true;
+
+        // =====================================================
+        // HIDE VISUAL
+        // =====================================================
+
+        HideExplosionVisual();
+
+        // =====================================================
+        // SELF DESTRUCT
+        // =====================================================
+
+        if (baseEnemy != null)
+        {
+            baseEnemy.SelfDestruct();
+        }
+        else if (enemyAnim != null)
+        {
+            enemyAnim.PlayDead(null);
+        }
     }
 
-    if (baseEnemy != null)
+    // =========================================================
+    // HIDE EXPLOSION VISUAL
+    // =========================================================
+
+    private void HideExplosionVisual()
     {
-        baseEnemy.SelfDestruct();
+        if (explosionVisual != null)
+        {
+            explosionVisual.Hide();
+        }
     }
-    else if (enemyAnim != null)
-    {
-        enemyAnim.PlayDead(null);
-    }
-}
+
+    // =========================================================
+    // EXPLOSION ANIMATION EVENT
+    // =========================================================
+
     public void ExplosionHitEvent()
     {
-        if (!hasExploded) return;
+        if (!hasExploded)
+            return;
 
         PerformExplosionDamage();
     }
 
+    // =========================================================
+    // EXPLOSION DAMAGE
+    // =========================================================
+
     private void PerformExplosionDamage()
     {
-        if (player == null) return;
+        if (player == null)
+            return;
 
-        float distance = Vector3.Distance( transform.position, player.position );
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                player.position
+            );
 
-        if (distance > explosionRange) return;
+        if (distance > explosionRange)
+            return;
 
-        IDamageable damageable = player.GetComponentInChildren<IDamageable>();
+        IDamageable damageable =
+            player.GetComponentInChildren<IDamageable>();
 
         if (damageable != null)
         {
-            damageable.TakeDamage(atkDamage);
+            damageable.TakeDamage(
+                atkDamage
+            );
         }
     }
 
+    // =========================================================
+    // STOP ATTACK
+    // =========================================================
+
     public override void StopAttack()
     {
+        // =====================================================
+        // ĐÃ COMMIT
+        // =====================================================
+        //
+        // Không được Cancel.
+        //
+        // =====================================================
+
         if (isExplosionCommitted)
             return;
 
         CancelExplosion();
     }
 
+    // =========================================================
+    // DISABLE
+    // =========================================================
 
     protected override void OnDisable()
     {
+        // =====================================================
+        // ĐẢM BẢO VISUAL TẮT
+        // =====================================================
+
+        HideExplosionVisual();
+
         if (enemyAnim != null)
         {
-            enemyAnim.OnExplosionHit -= ExplosionHitEvent;
+            enemyAnim.OnExplosionHit -=
+                ExplosionHitEvent;
         }
 
         base.OnDisable();
     }
-}
 
+    // =========================================================
+    // GIZMOS
+    // =========================================================
+
+    private void OnDrawGizmosSelected()
+    {
+        // =====================================================
+        // EXPLOSION RANGE
+        // =====================================================
+
+        Gizmos.color =
+            new Color(
+                1f,
+                0.15f,
+                0f,
+                0.35f
+            );
+
+        Gizmos.DrawWireSphere(
+            transform.position,
+            explosionRange
+        );
+
+        // =====================================================
+        // CENTER
+        // =====================================================
+
+        Gizmos.color =
+            new Color(
+                1f,
+                0.5f,
+                0f,
+                0.8f
+            );
+
+        Gizmos.DrawWireSphere(
+            transform.position,
+            0.15f
+        );
+    }
+}
