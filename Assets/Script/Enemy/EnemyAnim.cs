@@ -9,6 +9,12 @@ public class EnemyAnim : MonoBehaviour
 
     public event Action OnAttackHit;
 
+    public event Action OnExplosionHit;
+
+    // =========================================================
+    // MOVEMENT
+    // =========================================================
+
     public void SetSpeed(float speed)
     {
         animator.SetFloat(
@@ -17,12 +23,20 @@ public class EnemyAnim : MonoBehaviour
         );
     }
 
+    // =========================================================
+    // ATTACK
+    // =========================================================
+
     public void PlayAttack()
     {
         animator.SetTrigger(
             "isAttack"
         );
     }
+
+    // =========================================================
+    // DEAD
+    // =========================================================
 
     public void PlayDead(Action onFinished)
     {
@@ -44,11 +58,24 @@ public class EnemyAnim : MonoBehaviour
     }
 
     // =========================================================
-    // ANIMATION EVENT
+    // MELEE ANIMATION EVENT
     // =========================================================
 
     public void AttackHitEvent()
     {
         OnAttackHit?.Invoke();
+    }
+
+    // =========================================================
+    // BOMBER ANIMATION EVENT
+    // =========================================================
+    //
+    // Gắn event này vào frame đầu tiên của isDead.
+    //
+    // =========================================================
+
+    public void ExplosionHitEvent()
+    {
+        OnExplosionHit?.Invoke();
     }
 }

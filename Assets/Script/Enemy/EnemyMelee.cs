@@ -3,13 +3,11 @@ using UnityEngine;
 public class EnemyMelee : EnemyAttack
 {
     [Header("Melee Settings")]
-    [SerializeField] private float atkRange = 4f;
-
     [SerializeField, Range(0f, 360f)]
     private float attackAngle = 90f;
 
     public float AttackAngle => attackAngle;
-    public override float AttackRange => atkRange;
+
     // =========================================================
     // ATTACK
     // =========================================================
@@ -25,15 +23,6 @@ public class EnemyMelee : EnemyAttack
             return;
 
         StartAttack();
-    }
-    
-    // =========================================================
-    // START ATTACK
-    // =========================================================
-
-    protected override void StartAttack()
-    {
-        base.StartAttack();
     }
 
     // =========================================================
@@ -61,16 +50,6 @@ public class EnemyMelee : EnemyAttack
 
     // =========================================================
     // ANIMATION EVENT
-    // =========================================================
-    //
-    // Animation gọi hàm này đúng frame đánh trúng.
-    //
-    // EnemyAnim
-    //     ↓
-    // AttackHitEvent()
-    //     ↓
-    // EnemyMelee.PerformMeleeDamage()
-    //
     // =========================================================
 
     public void PerformMeleeDamage()
@@ -108,14 +87,14 @@ public class EnemyMelee : EnemyAttack
             );
 
         // =====================================================
-        // CHECK RANGE
+        // RANGE
         // =====================================================
 
         if (distance > atkRange)
             return;
 
         // =====================================================
-        // CHECK CONE
+        // CONE
         // =====================================================
 
         if (angle > attackAngle * 0.5f)
@@ -134,6 +113,43 @@ public class EnemyMelee : EnemyAttack
                 atkDamage
             );
         }
+    }
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    public override void Initialize(
+        EnemyBehaviour behaviour,
+        EnemyAnim enemyAnim)
+    {
+        base.Initialize(
+            behaviour,
+            enemyAnim
+        );
+
+        if (this.enemyAnim != null)
+        {
+            this.enemyAnim.OnAttackHit -= PerformMeleeDamage;
+
+            this.enemyAnim.OnAttackHit +=
+                PerformMeleeDamage;
+        }
+    }
+
+    // =========================================================
+    // DISABLE
+    // =========================================================
+
+    protected override void OnDisable()
+    {
+        if (enemyAnim != null)
+        {
+            enemyAnim.OnAttackHit -=
+                PerformMeleeDamage;
+        }
+
+        base.OnDisable();
     }
 
     // =========================================================
@@ -174,7 +190,7 @@ public class EnemyMelee : EnemyAttack
             angle * 0.5f * Mathf.Deg2Rad;
 
         // =====================================================
-        // CONE RAYS
+        // RAYS
         // =====================================================
 
         for (int i = 0;
@@ -208,7 +224,7 @@ public class EnemyMelee : EnemyAttack
         }
 
         // =====================================================
-        // CONE ARC
+        // ARC
         // =====================================================
 
         for (int i = 0;
@@ -257,29 +273,4 @@ public class EnemyMelee : EnemyAttack
             );
         }
     }
-    public override void Initialize(
-    EnemyBehaviour behaviour,
-    EnemyAnim enemyAnim)
-{
-    base.Initialize(
-        behaviour,
-        enemyAnim
-    );
-
-    if (this.enemyAnim != null)
-    {
-        this.enemyAnim.OnAttackHit -= PerformMeleeDamage;
-        this.enemyAnim.OnAttackHit += PerformMeleeDamage;
-    }
-}
-
-protected override void OnDisable()
-{
-    if (enemyAnim != null)
-    {
-        enemyAnim.OnAttackHit -= PerformMeleeDamage;
-    }
-
-    base.OnDisable();
-}
 }

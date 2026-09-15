@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
+    [SerializeField] protected float atkRange = 4f;
     [SerializeField] protected float atkDamage = 10f;
     [SerializeField] protected float atkCD = 2f;
 
@@ -13,13 +14,29 @@ public class EnemyAttack : MonoBehaviour
 
     protected float nextAttackTime;
 
+    public float AttackRange => atkRange;
     public float AttackDamage => atkDamage;
     public float AttackCooldown => atkCD;
 
-    public virtual float AttackRange => 0f;
-
     public bool CanAttack =>
         Time.time >= nextAttackTime;
+
+    // =========================================================
+    // KEEP ATTACK STATE
+    // =========================================================
+    //
+    // Mặc định:
+    // Player ra ngoài AttackRange
+    // => EnemyBehaviour chuyển sang Chase.
+    //
+    // Bomber có thể override:
+    // Sau khi đã commit nổ
+    // => dù Player chạy ra ngoài range
+    // => vẫn giữ Attack State.
+    //
+    // =========================================================
+
+    public virtual bool ShouldKeepAttackState => false;
 
     // =========================================================
     // INITIALIZE
@@ -40,7 +57,7 @@ public class EnemyAttack : MonoBehaviour
     }
 
     // =========================================================
-    // UPDATE
+    // UPDATE ATTACK
     // =========================================================
 
     public virtual void UpdateAttack()

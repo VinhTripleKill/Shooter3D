@@ -83,6 +83,78 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
 
         Die();
     }
+    public void SelfDestruct()
+{
+    // Bomber đã chết rồi thì không xử lý lần nữa
+    if (isDead)
+        return;
+
+    // =====================================================
+    // ĐÁNH DẤU ĐÃ CHẾT
+    // =====================================================
+
+    isDead = true;
+
+    StopAllCoroutines();
+
+    DisableCollision();
+
+    // =====================================================
+    // KHÔNG REWARD
+    // KHÔNG PLAYER KILL
+    // =====================================================
+
+    Debug.Log(
+        $"[{name}] Bomber tự phát nổ -> Không EXP / COIN / Player Kill"
+    );
+
+    // =====================================================
+    // WAVE MANAGER
+    // =====================================================
+    //
+    // Bomber đã chết khỏi wave,
+    // nhưng không tính là Player Kill.
+    //
+    // =====================================================
+
+    waveManager?.OnEnemyDied(this);
+
+    // =====================================================
+    // REMOVE TARGET
+    // =====================================================
+
+    AllEnemies.Remove(this);
+
+    AutoAimManager.Unregister(this);
+
+    // =====================================================
+    // DEAD ANIMATION
+    // =====================================================
+    //
+    // Explosion damage KHÔNG gọi ở đây.
+    //
+    // Animation Event:
+    //
+    // EnemyAnim.ExplosionHitEvent()
+    //
+    // sẽ gọi:
+    //
+    // EnemyBomber.ExplosionHitEvent()
+    //
+    // =====================================================
+
+    if (enemyAnim != null)
+    {
+        enemyAnim.PlayDead(
+            () => Destroy(gameObject)
+        );
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
+}
+
 
 
     protected override void Die()

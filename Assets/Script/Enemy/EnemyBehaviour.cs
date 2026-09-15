@@ -202,23 +202,44 @@ public class EnemyBehaviour : MonoBehaviour
     // ATTACK
     // =========================================================
 
-    private void UpdateAttack(float distance)
+private void UpdateAttack(float distance)
+{
+    // =====================================================
+    // PLAYER RA NGOÀI ATTACK RANGE
+    // =====================================================
+    //
+    // Bình thường:
+    //      Attack -> Chase
+    //
+    // Bomber đã Commit:
+    //      Attack -> vẫn Attack
+    //
+    // =====================================================
+
+    if (distance > enemyAttack.AttackRange &&
+        !enemyAttack.ShouldKeepAttackState)
     {
-        // Player ra khỏi attack range
-        if (distance > enemyAttack.AttackRange)
-        {
-            ChangeState(BehaviourState.Chase);
+        ChangeState(BehaviourState.Chase);
 
-            enemyAttack.StopAttack();
+        enemyAttack.StopAttack();
 
-            return;
-        }
-
-        idleAndChase.StopMovement();
-
-        enemyAttack.UpdateAttack();
+        return;
     }
 
+    // =====================================================
+    // STOP MOVEMENT
+    // =====================================================
+
+    idleAndChase.StopMovement();
+
+    idleAndChase.SetAnimationSpeed(0f);
+
+    // =====================================================
+    // ATTACK BEHAVIOUR
+    // =====================================================
+
+    enemyAttack.UpdateAttack();
+}
     // =========================================================
     // CHANGE STATE
     // =========================================================

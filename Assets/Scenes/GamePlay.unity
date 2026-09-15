@@ -2447,7 +2447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b857a9bd8f51743b4969d07d867252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  zombiePrefab: {fileID: 8861852149474711234, guid: 5c6a64ad7827fb94c957d3339550b957, type: 3}
+  zombiePrefab: {fileID: 6245144483180953006, guid: 379a164583f5cc14fbc2444cebbd5249, type: 3}
   spawnPoints:
   - {fileID: 2062239140}
   - {fileID: 333983857}
