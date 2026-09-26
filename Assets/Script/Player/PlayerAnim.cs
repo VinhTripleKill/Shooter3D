@@ -4,7 +4,6 @@ public class PlayerAnim : MonoBehaviour
 {
     [SerializeField] private Animator animator;
 
-    // Cho phép gán động sau khi spawn model
     public void SetAnimator(Animator newAnimator)
     {
         animator = newAnimator;

@@ -484,10 +484,12 @@ GameObject:
   - component: {fileID: 8345705196563250385}
   - component: {fileID: 9106935594860556004}
   - component: {fileID: 3138547354700429741}
-  - component: {fileID: 2959926364516746955}
   - component: {fileID: 419620185627268416}
   - component: {fileID: 4129186038483614875}
   - component: {fileID: 87360897422917935}
+  - component: {fileID: -7411120973953150006}
+  - component: {fileID: 8640012686548136572}
+  - component: {fileID: 9091212507528623787}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -667,9 +669,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c79fa2479c1487f4bbdfb6428e28b8b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerWeapon
-  autoAimRange: 15
   gunHolder: {fileID: 0}
-  gunRayDebug: {fileID: 2959926364516746955}
   gameplayUI: {fileID: 0}
 --- !u!114 &9106935594860556004
 MonoBehaviour:
@@ -700,19 +700,6 @@ MonoBehaviour:
   currentLevel: 0
   currentExp: 0
   currentCoins: 0
---- !u!114 &2959926364516746955
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2328074943725962016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b967f8d1cb54424439fbb072cf59da6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  lineDebugPrefab: {fileID: 8826263514642348245, guid: fb945453551d22c43889d4793b913532, type: 3}
 --- !u!114 &419620185627268416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -755,6 +742,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacter
   characterData: {fileID: 0}
+--- !u!114 &-7411120973953150006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2328074943725962016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e382d426f29d9bd488a6c2dd3c548444, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBullet
+--- !u!114 &8640012686548136572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2328074943725962016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faf886530d789e64a996175987ce88ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerShoot
+  autoAimRange: 15
+--- !u!114 &9091212507528623787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2328074943725962016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2758d64f16c64ad4c99431bc8c589368, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerReload
 --- !u!1 &3265683177954224390
 GameObject:
   m_ObjectHideFlags: 0

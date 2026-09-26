@@ -7,6 +7,8 @@ public class VisualCharacterInfo : MonoBehaviour
 {
     [Header("Character Information")]
     [SerializeField] private TextMeshProUGUI characterName;
+    [SerializeField] private TextMeshProUGUI descriptionCharacter;
+    [Header("Character Stats")]
     [SerializeField] private TextMeshProUGUI hp_text;
     [SerializeField] private TextMeshProUGUI moveSpeed_text;
     [SerializeField] private TextMeshProUGUI manaMax_text;
@@ -15,7 +17,7 @@ public class VisualCharacterInfo : MonoBehaviour
     [SerializeField] private TextMeshProUGUI critRate_text;
     [SerializeField] private TextMeshProUGUI critDamage_text;
     [SerializeField] private TextMeshProUGUI defense_text;
-    [SerializeField] private TextMeshProUGUI descriptionCharacter;
+    [SerializeField] private TextMeshProUGUI rangeAim_text;
 
     [Header ("Skill")]
     [SerializeField] private Image skillIcon;
@@ -85,6 +87,8 @@ private void ToggleSkillList()
     critDamage_text.text = data.CharacterStats.critDamage + "%";
 
     defense_text.text = data.CharacterStats.defense.ToString();
+
+    rangeAim_text.text = data.CharacterStats.attackRange.ToString();
 
     descriptionCharacter.text =data.descriptionCharacter;
 

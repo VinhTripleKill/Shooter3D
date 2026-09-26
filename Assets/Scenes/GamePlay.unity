@@ -1466,9 +1466,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 749571699}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bb9eb05e1d0e0e4bb308597d417b942, type: 3}
+  m_Script: {fileID: 11500000, guid: 444345d80f6937c499a458d50b6930c9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawn
   sceneJoystickMove: {fileID: 6229201487849596606}
   sceneJoystickAttack: {fileID: 6229201487849596603}
   sceneGamePlayUI: {fileID: 6229201487849596607}
@@ -3749,6 +3749,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 919441109059659939, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
+      propertyPath: m_Name
+      value: JoystickAttack
+      objectReference: {fileID: 0}
     - target: {fileID: 1599304327986713789, guid: 4dd7c2aac85e393499410c2ffd3beab7, type: 3}
       propertyPath: pauseGameUI
       value: 
@@ -4226,7 +4230,7 @@ PrefabInstance:
     - target: {fileID: 5204006583843564281, guid: 1f4b8cf9942749c4fabff20ed5b2b3c7, type: 3}
       propertyPath: playerSpawn
       value: 
-      objectReference: {fileID: 749571701}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

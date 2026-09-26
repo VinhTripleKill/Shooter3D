@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -7,12 +8,39 @@ public class JoystickAttack : MonoBehaviour,
     IDragHandler,
     IPointerUpHandler
 {
+    // =====================================================
+    // UI REFERENCES
+    // =====================================================
+
     [Header("References")]
-    [SerializeField] private Image OuterArea;
-    [SerializeField] private Image InnerArea;
-    [SerializeField] private Image attackB;
+
+    [SerializeField]
+    private Image OuterArea;
+
+    [SerializeField]
+    private Image InnerArea;
+
+    [SerializeField]
+    private Image attackB;
+
+    // =====================================================
+    // PLAYER REFERENCES
+    // =====================================================
+
     [Header("Player")]
-    [SerializeField] private PlayerWeapon playerWeapon;
+
+    [SerializeField]
+    private PlayerWeapon playerWeapon;
+
+    [SerializeField]
+    private PlayerShoot playerShoot;
+
+    [SerializeField]
+    private PlayerReload playerReload;
+
+    // =====================================================
+    // RECT TRANSFORMS
+    // =====================================================
 
     private RectTransform circleRect;
     private RectTransform innerRect;
@@ -20,9 +48,21 @@ public class JoystickAttack : MonoBehaviour,
 
     private Vector2 startPosition;
 
+    // =====================================================
+    // STATE
+    // =====================================================
+
     private bool isDragging;
 
-    public Vector2 InputDirection { get; private set; }
+    public Vector2 InputDirection
+    {
+        get;
+        private set;
+    }
+
+    // =====================================================
+    // ATTACK ZONE
+    // =====================================================
 
     private enum AttackZone
     {
@@ -32,112 +72,296 @@ public class JoystickAttack : MonoBehaviour,
 
     private AttackZone currentZone;
 
+    // =====================================================
+    // AWAKE
+    // =====================================================
+
     private void Awake()
     {
-        circleRect = OuterArea.rectTransform;
-        innerRect = InnerArea.rectTransform;
-        attackRect = attackB.rectTransform;
-        startPosition = attackRect.anchoredPosition;
+        if (OuterArea != null)
+        {
+            circleRect =
+                OuterArea.rectTransform;
+        }
 
-        currentZone = AttackZone.Inner;
+        if (InnerArea != null)
+        {
+            innerRect =
+                InnerArea.rectTransform;
+        }
+
+        if (attackB != null)
+        {
+            attackRect =
+                attackB.rectTransform;
+
+            startPosition =
+                attackRect.anchoredPosition;
+        }
+
+        currentZone =
+            AttackZone.Inner;
     }
-    public void SetPlayerWeapon(PlayerWeapon weapon)
+
+    // =====================================================
+    // SET PLAYER WEAPON
+    // =====================================================
+
+    public void SetPlayerWeapon(
+        PlayerWeapon weapon)
     {
         playerWeapon = weapon;
-        Debug.Log("JoystickAttack: Đã liên kết với PlayerWeapon");
+
+        Debug.Log(
+            "JoystickAttack | Đã liên kết PlayerWeapon."
+        );
     }
 
-    public void OnDrag(PointerEventData eventData)
+    // =====================================================
+    // SET PLAYER SHOOT
+    // =====================================================
+
+    public void SetPlayerShoot(
+        PlayerShoot shoot)
     {
-        UpdateJoystick(eventData);
+        playerShoot = shoot;
+
+        Debug.Log(
+            "JoystickAttack | Đã liên kết PlayerShoot."
+        );
     }
-    public void OnPointerDown(PointerEventData eventData)
+
+    // =====================================================
+    // SET PLAYER RELOAD
+    // =====================================================
+
+    public void SetPlayerReload(
+        PlayerReload reload)
+    {
+        playerReload = reload;
+
+        Debug.Log(
+            "JoystickAttack | Đã liên kết PlayerReload."
+        );
+    }
+
+    // =====================================================
+    // POINTER DOWN
+    // =====================================================
+
+    public void OnPointerDown(
+        PointerEventData eventData)
     {
         isDragging = true;
 
-        // KHÔNG chỉ set cho gun nữa
-        if (playerWeapon != null && playerWeapon.HasGun())
-        {
-            playerWeapon.SetAttackState(true);
-        }
-        // Melee sẽ được xử lý ở PlayerCombat
+        // ---------------------------------------------
+        // BẮT ĐẦU ATTACK
+        // ---------------------------------------------
 
-        UpdateJoystick(eventData);
+        if (playerShoot != null)
+        {
+            playerShoot.SetAttackState(
+                true
+            );
+        }
+
+        UpdateJoystick(
+            eventData
+        );
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    // =====================================================
+    // DRAG
+    // =====================================================
+
+    public void OnDrag(
+        PointerEventData eventData)
+    {
+        UpdateJoystick(
+            eventData
+        );
+    }
+
+    // =====================================================
+    // POINTER UP
+    // =====================================================
+
+    public void OnPointerUp(
+        PointerEventData eventData)
     {
         isDragging = false;
-        attackRect.anchoredPosition = startPosition;
-        InputDirection = Vector2.zero;
 
-        if (playerWeapon != null)
+        // ---------------------------------------------
+        // RESET JOYSTICK
+        // ---------------------------------------------
+
+        if (attackRect != null)
         {
-            playerWeapon.SetAttackState(false);
+            attackRect.anchoredPosition =
+                startPosition;
+        }
+
+        InputDirection =
+            Vector2.zero;
+
+        // ---------------------------------------------
+        // STOP ATTACK
+        // ---------------------------------------------
+
+        if (playerShoot != null)
+        {
+            playerShoot.SetAttackState(
+                false
+            );
         }
     }
 
-    private void UpdateJoystick(PointerEventData eventData)
+    // =====================================================
+    // UPDATE JOYSTICK
+    // =====================================================
+
+    private void UpdateJoystick(
+        PointerEventData eventData)
     {
+        if (circleRect == null)
+            return;
+
         Vector2 localPoint;
 
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        if (!RectTransformUtility
+            .ScreenPointToLocalPointInRectangle(
                 circleRect,
                 eventData.position,
                 eventData.pressEventCamera,
                 out localPoint))
+        {
             return;
+        }
 
         float radius =
-            circleRect.rect.width * 0.5f;
+            circleRect.rect.width *
+            0.5f;
 
         Vector2 clampedPosition =
             Vector2.ClampMagnitude(
                 localPoint,
-                radius);
+                radius
+            );
 
-        attackRect.anchoredPosition =
-            clampedPosition;
+        // ---------------------------------------------
+        // MOVE BUTTON
+        // ---------------------------------------------
+
+        if (attackRect != null)
+        {
+            attackRect.anchoredPosition =
+                clampedPosition;
+        }
+
+        // ---------------------------------------------
+        // INPUT DIRECTION
+        // ---------------------------------------------
 
         InputDirection =
-            clampedPosition.normalized;
-        if (playerWeapon != null)
+            clampedPosition.sqrMagnitude >
+            0.001f
+                ? clampedPosition.normalized
+                : Vector2.zero;
+
+        // ---------------------------------------------
+        // SEND AIM TO PLAYER SHOOT
+        // ---------------------------------------------
+
+        if (playerShoot != null)
         {
-            playerWeapon.SetJoystickManualAim(
-                InputDirection);
+            playerShoot.SetJoystickManualAim(
+                InputDirection
+            );
         }
-        CheckZone(clampedPosition);
+
+        // ---------------------------------------------
+        // CHECK ZONE
+        // ---------------------------------------------
+
+        CheckZone(
+            clampedPosition
+        );
     }
 
-    private void CheckZone(Vector2 currentPos)
+    // =====================================================
+    // CHECK ZONE
+    // =====================================================
+
+    private void CheckZone(
+        Vector2 currentPos)
     {
-        float distance = currentPos.magnitude;
+        if (innerRect == null)
+            return;
+
+        float distance =
+            currentPos.magnitude;
 
         float innerRadius =
-            innerRect.rect.width * 0.5f;
+            innerRect.rect.width *
+            0.5f;
 
         AttackZone newZone =
             distance <= innerRadius
-            ? AttackZone.Inner
-            : AttackZone.Outer;
+                ? AttackZone.Inner
+                : AttackZone.Outer;
 
-        currentZone = newZone;
+        currentZone =
+            newZone;
 
-        if (playerWeapon == null)
+        if (playerShoot == null)
             return;
 
-        if (currentZone == AttackZone.Inner)
+        // ---------------------------------------------
+        // INNER
+        // AUTO AIM
+        // ---------------------------------------------
+
+        if (currentZone ==
+            AttackZone.Inner)
         {
-            playerWeapon.SetAutoAim(true);
+            playerShoot.SetAutoAim(
+                true
+            );
         }
+
+        // ---------------------------------------------
+        // OUTER
+        // MANUAL AIM
+        // ---------------------------------------------
+
         else
         {
-            playerWeapon.SetAutoAim(false);
+            playerShoot.SetAutoAim(
+                false
+            );
 
-            playerWeapon.SetJoystickManualAim(
-                InputDirection);
+            playerShoot.SetJoystickManualAim(
+                InputDirection
+            );
         }
     }
+
+    // =====================================================
+    // RELOAD BUTTON
+    // =====================================================
+
+    public void Reload()
+    {
+        if (playerReload == null)
+            return;
+
+        playerReload.ManualReload();
+    }
+
+    // =====================================================
+    // IS DRAGGING
+    // =====================================================
+
     public bool IsDragging()
     {
         return isDragging;
