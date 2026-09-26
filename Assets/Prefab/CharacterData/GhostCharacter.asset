@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Ghost
   icon: {fileID: 21300000, guid: 8d55b5d943e84f74fa197c7ac00021a5, type: 3}
-  descriptionCharacter: I bleave i can fly
+  descriptionCharacter: I blieve i can fly
   modelPrefab: {fileID: 5982928375049809925, guid: c4991ca9e8278bf469391eef6dab3a90, type: 3}
   CharacterStats:
     maxHp: 50
@@ -25,4 +25,4 @@ MonoBehaviour:
     critRate: 5
     critDamage: 30
     defense: 0
-  ultimatePrefab: {fileID: 4903482773645303173, guid: 472065138261b2b46bfee5c7bbfbcad8, type: 3}
+    attackRange: 0

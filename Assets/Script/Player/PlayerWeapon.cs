@@ -54,8 +54,6 @@ public class PlayerWeapon : MonoBehaviour
         if (gameplayUI != null)
             gameplayUI.GetReloadButton().onClick.AddListener(OnReloadButtonClicked);
     }
-
-    // === HÀM MỚI: Được gọi sau khi spawn model ===
     public void SetGunHolder(Transform newGunHolder)
     {
         gunHolder = newGunHolder;
@@ -256,6 +254,9 @@ public class PlayerWeapon : MonoBehaviour
             cc.Move( -transform.forward * gunData.recoilForce);
         }
     }
+
+
+
     private void ShootMissile(GunData gunData)
 {
     Transform firePoint = currentGunVisual.GetFirePoint();
@@ -346,21 +347,6 @@ public class PlayerWeapon : MonoBehaviour
                 gunData.interactionMask);
         }
     }
-
-
-    private void RecoverManaByProjectileHit()
-    {
-         if (!hasGun) return;
-
-         playerController.RecoverMana(currentGunVisual.gunData.manaRecoveryByHit);
-    }
-    private void ProcessRaycastHit(GunData gunData, Collider hitCollider)
-    {
-    if (((1 << hitCollider.gameObject.layer) & gunData.interactionMask) == 0) return;
-
-    playerController.RecoverMana(gunData.manaRecoveryByHit);
-    }
-
     private void ShootRaycast(GunData gunData)
     {
         Transform firePoint = currentGunVisual.GetFirePoint();
@@ -417,6 +403,24 @@ public class PlayerWeapon : MonoBehaviour
             SpawnTrail(startPos, endPos, gunData);
         }
     }
+    
+
+    private void RecoverManaByProjectileHit()
+    {
+         if (!hasGun) return;
+
+         playerController.RecoverMana(currentGunVisual.gunData.manaRecoveryByHit);
+    }
+
+
+    private void ProcessRaycastHit(GunData gunData, Collider hitCollider)
+    {
+    if (((1 << hitCollider.gameObject.layer) & gunData.interactionMask) == 0) return;
+
+    playerController.RecoverMana(gunData.manaRecoveryByHit);
+    }
+
+    
     private void SpawnTrail(Vector3 start, Vector3 end, GunData gunData)
     {
         GameObject trailObj = Instantiate(gunData.bulletPrefab, start, Quaternion.identity);
@@ -427,6 +431,8 @@ public class PlayerWeapon : MonoBehaviour
 
         trail.Initialize(start, end, gunData.bulletSpeed);
     }
+
+
 
     public void EquipGun(GameObject gunPrefab, int ammo = -1, bool wasReloading = false)
     {
@@ -507,6 +513,9 @@ public class PlayerWeapon : MonoBehaviour
         rb.AddForce(throwDir.normalized * 3f, ForceMode.Impulse);
     }
 }
+    
+    
+    
     private void CancelReload()
     {
         if (reloadCoroutine != null)
@@ -518,7 +527,6 @@ public class PlayerWeapon : MonoBehaviour
         isHoldingAttack = false;
         gameplayUI?.StopReloadVisual();
     }
-
 
     private IEnumerator ReloadRoutine()
     {
@@ -541,6 +549,8 @@ public class PlayerWeapon : MonoBehaviour
 
         gameplayUI?.UpdateAmmoBar(currentShotCount,gunData.maxCountShot);
     }
+
+
     public void EquipStartingGun(GunData gunData)
 {
     if (gunData == null)

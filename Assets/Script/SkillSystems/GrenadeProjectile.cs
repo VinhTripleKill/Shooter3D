@@ -49,11 +49,11 @@ public class GrenadeProjectile : MonoBehaviour
         // KINEMATIC PARABOLA MODE
         // =========================================================
 
-        rb.isKinematic = true;
-        rb.useGravity = false;
+        // rb.isKinematic = true;
+        // rb.useGravity = false;
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        // rb.linearVelocity = Vector3.zero;
+        // rb.angularVelocity = Vector3.zero;
 
         rb.position = startPoint;
 

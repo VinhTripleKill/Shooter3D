@@ -46,10 +46,7 @@ public class TransferDataEquip : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// Xóa dữ liệu khi muốn bắt đầu một lựa chọn hoàn toàn mới.
-    /// Không cần gọi khi Replay.
-    /// </summary>
+
     public void ClearData()
     {
         selectedCharacter = null;

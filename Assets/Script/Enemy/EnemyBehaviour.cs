@@ -21,7 +21,7 @@ public class EnemyBehaviour : MonoBehaviour
     private EnemyIdleAndChase idleAndChase;
     private EnemyAttack enemyAttack;
     public BehaviourState CurrentState => currentState;
-
+    private EnemyLOS enemyLOS;
     public float DetectRange => idleAndChase.DetectRange;
     public float AttackRange => enemyAttack.AttackRange;
     public float AttackDamage => enemyAttack.AttackDamage;
@@ -32,8 +32,8 @@ public class EnemyBehaviour : MonoBehaviour
         baseEnemy = GetComponent<BaseEnemy>();
         agent = GetComponent<NavMeshAgent>();
         enemyAnim = GetComponentInChildren<EnemyAnim>();
-
-        idleAndChase = GetComponent<EnemyIdleAndChase>();
+        enemyLOS =GetComponent<EnemyLOS>();
+         idleAndChase = GetComponent<EnemyIdleAndChase>();
         enemyAttack = GetComponent<EnemyAttack>();
 
         if (idleAndChase == null)
@@ -198,28 +198,48 @@ public class EnemyBehaviour : MonoBehaviour
         idleAndChase.UpdateChase(distance);
     }
 
-    // =========================================================
-    // ATTACK
-    // =========================================================
-
 private void UpdateAttack(float distance)
 {
     // =====================================================
-    // PLAYER RA NGOÀI ATTACK RANGE
+    // LOS BỊ CHẶN
     // =====================================================
     //
-    // Bình thường:
-    //      Attack -> Chase
+    // Player đang nằm trong AttackRange ban đầu
+    // nhưng bị Wall che.
     //
-    // Bomber đã Commit:
-    //      Attack -> vẫn Attack
+    // EnemyLOS sẽ từ từ giảm AttackRange:
     //
+    // 8 -> 7 -> 6 -> ... -> 1
+    //
+    // Khi AttackRange còn 1:
+    //
+    // Enemy bắt đầu Chase Player.
+    //
+    // =====================================================
+
+    if (enemyLOS != null &&
+        enemyLOS.IsLOSBlocked &&
+        distance > enemyAttack.AttackRange)
+    {
+        ChangeState(
+            BehaviourState.Chase
+        );
+
+        enemyAttack.StopAttack();
+
+        return;
+    }
+
+    // =====================================================
+    // PLAYER RA NGOÀI ATTACK RANGE
     // =====================================================
 
     if (distance > enemyAttack.AttackRange &&
         !enemyAttack.ShouldKeepAttackState)
     {
-        ChangeState(BehaviourState.Chase);
+        ChangeState(
+            BehaviourState.Chase
+        );
 
         enemyAttack.StopAttack();
 
@@ -235,14 +255,12 @@ private void UpdateAttack(float distance)
     idleAndChase.SetAnimationSpeed(0f);
 
     // =====================================================
-    // ATTACK BEHAVIOUR
+    // ATTACK
     // =====================================================
 
     enemyAttack.UpdateAttack();
 }
-    // =========================================================
-    // CHANGE STATE
-    // =========================================================
+
 
     private void ChangeState(BehaviourState newState)
     {

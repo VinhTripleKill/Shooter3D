@@ -24,7 +24,6 @@ public class EnemyAttack : MonoBehaviour
 
     protected float nextAttackTime;
 
-    public float AttackRange => atkRange;
     public float AttackDamage => atkDamage;
     public float AttackCooldown => atkCD;
 
@@ -32,21 +31,12 @@ public class EnemyAttack : MonoBehaviour
 
     public bool CanAttack =>
         Time.time >= nextAttackTime;
+public float AttackRange => atkRange;
 
-    // =========================================================
-    // KEEP ATTACK STATE
-    // =========================================================
-    //
-    // Mặc định:
-    // Player ra ngoài AttackRange
-    // => EnemyBehaviour chuyển sang Chase.
-    //
-    // Bomber có thể override:
-    // Sau khi đã commit nổ
-    // => dù Player chạy ra ngoài range
-    // => vẫn giữ Attack State.
-    //
-    // =========================================================
+public void SetAttackRange(float newRange)
+{
+    atkRange = Mathf.Max(0f, newRange);
+}
 
     public virtual bool ShouldKeepAttackState => false;
 
