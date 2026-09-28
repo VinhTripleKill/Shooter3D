@@ -7,7 +7,7 @@ public class CharacterStats
 
     public float moveSpeed;
 
-    public float damage;
+    public float atk;
 
     public float maxMana;
 

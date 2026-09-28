@@ -23,10 +23,6 @@ public class GunData : ScriptableObject
     public LayerMask hitMask;
     [Tooltip("Các layer bị tương tác bởi đạn")]
     public LayerMask interactionMask; 
-
-    [Header("Debug")]
-    public bool showRay = true;
-    [Header("Visual")]
     public GameObject gunVisualPrefab;
     [Header("World Item")]
     public GameObject gunItemPrefab;

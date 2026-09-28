@@ -10,9 +10,15 @@ public class DamageVisual : MonoBehaviour
     private Camera cam;
     private float timer;
 
-    public void Initialize(float damage)
+    public void Initialize(
+        float damage,
+        Color damageColor)
     {
-        damageText.text = Mathf.RoundToInt(damage).ToString();
+        damageText.text =
+            Mathf.RoundToInt(damage).ToString();
+
+        damageText.color =
+            damageColor;
     }
 
     private void Start()
@@ -23,15 +29,23 @@ public class DamageVisual : MonoBehaviour
     private void Update()
     {
         // Bay lên
-        transform.position += Vector3.up * moveSpeed * Time.deltaTime;
+        transform.position +=
+            Vector3.up *
+            moveSpeed *
+            Time.deltaTime;
 
         // Luôn nhìn camera
         if (cam != null)
-            transform.forward = cam.transform.forward;
+        {
+            transform.forward =
+                cam.transform.forward;
+        }
 
         timer += Time.deltaTime;
 
         if (timer >= lifeTime)
+        {
             Destroy(gameObject);
+        }
     }
 }

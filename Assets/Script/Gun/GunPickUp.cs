@@ -14,7 +14,6 @@ public class GunPickup : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // Đảm bảo itemVisual được tìm lại sau khi Instantiate
     private void Awake()
     {
         GetComponent<GunItem>()?.Initialize();

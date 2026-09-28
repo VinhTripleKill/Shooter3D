@@ -22,7 +22,7 @@ MonoBehaviour:
     damage: 5
     maxMana: 100
     maxSprint: 100
-    critRate: 5
-    critDamage: 30
+    critRate: 10
+    critDamage: 120
     defense: 0
-    attackRange: 0
+    attackRange: 10

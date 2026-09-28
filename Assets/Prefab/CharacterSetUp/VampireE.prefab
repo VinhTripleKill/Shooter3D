@@ -315,6 +315,8 @@ MonoBehaviour:
   randomX: 0.6
   randomY: 0.4
   randomZ: 0.6
+  enemyDamageColor: {r: 1, g: 1, b: 1, a: 1}
+  playerDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &8725889041969683396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,7 +345,7 @@ MonoBehaviour:
   nearUpdateRate: 0.1
   mediumUpdateRate: 0.25
   farUpdateRate: 0.5
-  veryFarUpdateRate: 1
+  veryFarUpdateRate: 0.75
 --- !u!114 &7055199782488046001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,7 +377,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRange
   atkRange: 7
   atkDamage: 2
-  atkCD: 1
+  atkCD: 2
   typeFace: 0
   bulletPrefab: {fileID: 5457231402988934519, guid: 468a57f28e2d9b7438934282fa8f3ad0, type: 3}
   bulletSpawnPoint: {fileID: 2296415007319545510}
@@ -404,6 +406,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   rayHeight: 0.5
+  blockedAttackRange: 1
+  rangeReduceSpeed: 5
   drawRay: 1
   clearColor: {r: 0, g: 1, b: 0, a: 1}
   blockedColor: {r: 1, g: 0, b: 0, a: 1}

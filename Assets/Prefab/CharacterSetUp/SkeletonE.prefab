@@ -254,6 +254,8 @@ MonoBehaviour:
   randomX: 0.6
   randomY: 0.4
   randomZ: 0.6
+  enemyDamageColor: {r: 1, g: 1, b: 1, a: 1}
+  playerDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &-5816999615630920678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,7 +301,7 @@ MonoBehaviour:
   nearUpdateRate: 0.1
   mediumUpdateRate: 0.25
   farUpdateRate: 0.5
-  veryFarUpdateRate: 1
+  veryFarUpdateRate: 0.75
 --- !u!114 &6315641984747758042
 MonoBehaviour:
   m_ObjectHideFlags: 0

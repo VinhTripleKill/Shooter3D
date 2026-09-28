@@ -34,13 +34,28 @@ public class GamePlayUI : MonoBehaviour
     [Header("Pick Up")]
     [SerializeField] private Button pickUp;
     private bool isReloading;
+    [Header("Skill Notice")]
+    [SerializeField] private TextMeshProUGUI skillNoticeText;
+[SerializeField] private float skillNoticeStayTime = 1f;
+[SerializeField] private float skillNoticeFadeTime = 0.5f;
 
-    private void Awake()
+private Coroutine skillNoticeCoroutine;
+private void Awake()
+{
+    sprintLock.gameObject.SetActive(false);
+    reloadLock.gameObject.SetActive(false);
+    pickUp.gameObject.SetActive(false);
+
+    if (skillNoticeText != null)
     {
-        sprintLock.gameObject.SetActive(false);
-        reloadLock.gameObject.SetActive(false);
-        pickUp.gameObject.SetActive(false);
+        Color color =
+            skillNoticeText.color;
+
+        color.a = 0f;
+
+        skillNoticeText.color = color;
     }
+}
 
     private void Update()
     {
@@ -144,6 +159,79 @@ public void UpdateManaBar(float currentMana, float maxMana)
     
         reloadText.text = "0";
     }
+    public void ShowSkillNotice(string message)
+{
+    if (skillNoticeText == null)
+        return;
+
+    if (skillNoticeCoroutine != null)
+    {
+        StopCoroutine(skillNoticeCoroutine);
+    }
+
+    skillNoticeCoroutine =
+        StartCoroutine(
+            SkillNoticeRoutine(message)
+        );
+}
+
+private IEnumerator SkillNoticeRoutine(
+    string message)
+{
+    // ---------------------------------------------
+    // HIỆN TEXT
+    // ---------------------------------------------
+
+    skillNoticeText.text = message;
+
+    Color color =
+        skillNoticeText.color;
+
+    color.a = 1f;
+
+    skillNoticeText.color = color;
+
+    // ---------------------------------------------
+    // GIỮ NGUYÊN 1 GIÂY
+    // ---------------------------------------------
+
+    yield return new WaitForSeconds(
+        skillNoticeStayTime
+    );
+
+    // ---------------------------------------------
+    // FADE OUT
+    // ---------------------------------------------
+
+    float timer = 0f;
+
+    while (timer < skillNoticeFadeTime)
+    {
+        timer += Time.deltaTime;
+
+        float alpha =
+            1f -
+            Mathf.Clamp01(
+                timer / skillNoticeFadeTime
+            );
+
+        color.a = alpha;
+
+        skillNoticeText.color = color;
+
+        yield return null;
+    }
+
+    // ---------------------------------------------
+    // KẾT THÚC
+    // ---------------------------------------------
+
+    color.a = 0f;
+
+    skillNoticeText.color = color;
+
+    skillNoticeCoroutine = null;
+}
 
     public void UpdateSprintBar( float currentSprint,float maxSprint)
     {

@@ -80,7 +80,7 @@ private void ToggleSkillList()
 
     sprintEnergy_text.text = data.CharacterStats.maxSprint.ToString();
 
-    damageChar_text.text = data.CharacterStats.damage.ToString();
+    damageChar_text.text = data.CharacterStats.atk.ToString();
 
     critRate_text.text = data.CharacterStats.critRate + "%";
 

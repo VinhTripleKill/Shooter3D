@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerWeapon : MonoBehaviour
@@ -15,6 +14,9 @@ public class PlayerWeapon : MonoBehaviour
     [Header("Gun State")]
     private int currentShotCount;
     private bool isReloading;
+
+    [Header("Character Combat Stats")]
+    private CharacterStats characterStats;
 
     [Header("References")]
     private PlayerController playerController;
@@ -36,11 +38,30 @@ public class PlayerWeapon : MonoBehaviour
     public bool IsReloading => isReloading;
 
     public Transform GunHolder => gunHolder;
+    private PlayerAmmo playerAmmo;
+    public CharacterStats CharacterStats => characterStats;
 
+    public float CritRate => characterStats != null ? characterStats.critRate : 0f;
+
+    public float CritDamage => characterStats != null ? characterStats.critDamage : 1f;
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         playerAnim = GetComponent<PlayerAnim>();
+        playerAmmo = GetComponent<PlayerAmmo>();
+    }
+
+    public void SetCharacterStats(CharacterStats stats)
+    {
+        characterStats = stats;
+
+        if (characterStats == null)
+        {
+            Debug.LogWarning("PlayerWeapon | CharacterStats null.");
+            return;
+        }
+
+        Debug.Log( $"PlayerWeapon | " + $"CritRate: {characterStats.critRate} | " + $"CritDamage: {characterStats.critDamage}" );
     }
 
     // =====================================================
@@ -68,18 +89,18 @@ public class PlayerWeapon : MonoBehaviour
     // EQUIP
     // =====================================================
 
-    public void EquipGun( GameObject gunPrefab, int ammo = -1, bool wasReloading = false)
+    public void EquipGun(GameObject gunPrefab,int ammo = -1,bool wasReloading = false)
     {
         if (gunPrefab == null)
         {
-            Debug.LogWarning("PlayerWeapon | gunPrefab null.");
+            Debug.LogWarning( "PlayerWeapon | gunPrefab null." );
 
             return;
         }
 
         if (gunHolder == null)
         {
-            Debug.LogError("PlayerWeapon | GunHolder chưa được gán.");
+            Debug.LogError("PlayerWeapon | GunHolder chưa được gán." );
 
             return;
         }
@@ -96,8 +117,7 @@ public class PlayerWeapon : MonoBehaviour
 
             if (oldGunData != null)
             {
-                SpawnDroppedGun( oldGunData, currentShotCount, isReloading
-                );
+                SpawnDroppedGun( oldGunData, playerAmmo != null ? playerAmmo.CurrentAmmo : 0, isReloading );
             }
 
             Destroy(currentGun);
@@ -110,27 +130,20 @@ public class PlayerWeapon : MonoBehaviour
         // EQUIP WEAPON MỚI
         // ---------------------------------------------
 
-        currentGun = Instantiate(
-            gunPrefab,
-            gunHolder
-        );
+        currentGun = Instantiate( gunPrefab, gunHolder );
 
-        currentGun.transform.localPosition =
-            Vector3.zero;
+        currentGun.transform.localPosition = Vector3.zero;
 
-        currentGun.transform.localRotation =
-            Quaternion.identity;
+        currentGun.transform.localRotation = Quaternion.identity;
 
-        currentGunVisual =
-            currentGun.GetComponent<GunVisual>();
+        currentGunVisual = currentGun.GetComponent<GunVisual>();
 
         if (currentGunVisual == null)
         {
-            Debug.LogError(
-                "PlayerWeapon | GunPrefab không có GunVisual."
-            );
+            Debug.LogError( "PlayerWeapon | GunPrefab không có GunVisual." );
 
             Destroy(currentGun);
+
             currentGun = null;
 
             return;
@@ -140,25 +153,17 @@ public class PlayerWeapon : MonoBehaviour
         // RUNTIME DATA
         // ---------------------------------------------
 
-        GunRuntimeData runtime =
-            currentGun.GetComponent<GunRuntimeData>();
+        GunRuntimeData runtime = currentGun.GetComponent<GunRuntimeData>();
 
         if (runtime == null)
         {
-            runtime =
-                currentGun.AddComponent<GunRuntimeData>();
+            runtime = currentGun.AddComponent<GunRuntimeData>();
         }
 
-        runtime.Initialize(
-            currentGunVisual.gunData
-        );
+        runtime.Initialize( currentGunVisual.gunData );
 
-        currentShotCount =
-            ammo < 0
-                ? currentGunVisual.gunData.maxCountShot
-                : ammo;
+        playerAmmo?.InitializeAmmo( currentGunVisual.gunData, ammo );
 
-        runtime.currentAmmo = currentShotCount;
         runtime.isReloading = wasReloading;
 
         // ---------------------------------------------
@@ -166,12 +171,8 @@ public class PlayerWeapon : MonoBehaviour
         // ---------------------------------------------
 
         isReloading = false;
-        hasGun = true;
 
-        gameplayUI?.UpdateAmmoBar(
-            currentShotCount,
-            currentGunVisual.gunData.maxCountShot
-        );
+        hasGun = true;
 
         gameplayUI?.StopReloadVisual();
 
@@ -186,16 +187,12 @@ public class PlayerWeapon : MonoBehaviour
     {
         if (gunData == null)
         {
-            Debug.LogWarning(
-                "PlayerWeapon | Starting GunData null."
-            );
+            Debug.LogWarning( "PlayerWeapon | Starting GunData null." );
 
             return;
         }
 
-        EquipGun(
-            gunData.gunVisualPrefab
-        );
+        EquipGun( gunData.gunVisualPrefab );
     }
 
     // =====================================================
@@ -206,21 +203,13 @@ public class PlayerWeapon : MonoBehaviour
     {
         SetReloadingState(false);
 
-        if (!hasGun || currentGun == null)
-            return;
+        if (!hasGun || currentGun == null) return;
 
-        GunData gunData =
-            currentGunVisual != null
-                ? currentGunVisual.gunData
-                : null;
+        GunData gunData = currentGunVisual != null ? currentGunVisual.gunData : null;
 
         if (gunData != null)
         {
-            SpawnDroppedGun(
-                gunData,
-                currentShotCount,
-                isReloading
-            );
+            SpawnDroppedGun(gunData, playerAmmo != null ? playerAmmo.CurrentAmmo : 0,isReloading);
         }
 
         Destroy(currentGun);
@@ -250,20 +239,11 @@ public class PlayerWeapon : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPos =
-            transform.position +
-            transform.forward * 1f +
-            Vector3.up * 0.5f;
+        Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 0.5f;
 
-        GameObject droppedGun =
-            Instantiate(
-                gunData.gunItemPrefab,
-                spawnPos,
-                Quaternion.identity
-            );
+        GameObject droppedGun = Instantiate( gunData.gunItemPrefab, spawnPos, Quaternion.identity );
 
-        GunItem gunItem =
-            droppedGun.GetComponent<GunItem>();
+        GunItem gunItem = droppedGun.GetComponent<GunItem>();
 
         if (gunItem != null)
         {
@@ -271,8 +251,7 @@ public class PlayerWeapon : MonoBehaviour
             gunItem.SetGunData(gunData);
         }
 
-        GunPickup pickup =
-            droppedGun.GetComponent<GunPickup>();
+        GunPickup pickup = droppedGun.GetComponent<GunPickup>();
 
         if (pickup != null)
         {
@@ -280,97 +259,30 @@ public class PlayerWeapon : MonoBehaviour
             pickup.isReloading = wasReloading;
         }
 
-        Rigidbody rb =
-            droppedGun.GetComponent<Rigidbody>();
+        Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
 
         if (rb != null)
         {
-            Vector3 throwDir =
-                transform.forward +
-                Vector3.up * 0.7f;
+            Vector3 throwDir = transform.forward + Vector3.up * 0.7f;
 
-            rb.AddForce(
-                throwDir.normalized * 3f,
-                ForceMode.Impulse
-            );
+            rb.AddForce( throwDir.normalized * 3f, ForceMode.Impulse );
         }
     }
 
-    public bool HasAmmo()
+
+
+
+
+    public void SetReloadingState(bool value)
     {
-        return currentShotCount > 0;
-    }
+        isReloading = value;
 
-    public bool ConsumeAmmo()
-    {
-        if (!hasGun)
-            return false;
-
-        if (currentShotCount <= 0)
-            return false;
-
-        currentShotCount--;
-
-        UpdateRuntimeAmmo();
-        UpdateAmmoUI();
-
-        return true;
-    }
-
-    private void UpdateRuntimeAmmo()
-    {
-        if (currentGun == null)
-            return;
-
-        GunRuntimeData runtime =
-            currentGun.GetComponent<GunRuntimeData>();
+        GunRuntimeData runtime =  currentGun != null ? currentGun.GetComponent<GunRuntimeData>() : null;
 
         if (runtime != null)
         {
-            runtime.currentAmmo =
-                currentShotCount;
+            runtime.isReloading = value;
         }
     }
-
-   
-
-public void SetReloadingState(bool value)
-{
-    isReloading = value;
-
-    GunRuntimeData runtime =
-        currentGun != null
-            ? currentGun.GetComponent<GunRuntimeData>()
-            : null;
-
-    if (runtime != null)
-    {
-        runtime.isReloading = value;
-    }
-}
-
-
-public void SetFullAmmo()
-{
-    GunData gunData = CurrentGunData;
-
-    if (gunData == null) return;
-
-    currentShotCount = gunData.maxCountShot;
-
-    UpdateRuntimeAmmo();
-    UpdateAmmoUI();
-}
-
-
-public void UpdateAmmoUI()
-{
-    GunData gunData = CurrentGunData;
-
-    if (gunData == null) return;
-
-    gameplayUI?.UpdateAmmoBar( currentShotCount, gunData.maxCountShot);
-}
-
 
 }

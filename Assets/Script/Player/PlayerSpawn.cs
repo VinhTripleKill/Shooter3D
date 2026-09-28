@@ -68,8 +68,10 @@ public class PlayerSpawn : MonoBehaviour
 
     private void SpawnFromTransferData()
     {
-        if (TransferDataEquip.Instance == null ||
-            !TransferDataEquip.Instance.HasData)
+        if (
+            TransferDataEquip.Instance == null ||
+            !TransferDataEquip.Instance.HasData
+        )
         {
             Debug.LogError(
                 "PlayerSpawn | Không có dữ liệu Player."
@@ -111,8 +113,10 @@ public class PlayerSpawn : MonoBehaviour
         // CHECK
         // ---------------------------------------------
 
-        if (playerPrefab == null ||
-            spawnPoint == null)
+        if (
+            playerPrefab == null ||
+            spawnPoint == null
+        )
         {
             Debug.LogError(
                 "PlayerSpawn | Chưa gán PlayerPrefab hoặc SpawnPoint."
@@ -195,7 +199,8 @@ public class PlayerSpawn : MonoBehaviour
 
         PlayerInteraction interaction =
             currentPlayer.GetComponent<PlayerInteraction>();
-
+        PlayerAmmo ammo =
+    currentPlayer.GetComponent<PlayerAmmo>();
         // =================================================
         // CHARACTER
         // =================================================
@@ -213,6 +218,29 @@ public class PlayerSpawn : MonoBehaviour
                 character
             );
         }
+
+        // =================================================
+        // CHARACTER COMBAT STATS
+        // =================================================
+
+        if (weapon != null)
+        {
+            weapon.SetCharacterStats(
+                character.CharacterStats
+            );
+
+            Debug.Log(
+                $"PlayerSpawn | Character Stats Loaded | " +
+                $"CritRate: {character.CharacterStats.critRate} | " +
+                $"CritDamage: {character.CharacterStats.critDamage}"
+            );
+        }
+        if (ammo != null)
+{
+    ammo.SetGameplayUI(
+        sceneGamePlayUI
+    );
+}
 
         // =================================================
         // CHARACTER ATTACK RANGE
@@ -238,8 +266,10 @@ public class PlayerSpawn : MonoBehaviour
         // PLAYER INPUT
         // =================================================
 
-        if (input != null &&
-            coreUI != null)
+        if (
+            input != null &&
+            coreUI != null
+        )
         {
             coreUI.RegisterPlayerInput(
                 input
@@ -330,8 +360,10 @@ public class PlayerSpawn : MonoBehaviour
         // PLAYER PROGRESS
         // =================================================
 
-        if (progress != null &&
-            sceneGamePlayUI != null)
+        if (
+            progress != null &&
+            sceneGamePlayUI != null
+        )
         {
             sceneGamePlayUI.SetPlayerProgress(
                 progress
@@ -405,8 +437,9 @@ public class PlayerSpawn : MonoBehaviour
             $"PlayerSpawn | Spawn: " +
             $"{character.characterName} | " +
             $"Skill: {skill?.skillName} | " +
-            $"AttackRange: " +
-            $"{character.CharacterStats.attackRange}"
+            $"AttackRange: {character.CharacterStats.attackRange} | " +
+            $"CritRate: {character.CharacterStats.critRate} | " +
+            $"CritDamage: {character.CharacterStats.critDamage}"
         );
     }
 
@@ -418,8 +451,10 @@ public class PlayerSpawn : MonoBehaviour
         PlayerSkill skillComp,
         SkillData skill)
     {
-        if (skillComp == null ||
-            skillNav == null)
+        if (
+            skillComp == null ||
+            skillNav == null
+        )
         {
             return;
         }

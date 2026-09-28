@@ -4,19 +4,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerShoot : MonoBehaviour
 {
-    // =====================================================
-    // REFERENCES
-    // =====================================================
-
     private PlayerController playerController;
     private PlayerWeapon playerWeapon;
     private PlayerReload playerReload;
     private PlayerBullet playerBullet;
     private PlayerAnim playerAnim;
-
-    // =====================================================
-    // AIM
-    // =====================================================
+    private PlayerAmmo playerAmmo;
 
     [Header("Aim")]
 
@@ -32,10 +25,6 @@ public class PlayerShoot : MonoBehaviour
 
     private Transform currentTarget;
 
-    // =====================================================
-    // INPUT
-    // =====================================================
-
     [Header("Input")]
 
     private InputAction attackAutoAction;
@@ -43,69 +32,47 @@ public class PlayerShoot : MonoBehaviour
 
     private bool isHoldingAttack;
 
-    // =====================================================
-    // SHOOT
-    // =====================================================
-
     [Header("Shoot")]
 
     private float nextShotTime;
 
-    // =====================================================
-    // AWAKE
-    // =====================================================
-
     private void Awake()
     {
-        playerController =
-            GetComponent<PlayerController>();
+        playerController = GetComponent<PlayerController>();
 
-        playerWeapon =
-            GetComponent<PlayerWeapon>();
+        playerWeapon = GetComponent<PlayerWeapon>();
 
-        playerReload =
-            GetComponent<PlayerReload>();
+        playerReload = GetComponent<PlayerReload>();
 
-        playerBullet =
-            GetComponent<PlayerBullet>();
+        playerBullet = GetComponent<PlayerBullet>();
 
-        playerAnim =
-            GetComponent<PlayerAnim>();
+        playerAnim = GetComponent<PlayerAnim>();
 
-        PlayerInput playerInput =
-            GetComponent<PlayerInput>();
+        playerAmmo = GetComponent<PlayerAmmo>();
+
+        PlayerInput playerInput = GetComponent<PlayerInput>();
 
         if (playerInput != null)
         {
-            attackAutoAction =
-                playerInput.actions["AttackAuto"];
+            attackAutoAction = playerInput.actions["AttackAuto"];
 
-            attackManualAction =
-                playerInput.actions["AttackManual"];
+            attackManualAction = playerInput.actions["AttackManual"];
         }
     }
 
-    // =====================================================
-    // SET CHARACTER ATTACK RANGE
-    // =====================================================
 
     public void SetAutoAimRange(float range)
     {
         if (range <= 0f)
         {
-            Debug.LogWarning(
-                "PlayerShoot | AttackRange không hợp lệ. " +
-                "Giữ giá trị AutoAimRange hiện tại."
-            );
+            Debug.LogWarning("PlayerShoot | AttackRange không hợp lệ. " + "Giữ giá trị AutoAimRange hiện tại." );
 
             return;
         }
 
         autoAimRange = range;
 
-        Debug.Log(
-            $"PlayerShoot | AutoAimRange = {autoAimRange}"
-        );
+        Debug.Log( $"PlayerShoot | AutoAimRange = {autoAimRange}" );
     }
 
     // =====================================================
@@ -116,69 +83,44 @@ public class PlayerShoot : MonoBehaviour
     {
         if (attackAutoAction != null)
         {
-            attackAutoAction.started +=
-                AttackAutoStarted;
+            attackAutoAction.started += AttackAutoStarted;
 
-            attackAutoAction.canceled +=
-                AttackCanceled;
+            attackAutoAction.canceled += AttackCanceled;
         }
 
         if (attackManualAction != null)
         {
-            attackManualAction.started +=
-                AttackManualStarted;
+            attackManualAction.started += AttackManualStarted;
 
-            attackManualAction.canceled +=
-                AttackCanceled;
+            attackManualAction.canceled += AttackCanceled;
         }
     }
-
-    // =====================================================
-    // DISABLE
-    // =====================================================
-
     private void OnDisable()
     {
         if (attackAutoAction != null)
         {
-            attackAutoAction.started -=
-                AttackAutoStarted;
+            attackAutoAction.started -= AttackAutoStarted;
 
-            attackAutoAction.canceled -=
-                AttackCanceled;
+            attackAutoAction.canceled -= AttackCanceled;
         }
 
         if (attackManualAction != null)
         {
-            attackManualAction.started -=
-                AttackManualStarted;
+            attackManualAction.started -= AttackManualStarted;
 
-            attackManualAction.canceled -=
-                AttackCanceled;
+            attackManualAction.canceled -= AttackCanceled;
         }
     }
 
-    // =====================================================
-    // UPDATE
-    // =====================================================
-
     private void Update()
     {
-        if (playerController == null)
-            return;
+        if (playerController == null) return;
 
-        if (playerController.IsDead())
-            return;
+        if (playerController.IsDead()) return;
 
-        if (playerWeapon == null)
-            return;
+        if (playerWeapon == null) return;
 
-        if (!playerWeapon.HasGun)
-            return;
-
-        // ---------------------------------------------
-        // MOUSE AIM
-        // ---------------------------------------------
+        if (!playerWeapon.HasGun) return;
 
         if (!useAutoAim && useMouseAim)
         {
@@ -216,8 +158,7 @@ public class PlayerShoot : MonoBehaviour
     // INPUT
     // =====================================================
 
-    private void AttackAutoStarted(
-        InputAction.CallbackContext ctx)
+    private void AttackAutoStarted(InputAction.CallbackContext ctx)
     {
         useAutoAim = true;
         useMouseAim = false;
@@ -225,8 +166,7 @@ public class PlayerShoot : MonoBehaviour
         isHoldingAttack = true;
     }
 
-    private void AttackManualStarted(
-        InputAction.CallbackContext ctx)
+    private void AttackManualStarted(InputAction.CallbackContext ctx)
     {
         useAutoAim = false;
         useMouseAim = true;
@@ -234,8 +174,7 @@ public class PlayerShoot : MonoBehaviour
         isHoldingAttack = true;
     }
 
-    private void AttackCanceled(
-        InputAction.CallbackContext ctx)
+    private void AttackCanceled(InputAction.CallbackContext ctx)
     {
         isHoldingAttack = false;
     }
@@ -254,29 +193,24 @@ public class PlayerShoot : MonoBehaviour
         useAutoAim = value;
     }
 
-    public void SetManualAimDirection(
-        Vector2 direction)
+    public void SetManualAimDirection(Vector2 direction)
     {
-        manualAimDirection =
-            direction;
+        manualAimDirection = direction;
     }
 
-    public void SetJoystickManualAim(
-        Vector2 direction)
+    public void SetJoystickManualAim( Vector2 direction)
     {
         useAutoAim = false;
         useMouseAim = false;
 
         if (direction.sqrMagnitude <= 0.001f)
         {
-            manualAimDirection =
-                Vector2.zero;
+            manualAimDirection = Vector2.zero;
 
             return;
         }
 
-        manualAimDirection =
-            direction.normalized;
+        manualAimDirection = direction.normalized;
     }
 
     // =====================================================
@@ -285,32 +219,19 @@ public class PlayerShoot : MonoBehaviour
 
     private void UpdateMouseAimDirection()
     {
-        Camera cam =
-            Camera.main;
+        Camera cam = Camera.main;
 
-        if (cam == null)
-            return;
+        if (cam == null) return;
 
-        if (Mouse.current == null)
-            return;
+        if (Mouse.current == null) return;
 
-        Vector2 mousePos =
-            Mouse.current.position.ReadValue();
+        Vector2 mousePos = Mouse.current.position.ReadValue();
 
-        Ray ray =
-            cam.ScreenPointToRay(
-                mousePos
-            );
+        Ray ray = cam.ScreenPointToRay( mousePos );
 
-        Plane groundPlane =
-            new Plane(
-                Vector3.up,
-                Vector3.zero
-            );
+        Plane groundPlane = new Plane( Vector3.up, Vector3.zero );
 
-        if (!groundPlane.Raycast(
-                ray,
-                out float distance))
+        if (!groundPlane.Raycast( ray, out float distance))
         {
             return;
         }
@@ -386,134 +307,76 @@ public class PlayerShoot : MonoBehaviour
 
     private void TryShoot()
     {
-        if (playerController == null)
-            return;
+        if (playerController == null) return;
 
-        if (playerWeapon == null)
-            return;
+        if (playerWeapon == null) return;
 
-        if (playerController.IsDead())
-            return;
+        if (playerController.IsDead()) return;
 
-        if (!playerWeapon.HasGun)
-            return;
+        if (!playerWeapon.HasGun) return;
 
-        if (playerController.IsSprintingPublic())
-            return;
+        if (playerController.IsSprintingPublic()) return;
 
-        // =================================================
-        // ĐANG RELOAD
-        // =================================================
+        if (playerWeapon.IsReloading) return;
 
-        if (playerWeapon.IsReloading)
-            return;
+        GunData gunData = playerWeapon.CurrentGunData;
 
-        // =================================================
-        // GUN DATA
-        // =================================================
+        if (gunData == null) return;
 
-        GunData gunData =
-            playerWeapon.CurrentGunData;
 
-        if (gunData == null)
-            return;
+if (playerAmmo == null)
+    return;
 
-        // =================================================
-        // HẾT ĐẠN
-        // =================================================
+if (!playerAmmo.HasAmmo())
+{
+    if (playerReload != null)
+    {
+        playerReload.ManualReload();
+    }
 
-        if (!playerWeapon.HasAmmo())
-        {
-            if (playerReload != null)
-            {
-                playerReload.ManualReload();
-            }
+    return;
+}
 
-            return;
-        }
 
-        // =================================================
-        // FIRE RATE
-        // =================================================
-
-        if (Time.time < nextShotTime)
-            return;
-
-        // =================================================
-        // BẮN
-        // =================================================
+        if (Time.time < nextShotTime) return;
 
         Shot();
 
-        nextShotTime =
-            Time.time +
-            gunData.timeBetweenShots;
+        nextShotTime = Time.time + gunData.timeBetweenShots;
     }
-
-    // =====================================================
-    // SHOT
-    // =====================================================
 
     private void Shot()
     {
-        GunData gunData =
-            playerWeapon.CurrentGunData;
+        GunData gunData = playerWeapon.CurrentGunData;
 
-        if (gunData == null)
-            return;
+        if (gunData == null) return;
 
-        Transform firePoint =
-            playerWeapon.CurrentGunVisual != null
-                ? playerWeapon.CurrentGunVisual
-                    .GetFirePoint()
-                : null;
+        Transform firePoint = playerWeapon.CurrentGunVisual != null ? playerWeapon.CurrentGunVisual.GetFirePoint(): null;
 
         if (firePoint == null)
         {
-            Debug.LogWarning(
-                "PlayerShoot | Không tìm thấy FirePoint."
-            );
-
-            return;
+            Debug.LogWarning("PlayerShoot | Không tìm thấy FirePoint."); return;
         }
 
-        // ---------------------------------------------
-        // CONSUME AMMO
-        // ---------------------------------------------
+        if (playerAmmo == null)
+    return;
 
-        if (!playerWeapon.ConsumeAmmo())
-            return;
-
-        // ---------------------------------------------
-        // FIRE BULLET
-        // ---------------------------------------------
+if (!playerAmmo.ConsumeAmmo())
+    return;
 
         if (playerBullet != null)
         {
-            playerBullet.Fire(
-                gunData,
-                firePoint,
-                currentTarget
-            );
+            playerBullet.Fire( gunData, firePoint, currentTarget );
         }
 
-        // ---------------------------------------------
-        // RECOIL
-        // ---------------------------------------------
 
         if (gunData.recoilForce > 0f)
         {
-            CharacterController cc =
-                GetComponent<
-                    CharacterController
-                >();
+            CharacterController cc = GetComponent<CharacterController>();
 
             if (cc != null)
             {
-                cc.Move(
-                    -transform.forward *
-                    gunData.recoilForce
-                );
+                cc.Move(-transform.forward *gunData.recoilForce);
             }
         }
     }

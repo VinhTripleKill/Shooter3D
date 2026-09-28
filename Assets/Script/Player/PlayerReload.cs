@@ -12,10 +12,7 @@ public class PlayerReload : MonoBehaviour
 
     private PlayerController playerController;
     private PlayerWeapon playerWeapon;
-
-    // =====================================================
-    // INPUT
-    // =====================================================
+private PlayerAmmo playerAmmo;
 
     private InputAction reloadAction;
 
@@ -30,28 +27,26 @@ public class PlayerReload : MonoBehaviour
 
     public bool IsReloading => isReloading;
 
-    // =====================================================
-    // AWAKE
-    // =====================================================
+private void Awake()
+{
+    playerController =
+        GetComponent<PlayerController>();
 
-    private void Awake()
+    playerWeapon =
+        GetComponent<PlayerWeapon>();
+
+    playerAmmo =
+        GetComponent<PlayerAmmo>();
+
+    PlayerInput playerInput =
+        GetComponent<PlayerInput>();
+
+    if (playerInput != null)
     {
-        playerController =
-            GetComponent<PlayerController>();
-
-        playerWeapon =
-            GetComponent<PlayerWeapon>();
-
-        PlayerInput playerInput =
-            GetComponent<PlayerInput>();
-
-        if (playerInput != null)
-        {
-            reloadAction =
-                playerInput.actions["Reload"];
-        }
+        reloadAction =
+            playerInput.actions["Reload"];
     }
-
+}
     // =====================================================
     // ENABLE / DISABLE
     // =====================================================
@@ -154,12 +149,14 @@ public class PlayerReload : MonoBehaviour
         if (gunData == null)
             return;
 
-        // Đạn đã đầy
-        if (playerWeapon.CurrentAmmo >=
-            gunData.maxCountShot)
-        {
-            return;
-        }
+if (playerAmmo == null)
+    return;
+
+if (playerAmmo.CurrentAmmo >=
+    gunData.maxCountShot)
+{
+    return;
+}
 
         // Bắt đầu reload
         reloadCoroutine =
@@ -258,7 +255,7 @@ public class PlayerReload : MonoBehaviour
         // FULL AMMO
         // ---------------------------------------------
 
-        playerWeapon.SetFullAmmo();
+        playerAmmo.SetFullAmmo();
 
         // ---------------------------------------------
         // FINISH
@@ -283,7 +280,7 @@ public class PlayerReload : MonoBehaviour
                 false
             );
 
-            playerWeapon.UpdateAmmoUI();
+            playerAmmo.UpdateAmmoUI();
         }
 
         if (playerWeapon != null &&

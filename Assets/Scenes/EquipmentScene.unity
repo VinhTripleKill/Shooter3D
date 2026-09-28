@@ -5131,6 +5131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisualCharacterInfo
   characterName: {fileID: 977090544}
+  descriptionCharacter: {fileID: 925601189}
   hp_text: {fileID: 48589014}
   moveSpeed_text: {fileID: 526185108}
   manaMax_text: {fileID: 1507881896}
@@ -5139,7 +5140,7 @@ MonoBehaviour:
   critRate_text: {fileID: 336648702}
   critDamage_text: {fileID: 1998920278}
   defense_text: {fileID: 1017370537}
-  descriptionCharacter: {fileID: 925601189}
+  rangeAim_text: {fileID: 1554806302}
   skillIcon: {fileID: 1486392351}
   skillName_text: {fileID: 1249983822}
   skillStack_text: {fileID: 0}

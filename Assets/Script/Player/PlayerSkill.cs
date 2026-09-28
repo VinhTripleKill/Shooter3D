@@ -156,12 +156,18 @@ private void SkillPerformed(InputAction.CallbackContext ctx)
     if (currentSkillData == null)
         return;
 
-    // Không còn stack
     if (currentStack <= 0)
-    {
-        Debug.Log("Không thể sử dụng skill: hết stack!");
-        return;
-    }
+{
+    Debug.Log(
+        "Không thể sử dụng skill: hết stack!"
+    );
+
+    gameplayUI?.ShowSkillNotice(
+        "Insufficient quantity to execute the skill."
+    );
+
+    return;
+}
 
     if (basePlayer == null)
     {
@@ -173,14 +179,18 @@ private void SkillPerformed(InputAction.CallbackContext ctx)
     float manaCost = currentSkillData.skillCostMana;
 
     if (basePlayer.GetCurrentMana() < manaCost)
-    {
-        Debug.Log(
-            $"Không đủ mana để dùng skill {currentSkillData.skillName}! " +
-            $"Cần: {manaCost}, hiện tại: {basePlayer.GetCurrentMana()}"
-        );
+{
+    Debug.Log(
+        $"Không đủ mana để dùng skill {currentSkillData.skillName}! " +
+        $"Cần: {manaCost}, hiện tại: {basePlayer.GetCurrentMana()}"
+    );
 
-        return;
-    }
+    gameplayUI?.ShowSkillNotice(
+        "Not enought Mana"
+    );
+
+    return;
+}
 
     if (currentSkillData.skillBehaviourPrefab == null)
     {

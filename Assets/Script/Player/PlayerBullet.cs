@@ -2,25 +2,190 @@ using UnityEngine;
 
 public class PlayerBullet : MonoBehaviour
 {
+    // =====================================================
+    // REFERENCES
+    // =====================================================
+
     private PlayerController playerController;
     private PlayerWeapon playerWeapon;
 
+    // =====================================================
+    // SHOOT MODULES
+    // =====================================================
+
+    private ShootBullet shootBullet;
+    private ShootRayCast shootRayCast;
+    private ShootMissile shootMissile;
+
+    // =====================================================
+    // AWAKE
+    // =====================================================
+
     private void Awake()
     {
-        playerController = GetComponent<PlayerController>();
+        playerController =
+            GetComponent<PlayerController>();
 
-        playerWeapon = GetComponent<PlayerWeapon>();
+        playerWeapon =
+            GetComponent<PlayerWeapon>();
 
-        BulletProjectile.OnSuccessfulHit += RecoverManaByProjectileHit;
+        // -------------------------------------------------
+        // LẤY CÁC MODULE BẮN
+        // -------------------------------------------------
 
-        MissileProjectile.OnSuccessfulHit += RecoverManaByProjectileHit;
+        shootBullet =
+            GetComponent<ShootBullet>();
+
+        shootRayCast =
+            GetComponent<ShootRayCast>();
+
+        shootMissile =
+            GetComponent<ShootMissile>();
+
+        // -------------------------------------------------
+        // TỰ ADD NẾU PLAYER PREFAB CHƯA CÓ
+        // -------------------------------------------------
+
+        if (shootBullet == null)
+        {
+            shootBullet =
+                gameObject.AddComponent<ShootBullet>();
+        }
+
+        if (shootRayCast == null)
+        {
+            shootRayCast =
+                gameObject.AddComponent<ShootRayCast>();
+        }
+
+        if (shootMissile == null)
+        {
+            shootMissile =
+                gameObject.AddComponent<ShootMissile>();
+        }
+
+        // -------------------------------------------------
+        // GÁN REFERENCES
+        // -------------------------------------------------
+
+        shootBullet.Initialize(
+            this
+        );
+
+        shootRayCast.Initialize(
+            this
+        );
+
+        shootMissile.Initialize(
+            this
+        );
+
+        // -------------------------------------------------
+        // PROJECTILE HIT -> MANA
+        // -------------------------------------------------
+
+        BulletProjectile.OnSuccessfulHit +=
+            RecoverManaByProjectileHit;
+
+        MissileProjectile.OnSuccessfulHit +=
+            RecoverManaByProjectileHit;
     }
+
+    // =====================================================
+    // DESTROY
+    // =====================================================
 
     private void OnDestroy()
     {
-        BulletProjectile.OnSuccessfulHit -= RecoverManaByProjectileHit;
+        BulletProjectile.OnSuccessfulHit -=
+            RecoverManaByProjectileHit;
 
-        MissileProjectile.OnSuccessfulHit -= RecoverManaByProjectileHit;
+        MissileProjectile.OnSuccessfulHit -=
+            RecoverManaByProjectileHit;
+    }
+
+    // =====================================================
+    // CRITICAL HIT
+    // =====================================================
+
+    public bool RollCriticalHit()
+    {
+        if (playerWeapon == null)
+            return false;
+
+        float critRate =
+            playerWeapon.CritRate;
+
+        critRate =
+            Mathf.Clamp(
+                critRate,
+                0f,
+                100f
+            );
+
+        float randomValue =
+            Random.Range(
+                0f,
+                100f
+            );
+
+        return randomValue < critRate;
+    }
+
+    // =====================================================
+    // FINAL DAMAGE
+    // =====================================================
+
+    public float CalculateFinalDamage(
+        float baseDamage,
+        bool isCritical)
+    {
+        if (!isCritical)
+            return baseDamage;
+
+        float critDamage =
+            playerWeapon != null
+                ? playerWeapon.CritDamage
+                : 100f;
+
+        critDamage =
+            Mathf.Max(
+                0f,
+                critDamage
+            );
+
+        return baseDamage *
+               (critDamage / 100f);
+    }
+
+    // =====================================================
+    // SHOT DAMAGE
+    // =====================================================
+
+    public float GetShotDamage(
+        float baseDamage,
+        out bool isCritical)
+    {
+        isCritical =
+            RollCriticalHit();
+
+        float finalDamage =
+            CalculateFinalDamage(
+                baseDamage,
+                isCritical
+            );
+
+        if (isCritical)
+        {
+            Debug.Log(
+                $"PLAYER CRITICAL HIT | " +
+                $"Base: {baseDamage} | " +
+                $"CritMultiplier: {playerWeapon.CritDamage} | " +
+                $"Final: {finalDamage}"
+            );
+        }
+
+        return finalDamage;
     }
 
     // =====================================================
@@ -35,7 +200,8 @@ public class PlayerBullet : MonoBehaviour
         if (gunData == null)
         {
             Debug.LogWarning(
-                "PlayerBullet | GunData null." );
+                "PlayerBullet | GunData null."
+            );
 
             return;
         }
@@ -43,45 +209,60 @@ public class PlayerBullet : MonoBehaviour
         if (firePoint == null)
         {
             Debug.LogWarning(
-                "PlayerBullet | FirePoint null." );
+                "PlayerBullet | FirePoint null."
+            );
 
             return;
         }
 
+        // =================================================
+        // CHỌN MODULE THEO FIRE TYPE
+        // =================================================
+
         switch (gunData.fireType)
         {
-            case GunData.GunFireType.Raycast:
+            case GunData.GunFireType.Bullet:
 
-                ShootRaycast(
-                    gunData,
-                    firePoint
-                );
+                if (shootBullet != null)
+                {
+                    shootBullet.Shoot(
+                        gunData,
+                        firePoint
+                    );
+                }
 
                 break;
 
-            case GunData.GunFireType.Bullet:
+            case GunData.GunFireType.Raycast:
 
-                ShootBullet(
-                    gunData,
-                    firePoint
-                );
+                if (shootRayCast != null)
+                {
+                    shootRayCast.Shoot(
+                        gunData,
+                        firePoint
+                    );
+                }
 
                 break;
 
             case GunData.GunFireType.Missile:
 
-                ShootMissile(
-                    gunData,
-                    firePoint,
-                    currentTarget
-                );
+                if (shootMissile != null)
+                {
+                    shootMissile.Shoot(
+                        gunData,
+                        firePoint,
+                        currentTarget
+                    );
+                }
 
                 break;
 
             default:
 
                 Debug.LogWarning(
-                    $"PlayerBullet | FireType chưa được xử lý: {gunData.fireType}"
+                    $"PlayerBullet | FireType chưa được xử lý: " +
+                    $"{gunData.fireType}"
                 );
 
                 break;
@@ -89,317 +270,35 @@ public class PlayerBullet : MonoBehaviour
     }
 
     // =====================================================
-    // MISSILE
+    // RAYCAST MANA
     // =====================================================
 
-    private void ShootMissile(
-        GunData gunData,
-        Transform firePoint,
-        Transform currentTarget)
-    {
-        int pelletCount = Mathf.Max(1, gunData.pelletCount);
-
-        float angleStep = gunData.angleBetweenBullets;
-
-        float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
-
-        for (int i = 0; i < pelletCount; i++)
-        {
-            float currentAngle =
-                startAngle +
-                angleStep * i;
-
-            Quaternion fixedSpread =
-                Quaternion.Euler(
-                    0f,
-                    currentAngle,
-                    0f
-                );
-
-            Quaternion randomSpread =
-                Quaternion.Euler(
-                    Random.Range(
-                        -gunData.randomSpreadX,
-                        gunData.randomSpreadX
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadY,
-                        gunData.randomSpreadY
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadZ,
-                        gunData.randomSpreadZ
-                    )
-                );
-
-            Quaternion finalRotation =
-                firePoint.rotation *
-                fixedSpread *
-                randomSpread;
-
-            GameObject missileObj =
-                Instantiate(
-                    gunData.missilePrefab,
-                    firePoint.position,
-                    finalRotation
-                );
-
-            if (missileObj == null)
-                continue;
-
-            MissileProjectile missile =
-                missileObj.GetComponent<MissileProjectile>();
-
-            if (missile == null)
-            {
-                Debug.LogWarning(
-                    "PlayerBullet | missilePrefab không có MissileProjectile."
-                );
-
-                continue;
-            }
-
-            missile.Initialize(
-                gunData.bulletSpeed,
-                gunData.missileLifeTime,
-                gunData.damage,
-                gunData.hitMask,
-                gunData.interactionMask,
-                currentTarget
-            );
-        }
-    }
-
-    // =====================================================
-    // BULLET PROJECTILE
-    // =====================================================
-
-    private void ShootBullet(
-        GunData gunData,
-        Transform firePoint)
-    {
-        int pelletCount = Mathf.Max(1, gunData.pelletCount);
-
-        float angleStep = gunData.angleBetweenBullets;
-
-        float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
-
-        for (int i = 0; i < pelletCount; i++)
-        {
-            float currentAngle =
-                startAngle +
-                angleStep * i;
-
-            Quaternion fixedSpread =
-                Quaternion.Euler(
-                    0f,
-                    currentAngle,
-                    0f
-                );
-
-            Quaternion randomSpread =
-                Quaternion.Euler(
-                    Random.Range(
-                        -gunData.randomSpreadX,
-                        gunData.randomSpreadX
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadY,
-                        gunData.randomSpreadY
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadZ,
-                        gunData.randomSpreadZ
-                    )
-                );
-
-            Quaternion finalRotation =
-                firePoint.rotation *
-                fixedSpread *
-                randomSpread;
-
-            GameObject bulletObj =
-                Instantiate(
-                    gunData.bulletPrefab,
-                    firePoint.position,
-                    finalRotation
-                );
-
-            if (bulletObj == null)
-                continue;
-
-            BulletProjectile bullet =
-                bulletObj.GetComponent<BulletProjectile>();
-
-            if (bullet == null)
-            {
-                Debug.LogWarning(
-                    "PlayerBullet | bulletPrefab không có BulletProjectile."
-                );
-
-                continue;
-            }
-
-            bullet.Initialize(
-                finalRotation * Vector3.forward,
-                gunData.bulletSpeed,
-                gunData.damage,
-                gunData.rangeAttack,
-                gunData.hitMask,
-                gunData.interactionMask
-            );
-        }
-    }
-
-    // =====================================================
-    // RAYCAST
-    // =====================================================
-
-    private void ShootRaycast(
-        GunData gunData,
-        Transform firePoint)
-    {
-        int pelletCount = Mathf.Max(1, gunData.pelletCount);
-
-        float angleStep = gunData.angleBetweenBullets;
-
-        float startAngle = -(angleStep * (pelletCount - 1)) / 2f;
-
-        for (int i = 0; i < pelletCount; i++)
-        {
-            float currentAngle =
-                startAngle +
-                angleStep * i;
-
-            Quaternion spread =
-                Quaternion.Euler(
-                    Random.Range(
-                        -gunData.randomSpreadX,
-                        gunData.randomSpreadX
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadY,
-                        gunData.randomSpreadY
-                    ),
-
-                    Random.Range(
-                        -gunData.randomSpreadZ,
-                        gunData.randomSpreadZ
-                    )
-                );
-
-            Vector3 direction =
-                (
-                    firePoint.rotation *
-                    Quaternion.Euler(
-                        0f,
-                        currentAngle,
-                        0f
-                    ) *
-                    spread
-                ) *
-                Vector3.forward;
-
-            Vector3 startPos =
-                firePoint.position;
-
-            Vector3 endPos;
-
-            RaycastHit hit;
-
-            if (Physics.SphereCast(
-                startPos,
-                gunData.hitRadius,
-                direction,
-                out hit,
-                gunData.rangeAttack,
-                gunData.hitMask,
-                QueryTriggerInteraction.Ignore))
-            {
-                endPos = hit.point;
-
-                IDamageable damageable =
-                    hit.collider
-                        .GetComponentInParent<IDamageable>();
-
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(
-                        gunData.damage
-                    );
-
-                    ProcessRaycastHit(
-                        gunData,
-                        hit.collider
-                    );
-                }
-            }
-            else
-            {
-                endPos =
-                    startPos +
-                    direction *
-                    gunData.rangeAttack;
-            }
-
-            SpawnTrail(
-                startPos,
-                endPos,
-                gunData
-            );
-        }
-    }
-
-    // =====================================================
-    // RAYCAST HIT
-    // =====================================================
-
-    private void ProcessRaycastHit(
+    public void RecoverManaByRaycastHit(
         GunData gunData,
         Collider hitCollider)
     {
-        if (playerController == null) return;
+        if (playerController == null)
+            return;
 
-        if ( (
+        if (gunData == null)
+            return;
+
+        if (hitCollider == null)
+            return;
+
+        if (
+            (
                 (1 << hitCollider.gameObject.layer)
                 &
-                gunData.interactionMask ) == 0)
+                gunData.interactionMask
+            ) == 0
+        )
         {
             return;
         }
 
-        playerController.RecoverMana( gunData.manaRecoveryByHit
-        );
-    }
-
-    // =====================================================
-    // TRAIL
-    // =====================================================
-
-    private void SpawnTrail(
-        Vector3 start,
-        Vector3 end,
-        GunData gunData)
-    {
-        if (gunData.bulletPrefab == null) return;
-
-        GameObject trailObj = Instantiate(
-                gunData.bulletPrefab,
-                start,
-                Quaternion.identity );
-
-        if (trailObj == null) return;
-
-        BulletRayTrail trail = trailObj.GetComponent<BulletRayTrail>();
-
-        if (trail == null) return;
-
-        trail.Initialize( start, end, gunData.bulletSpeed
+        playerController.RecoverMana(
+            gunData.manaRecoveryByHit
         );
     }
 
@@ -409,14 +308,23 @@ public class PlayerBullet : MonoBehaviour
 
     private void RecoverManaByProjectileHit()
     {
-        if (playerWeapon == null) return;
+        if (playerWeapon == null)
+            return;
 
-        if (!playerWeapon.HasGun) return;
+        if (!playerWeapon.HasGun)
+            return;
 
-        GunData gunData = playerWeapon.CurrentGunData;
+        GunData gunData =
+            playerWeapon.CurrentGunData;
 
-        if (gunData == null) return;
+        if (gunData == null)
+            return;
 
-        playerController.RecoverMana( gunData.manaRecoveryByHit );
+        if (playerController == null)
+            return;
+
+        playerController.RecoverMana(
+            gunData.manaRecoveryByHit
+        );
     }
 }

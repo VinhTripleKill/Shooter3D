@@ -14,10 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Farmer
   icon: {fileID: 21300000, guid: a20e0c61cccf24f48b61916f3440ae05, type: 3}
-  descriptionCharacter: A kind-hearted farmer lives in a dark Halloween world and
-    must survive day after day using his knowledge of plants. He has researched and
-    developed plant species that can be used for combat, as raw materials, and as
-    food... Truly diverse.
+  descriptionCharacter: A kind-hearted farmer lives in a dark Halloween world and must survive day after day using his knowledge of plants. He has researched and developed plant species that can be used for combat, as raw materials, and as food... Truly diverse.
   modelPrefab: {fileID: 6685473335534931949, guid: 9a2a1f84dc244f94cafa0e3f05f7f322, type: 3}
   CharacterStats:
     maxHp: 100
@@ -25,7 +22,7 @@ MonoBehaviour:
     damage: 2
     maxMana: 50
     maxSprint: 50
-    critRate: 20
+    critRate: 5
     critDamage: 145
     defense: 20
-  ultimatePrefab: {fileID: 4903482773645303173, guid: 472065138261b2b46bfee5c7bbfbcad8, type: 3}
+    attackRange: 15
