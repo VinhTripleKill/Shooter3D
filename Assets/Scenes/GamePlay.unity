@@ -3867,10 +3867,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b857a9bd8f51743b4969d07d867252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemiesPrefab:
-  - {fileID: 5560677049981004104, guid: ecaa44017465a3746a922dd65ce0fd71, type: 3}
-  - {fileID: 6245144483180953006, guid: 379a164583f5cc14fbc2444cebbd5249, type: 3}
-  - {fileID: 8861852149474711234, guid: 5c6a64ad7827fb94c957d3339550b957, type: 3}
+  enemyDatabase: {fileID: 11400000, guid: fb38e62a1805e6c4289e31a07485a391, type: 2}
   spawnPoints:
   - {fileID: 2062239140}
   - {fileID: 333983857}
@@ -6983,7 +6980,7 @@ PrefabInstance:
     - target: {fileID: 5204006583843564281, guid: 1f4b8cf9942749c4fabff20ed5b2b3c7, type: 3}
       propertyPath: playerSpawn
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 749571701}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

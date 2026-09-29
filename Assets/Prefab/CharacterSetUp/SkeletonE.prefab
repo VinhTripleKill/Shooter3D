@@ -162,10 +162,11 @@ GameObject:
   - component: {fileID: 1116965221204994791}
   - component: {fileID: 6141354104481441724}
   - component: {fileID: 36785428418725443}
-  - component: {fileID: -5816999615630920678}
   - component: {fileID: 245981241914583162}
   - component: {fileID: 4155105944922297310}
   - component: {fileID: 6315641984747758042}
+  - component: {fileID: -7608900392924328921}
+  - component: {fileID: -2674027756655432066}
   m_Layer: 7
   m_Name: SkeletonE
   m_TagString: Untagged
@@ -256,23 +257,6 @@ MonoBehaviour:
   randomZ: 0.6
   enemyDamageColor: {r: 1, g: 1, b: 1, a: 1}
   playerDamageColor: {r: 1, g: 0, b: 0, a: 1}
---- !u!114 &-5816999615630920678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6245144483180953006}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91b6a0d7cd6765f4fb04804784b88e94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  maxHp: 80
-  currentHp: 0
-  expReward: 500
-  coinReward: 30
-  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!114 &245981241914583162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,6 +305,37 @@ MonoBehaviour:
   explosionRange: 3
   explosionDelay: 1
   explosionCommit: 0.5
+--- !u!114 &-7608900392924328921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6245144483180953006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b7a729f805a174bac743d0e43b5c4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCharacter
+  enemyData: {fileID: 11400000, guid: 09c20e2c1d801764daa17e13366b6323, type: 2}
+--- !u!114 &-2674027756655432066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6245144483180953006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ef337ae304ea64e9097b993af43bf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieEnemy
+  maxHp: 0
+  defense: 0
+  currentHp: 0
+  expReward: 50
+  coinReward: 20
+  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!1 &6293940574844318914
 GameObject:
   m_ObjectHideFlags: 0

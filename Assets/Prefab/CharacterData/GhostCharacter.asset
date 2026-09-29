@@ -19,7 +19,7 @@ MonoBehaviour:
   CharacterStats:
     maxHp: 50
     moveSpeed: 5.2
-    damage: 5
+    atk: 5
     maxMana: 100
     maxSprint: 100
     critRate: 10

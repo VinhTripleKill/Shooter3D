@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c77aa003df7fd842ab2f99fbb80bf83, type: 3}
+  m_Name: Zombie
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  enemyName: Zombie
+  icon: {fileID: 21300000, guid: 50d87f3f2d57ad84ea83143de9300712, type: 3}
+  descriptionEnemy: They are very dangerous because they originate from a viral infection. You, too, could become infected if you happen to be bitten by one.
+  enemyPrefab: {fileID: 8861852149474711234, guid: 5c6a64ad7827fb94c957d3339550b957, type: 3}
+  maxHp: 100
+  moveSpeed: 3.5
+  atk: 10
+  defense: 0
+  enemyRanged: 2
+  atkCD: 3
+  expReward: 100
+  coinReward: 100
+  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}

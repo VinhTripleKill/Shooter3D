@@ -376,6 +376,7 @@ GameObject:
   - component: {fileID: 992629607792777896}
   - component: {fileID: 8792460920715425711}
   - component: {fileID: 5755760679366919100}
+  - component: {fileID: -1498084230337109250}
   m_Layer: 7
   m_Name: ZombieE
   m_TagString: Untagged
@@ -412,7 +413,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80ef337ae304ea64e9097b993af43bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieEnemy
-  maxHp: 100
+  maxHp: 0
+  defense: 0
   currentHp: 0
   expReward: 50
   coinReward: 20
@@ -528,6 +530,19 @@ MonoBehaviour:
   atkCD: 1.5
   typeFace: 0
   attackAngle: 90
+--- !u!114 &-1498084230337109250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8861852149474711234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b7a729f805a174bac743d0e43b5c4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCharacter
+  enemyData: {fileID: 11400000, guid: 503a2d1881a1e98419f8262e098cf51b, type: 2}
 --- !u!1001 &8535238557583714450
 PrefabInstance:
   m_ObjectHideFlags: 0

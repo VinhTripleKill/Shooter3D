@@ -37,7 +37,15 @@ public void SetAttackRange(float newRange)
 {
     atkRange = Mathf.Max(0f, newRange);
 }
+public void SetAttackDamage(float value)
+{
+    atkDamage = Mathf.Max(0f, value);
+}
 
+public void SetAttackCooldown(float value)
+{
+    atkCD = Mathf.Max(0f, value);
+}
     public virtual bool ShouldKeepAttackState => false;
 
     // =========================================================

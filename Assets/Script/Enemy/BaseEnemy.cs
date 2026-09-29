@@ -3,13 +3,12 @@ using UnityEngine;
 
 public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
 {
+    protected EnemyCharacter enemyCharacter;
 
-    [Header("Reward")]
-    [SerializeField] protected int expReward = 200;
-    [SerializeField] protected int coinReward = 1;
-    [SerializeField] protected GameObject coinPrefab;
-
-
+public EnemyData EnemyData =>
+    enemyCharacter != null
+        ? enemyCharacter.Data
+        : null;
     protected EnemyAnim enemyAnim;
 
     private Collider[] enemyColliders;
@@ -28,14 +27,19 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     }
 
 
-    protected override void Awake()
-    {
-        base.Awake();
+protected override void Awake()
+{
+    base.Awake();
 
-        enemyColliders = GetComponentsInChildren<Collider>();
+    enemyCharacter =
+        GetComponent<EnemyCharacter>();
 
-        enemyAnim = GetComponentInChildren<EnemyAnim>();
-    }
+    enemyColliders =
+        GetComponentsInChildren<Collider>();
+
+    enemyAnim =
+        GetComponentInChildren<EnemyAnim>();
+}
 
 
     protected virtual void DisableCollision()
@@ -215,54 +219,104 @@ public abstract class BaseEnemy : BaseCharacter, IAutoAimTarget
     }
 
 
-    protected virtual void GiveReward()
-    {
+protected virtual void GiveReward()
+{
+    EnemyData data = EnemyData;
 
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+    if (data == null)
+    {
+        Debug.LogWarning(
+            $"[{name}] Không có EnemyData -> Không thể nhận Reward."
+        );
+
+        return;
+    }
+
+
+    // =========================================================
+    // EXP
+    // =========================================================
+
+    if (data.expReward > 0)
+    {
+        GameObject playerObject =
+            GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
         {
-            PlayerProgress pp = playerObject.GetComponent<PlayerProgress>();
+            PlayerProgress pp =
+                playerObject.GetComponent<PlayerProgress>();
 
             if (pp != null)
             {
-                pp.AddExp(expReward);
+                pp.AddExp(
+                    data.expReward
+                );
             }
         }
-
-
-        SpawnCoinReward();
     }
 
 
-    protected virtual void SpawnCoinReward()
+    // =========================================================
+    // COIN
+    // =========================================================
+
+    SpawnCoinReward(data);
+}
+
+protected virtual void SpawnCoinReward(
+    EnemyData data
+)
+{
+    if (data == null)
+        return;
+
+
+    if (data.coinPrefab == null)
     {
-        if (coinPrefab == null)
-        {
-            Debug.LogWarning($"[{name}] Chưa gán Coin Prefab.");
+        Debug.LogWarning(
+            $"[{name}] EnemyData chưa có Coin Prefab."
+        );
 
-            return;
-        }
-
-        if (coinReward <= 0) return;
-
-
-        GameObject coinObject = Instantiate( coinPrefab, transform.position, Quaternion.identity );
-
-
-        ItemCoin coin = coinObject.GetComponent<ItemCoin>();
-
-
-        if (coin == null)
-        {
-            Debug.LogError($"[{name}] Coin Prefab không có ItemCoin." );
-
-            Destroy(coinObject);
-
-            return;
-        }
-
-
-        coin.SetCoinValue(coinReward);
+        return;
     }
+
+
+    if (data.coinReward <= 0)
+        return;
+
+
+    GameObject coinObject =
+        Instantiate(
+            data.coinPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+
+
+    ItemCoin coin =
+        coinObject.GetComponent<ItemCoin>();
+
+
+    if (coin == null)
+    {
+        Debug.LogError(
+            $"[{name}] Coin Prefab trong EnemyData " +
+            $"không có ItemCoin."
+        );
+
+        Destroy(coinObject);
+
+        return;
+    }
+
+
+    coin.SetCoinValue(
+        data.coinReward
+    );
+}
+
+
+
+
 }

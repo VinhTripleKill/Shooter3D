@@ -4,15 +4,46 @@ using System.Collections.Generic;
 
 public class EnemyWaveSpawn : MonoBehaviour
 {
+    // =========================================================
+    // ENEMY DATABASE
+    // =========================================================
+
+    [Header("Enemy Database")]
+    [SerializeField]
+    private EnemyDatabase enemyDatabase;
+
+
+    // =========================================================
+    // SPAWN POINTS
+    // =========================================================
+
     [Header("Spawn Settings")]
-    [SerializeField] private List<GameObject> enemiesPrefab = new List<GameObject>();
-    [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
+    [SerializeField]
+    private List<Transform> spawnPoints =
+        new List<Transform>();
+
+
+    // =========================================================
+    // WAVE SETTINGS
+    // =========================================================
 
     [Header("Wave Settings")]
-    [SerializeField] private int startingWave = 1;
-    [SerializeField] private float delayBeforeFirstWave = 2f;
-    [SerializeField] private float timeBetweenWaves = 1.5f;
-    [SerializeField] private CoreGameUI coreGameUI;
+    [SerializeField]
+    private int startingWave = 1;
+
+    [SerializeField]
+    private float delayBeforeFirstWave = 2f;
+
+    [SerializeField]
+    private float timeBetweenWaves = 1.5f;
+
+    [SerializeField]
+    private CoreGameUI coreGameUI;
+
+
+    // =========================================================
+    // RUNTIME
+    // =========================================================
 
     private int currentWave = 1;
     private int playerKillCount = 0;
@@ -28,9 +59,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     private Coroutine nextWaveCoroutine;
 
 
-    // =====================================================
+    // =========================================================
     // START
-    // =====================================================
+    // =========================================================
 
     private void Start()
     {
@@ -42,11 +73,18 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
+    // =========================================================
+    // WAIT PLAYER
+    // =========================================================
+
     private IEnumerator WaitForPlayerAndStartWave()
     {
         yield return new WaitForSeconds(0.5f);
 
-        while (GameObject.FindGameObjectWithTag("Player") == null)
+        while (
+            GameObject.FindGameObjectWithTag("Player")
+            == null
+        )
         {
             yield return new WaitForSeconds(0.2f);
         }
@@ -59,9 +97,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // START WAVE
-    // =====================================================
+    // =========================================================
 
     public void StartNextWave()
     {
@@ -74,20 +112,34 @@ public class EnemyWaveSpawn : MonoBehaviour
         if (gameOver)
             return;
 
-        // Kiểm tra prefab
-        if (enemiesPrefab == null ||
-            enemiesPrefab.Count == 0)
+
+        // =====================================================
+        // DATABASE
+        // =====================================================
+
+        if (
+            enemyDatabase == null ||
+            enemyDatabase.Enemies == null ||
+            enemyDatabase.Enemies.Count == 0
+        )
         {
             Debug.LogError(
-                "EnemyWaveSpawn: Chưa gán Enemy Prefab!"
+                "EnemyWaveSpawn: Chưa gán EnemyDatabase " +
+                "hoặc EnemyDatabase không có EnemyData!"
             );
 
             return;
         }
 
-        // Kiểm tra spawn point
-        if (spawnPoints == null ||
-            spawnPoints.Count == 0)
+
+        // =====================================================
+        // SPAWN POINT
+        // =====================================================
+
+        if (
+            spawnPoints == null ||
+            spawnPoints.Count == 0
+        )
         {
             Debug.LogError(
                 "EnemyWaveSpawn: Chưa gán Spawn Points!"
@@ -96,18 +148,28 @@ public class EnemyWaveSpawn : MonoBehaviour
             return;
         }
 
+
+        // =====================================================
+        // START
+        // =====================================================
+
         waveInProgress = true;
 
         currentWaveEnemies.Clear();
 
+
         int totalEnemyCount =
-            enemiesPrefab.Count * currentWave;
+            enemyDatabase.Enemies.Count *
+            currentWave;
+
 
         Debug.Log(
             $"=== WAVE {currentWave} BẮT ĐẦU === " +
-            $"SPAWN {enemiesPrefab.Count} LOẠI x {currentWave} = " +
+            $"SPAWN {enemyDatabase.Enemies.Count} LOẠI x " +
+            $"{currentWave} = " +
             $"{totalEnemyCount} ENEMIES"
         );
+
 
         spawnCoroutine =
             StartCoroutine(
@@ -116,37 +178,72 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // SPAWN WAVE
-    // =====================================================
+    // =========================================================
 
     private IEnumerator SpawnWaveCoroutine()
     {
         isSpawning = true;
 
-        foreach (GameObject enemyPrefab in enemiesPrefab)
+
+        foreach (
+            EnemyData enemyData
+            in enemyDatabase.Enemies
+        )
         {
-            // Kiểm tra prefab null
-            if (enemyPrefab == null)
+            // =================================================
+            // NULL DATA
+            // =================================================
+
+            if (enemyData == null)
             {
                 Debug.LogWarning(
-                    "EnemyWaveSpawn: Có Enemy Prefab đang bị null!"
+                    "EnemyWaveSpawn: Có EnemyData null!"
                 );
 
                 continue;
             }
 
-            // Mỗi loại enemy spawn = currentWave
-            for (int i = 0; i < currentWave; i++)
+
+            // =================================================
+            // PREFAB
+            // =================================================
+
+            if (enemyData.enemyPrefab == null)
             {
-                // Nếu Game Over thì dừng spawn
+                Debug.LogWarning(
+                    $"EnemyWaveSpawn: EnemyData " +
+                    $"'{enemyData.enemyName}' " +
+                    $"chưa có Enemy Prefab!"
+                );
+
+                continue;
+            }
+
+
+            // =================================================
+            // SPAWN
+            // =================================================
+
+            for (
+                int i = 0;
+                i < currentWave;
+                i++
+            )
+            {
                 if (gameOver)
                 {
                     isSpawning = false;
+
                     yield break;
                 }
 
-                // Lấy Spawn Point random
+
+                // =============================================
+                // RANDOM SPAWN POINT
+                // =============================================
+
                 Transform spawnPoint =
                     spawnPoints[
                         Random.Range(
@@ -155,17 +252,50 @@ public class EnemyWaveSpawn : MonoBehaviour
                         )
                     ];
 
-                // Spawn enemy
+
+                // =============================================
+                // INSTANTIATE
+                // =============================================
+
                 GameObject enemyObj =
                     Instantiate(
-                        enemyPrefab,
+                        enemyData.enemyPrefab,
                         spawnPoint.position,
                         spawnPoint.rotation
                     );
 
-                // Lấy BaseEnemy
+
+                // =============================================
+                // APPLY ENEMY DATA
+                // =============================================
+
+                EnemyCharacter enemyCharacter =
+                    enemyObj.GetComponent<EnemyCharacter>();
+
+
+                if (enemyCharacter != null)
+                {
+                    enemyCharacter.SetEnemyData(
+                        enemyData
+                    );
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"Enemy Prefab " +
+                        $"'{enemyData.enemyPrefab.name}' " +
+                        $"không có EnemyCharacter!"
+                    );
+                }
+
+
+                // =============================================
+                // BASE ENEMY
+                // =============================================
+
                 BaseEnemy enemy =
                     enemyObj.GetComponent<BaseEnemy>();
+
 
                 if (enemy != null)
                 {
@@ -176,19 +306,21 @@ public class EnemyWaveSpawn : MonoBehaviour
                 else
                 {
                     Debug.LogWarning(
-                        $"Enemy Prefab '{enemyPrefab.name}' " +
+                        $"Enemy Prefab " +
+                        $"'{enemyData.enemyPrefab.name}' " +
                         $"không có BaseEnemy component!"
                     );
                 }
 
+
                 /*
-                 * Nếu muốn spawn từng enemy cách nhau,
-                 * có thể bật dòng này:
+                 * Nếu muốn spawn từng enemy cách nhau:
                  *
                  * yield return new WaitForSeconds(0.2f);
                  */
             }
         }
+
 
         isSpawning = false;
 
@@ -198,9 +330,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // ENEMY DIED
-    // =====================================================
+    // =========================================================
 
     public void OnEnemyDied(BaseEnemy enemy)
     {
@@ -213,9 +345,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // UPDATE
-    // =====================================================
+    // =========================================================
 
     private void Update()
     {
@@ -225,28 +357,27 @@ public class EnemyWaveSpawn : MonoBehaviour
         if (!waveInProgress)
             return;
 
-        // Xóa enemy null
+
         currentWaveEnemies.RemoveAll(
             enemy => enemy == null
         );
 
-        /*
-         * Khi:
-         *
-         * - Không còn enemy
-         * - Và đã spawn xong
-         *
-         * => Wave hoàn thành
-         */
 
-        if (currentWaveEnemies.Count == 0 &&
-            !isSpawning)
+        // =====================================================
+        // WAVE COMPLETE
+        // =====================================================
+
+        if (
+            currentWaveEnemies.Count == 0 &&
+            !isSpawning
+        )
         {
             waveInProgress = false;
 
             coreGameUI?.OnWaveChanged();
 
             currentWave++;
+
 
             nextWaveCoroutine =
                 StartCoroutine(
@@ -256,9 +387,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // NEXT WAVE DELAY
-    // =====================================================
+    // =========================================================
 
     private IEnumerator NextWaveDelay()
     {
@@ -266,8 +397,10 @@ public class EnemyWaveSpawn : MonoBehaviour
             timeBetweenWaves
         );
 
+
         if (gameOver)
             yield break;
+
 
         StartNextWave();
 
@@ -275,9 +408,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // GAME OVER
-    // =====================================================
+    // =========================================================
 
     public void GameOver()
     {
@@ -286,11 +419,13 @@ public class EnemyWaveSpawn : MonoBehaviour
 
         gameOver = true;
 
+
         Debug.Log(
-            "EnemyWaveSpawn: GAME OVER - DỪNG TOÀN BỘ SPAWN"
+            "EnemyWaveSpawn: GAME OVER - " +
+            "DỪNG TOÀN BỘ SPAWN"
         );
 
-        // Dừng coroutine spawn
+
         if (spawnCoroutine != null)
         {
             StopCoroutine(spawnCoroutine);
@@ -298,7 +433,7 @@ public class EnemyWaveSpawn : MonoBehaviour
             spawnCoroutine = null;
         }
 
-        // Dừng coroutine wave tiếp theo
+
         if (nextWaveCoroutine != null)
         {
             StopCoroutine(nextWaveCoroutine);
@@ -306,8 +441,10 @@ public class EnemyWaveSpawn : MonoBehaviour
             nextWaveCoroutine = null;
         }
 
+
         isSpawning = false;
         waveInProgress = false;
+
 
         KillAllEnemies();
 
@@ -315,23 +452,22 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // KILL ALL ENEMIES
-    // =====================================================
+    // =========================================================
 
     private void KillAllEnemies()
     {
-        /*
-         * Tạo bản sao để tránh lỗi
-         * khi danh sách bị thay đổi trong lúc Die()
-         */
-
         List<BaseEnemy> enemiesToKill =
             new List<BaseEnemy>(
                 BaseEnemy.AllEnemies
             );
 
-        foreach (BaseEnemy enemy in enemiesToKill)
+
+        foreach (
+            BaseEnemy enemy
+            in enemiesToKill
+        )
         {
             if (enemy == null)
                 continue;
@@ -342,23 +478,24 @@ public class EnemyWaveSpawn : MonoBehaviour
             enemy.ForceKill();
         }
 
+
         currentWaveEnemies.Clear();
     }
 
 
-    // =====================================================
+    // =========================================================
     // DESTROY ALL ENEMIES IMMEDIATELY
-    // =====================================================
+    // =========================================================
 
     public void DestroyAllEnemiesImmediately()
     {
-        // Dừng coroutine spawn / wave cũ
         if (spawnCoroutine != null)
         {
             StopCoroutine(spawnCoroutine);
 
             spawnCoroutine = null;
         }
+
 
         if (nextWaveCoroutine != null)
         {
@@ -367,20 +504,21 @@ public class EnemyWaveSpawn : MonoBehaviour
             nextWaveCoroutine = null;
         }
 
+
         isSpawning = false;
         waveInProgress = false;
 
-        /*
-         * Tạo bản sao để tránh lỗi
-         * khi enemy bị Destroy
-         */
 
         List<BaseEnemy> enemiesToDestroy =
             new List<BaseEnemy>(
                 BaseEnemy.AllEnemies
             );
 
-        foreach (BaseEnemy enemy in enemiesToDestroy)
+
+        foreach (
+            BaseEnemy enemy
+            in enemiesToDestroy
+        )
         {
             if (enemy == null)
                 continue;
@@ -388,10 +526,11 @@ public class EnemyWaveSpawn : MonoBehaviour
             Destroy(enemy.gameObject);
         }
 
-        // Xóa danh sách enemy cũ
+
         BaseEnemy.AllEnemies.Clear();
 
         currentWaveEnemies.Clear();
+
 
         Debug.Log(
             "Đã Destroy toàn bộ enemy của màn chơi cũ."
@@ -399,9 +538,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // GET CURRENT WAVE
-    // =====================================================
+    // =========================================================
 
     public int GetCurrentWave()
     {
@@ -409,9 +548,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // GET REMAINING ENEMIES
-    // =====================================================
+    // =========================================================
 
     public int GetRemainingEnemiesInWave()
     {
@@ -423,13 +562,12 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // RESET WAVES
-    // =====================================================
+    // =========================================================
 
     public void ResetWaves()
     {
-        // Xóa toàn bộ enemy cũ trước
         DestroyAllEnemiesImmediately();
 
         currentWave = startingWave;
@@ -443,8 +581,8 @@ public class EnemyWaveSpawn : MonoBehaviour
         spawnCoroutine = null;
         nextWaveCoroutine = null;
 
-        // Reset player kill
         playerKillCount = 0;
+
 
         Debug.Log(
             "EnemyWaveSpawn đã Reset hoàn toàn."
@@ -452,9 +590,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    // =====================================================
+    // =========================================================
     // PLAYER KILL
-    // =====================================================
+    // =========================================================
 
     public int GetPlayerKillCount()
     {
@@ -462,7 +600,9 @@ public class EnemyWaveSpawn : MonoBehaviour
     }
 
 
-    public void RegisterPlayerKill(BaseEnemy enemy)
+    public void RegisterPlayerKill(
+        BaseEnemy enemy
+    )
     {
         if (gameOver)
             return;
@@ -472,8 +612,10 @@ public class EnemyWaveSpawn : MonoBehaviour
 
         playerKillCount++;
 
+
         Debug.Log(
-            $"PLAYER KILL +1 | TOTAL = {playerKillCount}"
+            $"PLAYER KILL +1 | TOTAL = " +
+            $"{playerKillCount}"
         );
     }
 }

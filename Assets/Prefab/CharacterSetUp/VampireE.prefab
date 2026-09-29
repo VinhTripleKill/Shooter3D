@@ -224,9 +224,10 @@ GameObject:
   - component: {fileID: 2002584096009711695}
   - component: {fileID: 8725889041969683396}
   - component: {fileID: 6326173182051484995}
-  - component: {fileID: 7055199782488046001}
   - component: {fileID: 2254645638991926694}
   - component: {fileID: 4450060975248981470}
+  - component: {fileID: -1194765761767178907}
+  - component: {fileID: 7400792628890894068}
   m_Layer: 7
   m_Name: VampireE
   m_TagString: Untagged
@@ -346,23 +347,6 @@ MonoBehaviour:
   mediumUpdateRate: 0.25
   farUpdateRate: 0.5
   veryFarUpdateRate: 0.75
---- !u!114 &7055199782488046001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5560677049981004104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08e91972e0d81aa4f8111af0a187c665, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VampireEnemy
-  maxHp: 50
-  currentHp: 0
-  expReward: 250
-  coinReward: 50
-  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!114 &2254645638991926694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,7 +360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRange
   atkRange: 7
-  atkDamage: 2
+  atkDamage: 1
   atkCD: 2
   typeFace: 0
   bulletPrefab: {fileID: 5457231402988934519, guid: 468a57f28e2d9b7438934282fa8f3ad0, type: 3}
@@ -411,6 +395,37 @@ MonoBehaviour:
   drawRay: 1
   clearColor: {r: 0, g: 1, b: 0, a: 1}
   blockedColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &-1194765761767178907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560677049981004104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b7a729f805a174bac743d0e43b5c4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCharacter
+  enemyData: {fileID: 11400000, guid: 121c58d024d002946a592075322ad8fa, type: 2}
+--- !u!114 &7400792628890894068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5560677049981004104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ef337ae304ea64e9097b993af43bf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieEnemy
+  maxHp: 0
+  defense: 0
+  currentHp: 0
+  expReward: 50
+  coinReward: 20
+  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!1 &7589948848613995458
 GameObject:
   m_ObjectHideFlags: 0

@@ -201,6 +201,8 @@ public class PlayerSpawn : MonoBehaviour
             currentPlayer.GetComponent<PlayerInteraction>();
         PlayerAmmo ammo =
     currentPlayer.GetComponent<PlayerAmmo>();
+    BaseCharacter baseCharacter =
+    currentPlayer.GetComponent<BaseCharacter>();
         // =================================================
         // CHARACTER
         // =================================================
@@ -235,6 +237,7 @@ public class PlayerSpawn : MonoBehaviour
                 $"CritDamage: {character.CharacterStats.critDamage}"
             );
         }
+        if (baseCharacter != null) { float defense = character.CharacterStats.defense; baseCharacter.SetDefense( defense ); Debug.Log( $"PlayerSpawn | Defense Loaded | " + $"Defense: {defense} | " + $"Runtime Defense: {baseCharacter.CurrentDefense}" ); }
         if (ammo != null)
 {
     ammo.SetGameplayUI(
