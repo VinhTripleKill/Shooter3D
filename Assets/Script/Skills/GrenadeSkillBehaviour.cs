@@ -129,10 +129,47 @@ public class GrenadeSkillBehaviour : SkillBehaviour
             firePoint.position,
             groundPosition
         );
-
+        PlayThrowSFX(firePoint.position);
         return true;
     }
+private void PlayThrowSFX(Vector3 position)
+{
+    if (skillData.throwSFXPrefab == null)
+    {
+        Debug.LogWarning(
+            "GrenadeSkillBehaviour | " +
+            "throwSFXPrefab chưa được gán!"
+        );
 
+        return;
+    }
+
+    GameObject throwSFXObject =
+        Instantiate(
+            skillData.throwSFXPrefab,
+            position,
+            Quaternion.identity
+        );
+
+    ThrowSFX sfx =
+        throwSFXObject.GetComponent<ThrowSFX>();
+
+    if (sfx != null)
+    {
+        sfx.Initialize(
+            skillData.throwSFX
+        );
+    }
+    else
+    {
+        Debug.LogWarning(
+            "GrenadeSkillBehaviour | " +
+            "throwSFXPrefab không có component ThrowSFX!"
+        );
+
+        Destroy(throwSFXObject);
+    }
+}
     // =============================================================
     // TARGET -> GROUND RAYCAST
     // =============================================================

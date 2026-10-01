@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48710c2f00548ed4f8d2c0f1ef341da7, type: 3}
+  m_Name: FragGrenade
+  m_EditorClassIdentifier: Assembly-CSharp::GrenadeSkillData
+  skillName: ExGre
+  icon: {fileID: 21300000, guid: 4fdb3fb90cca2cc458cd869e6f489aa5, type: 3}
+  cooldown: 5
+  maxStack: 3
+  rangeRadius: 10
+  skillCostMana: 20
+  skillBehaviourPrefab: {fileID: 7897214159764592600, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
+  skillSFXPrefab: {fileID: 2264942174675488685, guid: 90860f9c877fcc64e965de7f2b49a298, type: 3}
+  skillSFX: {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
+  grenadePrefab: {fileID: 4116265864312067926, guid: ec4397b13c65b6f46b951204c3fc9511, type: 3}
+  throwSFXPrefab: {fileID: 2264942174675488685, guid: 4a54f576114948f49b6772ef1172231d, type: 3}
+  throwSFX: {fileID: 8300000, guid: ada4319dc7b507547bfefbeda133745b, type: 3}
+  explosionPrefab: {fileID: 2195401069695916235, guid: 00f29969904a6024990a6dcf6f674ab9, type: 3}
+  moveSpeed: 8
+  arriveDistance: 0.01
+  arcHeightNear: 0.1
+  arcHeightFar: 4
+  distanceForMaxArc: 15
+  speedRotX: 360
+  speedRotY: 60
+  speedRotZ: 90
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 3072
+  wallBounceForce: 1
+  wallUpwardForce: 0.25
+  minimumBounceSpeed: 1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8
+  explodeDelay: 3
+  explodeRadius: 3
+  damage: 30
+  effectMask:
+    serializedVersion: 2
+    m_Bits: 640

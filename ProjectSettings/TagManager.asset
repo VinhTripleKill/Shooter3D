@@ -16,8 +16,8 @@ TagManager:
   - Player
   - Target
   - Wall
-  - 
-  - 
+  - CanFade
+  - Item
   - 
   - 
   - 

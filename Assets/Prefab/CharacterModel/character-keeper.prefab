@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2881146771054592712}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GunHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81,15 +81,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7134394785105016132, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -5151492872390713093, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -5069531478518834764, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -5017971254852617305, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -129,7 +129,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3250163066507786643, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4314722597813798244, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: d4a387b64d6249d40a2bbcc68e1b8c84, type: 2}
     - target: {fileID: 5788240856288092216, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7604367576434143486, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -145,7 +145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8303906797054990637, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8891244130364874969, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -161,7 +161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8908311948669537042, guid: bf61ad2aeb5f0c9478632d097a90ba4e, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

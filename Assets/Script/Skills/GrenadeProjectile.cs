@@ -349,49 +349,82 @@ public class GrenadeProjectile : MonoBehaviour
     }
 
     // =============================================================
-    // EXPLODE
-    // =============================================================
+// EXPLODE
+// =============================================================
 
-    private void Explode()
+private void Explode()
+{
+    if (exploded)
+        return;
+
+    exploded = true;
+
+    StopAllCoroutines();
+
+    Vector3 explosionPosition =
+        transform.position;
+
+    // =========================================================
+    // SPAWN EXPLOSION EFFECT
+    // =========================================================
+
+    if (data.explosionPrefab != null)
     {
-        if (exploded)
-            return;
+        GameObject explosion =
+            Instantiate(
+                data.explosionPrefab,
+                explosionPosition,
+                Quaternion.identity
+            );
 
-        exploded = true;
+        ExplosionEffect effect =
+            explosion.GetComponent<ExplosionEffect>();
 
-        StopAllCoroutines();
-
-        Vector3 explosionPosition =
-            transform.position;
-
-        // =========================================================
-        // SPAWN EXPLOSION
-        // =========================================================
-
-        if (data.explosionPrefab != null)
+        if (effect != null)
         {
-            GameObject explosion =
-                Instantiate(
-                    data.explosionPrefab,
-                    explosionPosition,
-                    Quaternion.identity
-                );
-
-            ExplosionEffect effect =
-                explosion.GetComponent<ExplosionEffect>();
-
-            if (effect != null)
-            {
-                effect.Initialize(data);
-            }
+            effect.Initialize(data);
         }
-
-        Destroy(gameObject);
     }
 
-    // =============================================================
-    // GIZMOS
-    // =============================================================
+    // =========================================================
+    // SPAWN EXPLOSION SFX
+    // =========================================================
+
+    if (data.skillSFXPrefab != null)
+    {
+        GameObject explosionSFX =
+            Instantiate(
+                data.skillSFXPrefab,
+                explosionPosition,
+                Quaternion.identity
+            );
+
+        ExplosionSFX sfx =
+            explosionSFX.GetComponent<ExplosionSFX>();
+
+        if (sfx != null)
+        {
+            sfx.Initialize(
+                data.skillSFX
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "GrenadeProjectile | skillSFXPrefab " +
+                "không có component ExplosionSFX!"
+            );
+
+            Destroy(explosionSFX);
+        }
+    }
+
+    // =========================================================
+    // DESTROY GRENADE
+    // =========================================================
+
+    Destroy(gameObject);
+}
 
     private void OnDrawGizmosSelected()
     {

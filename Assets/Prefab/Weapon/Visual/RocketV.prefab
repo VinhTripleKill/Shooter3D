@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3921448388450455252}
   - component: {fileID: 3841231484775487821}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RocketV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1746565041240368844}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 851052926811234469}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,6 +162,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3c7a2966e1c29c4468d00ef6a30ed54d, type: 3}
       propertyPath: m_Name
       value: RocketM
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3c7a2966e1c29c4468d00ef6a30ed54d, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

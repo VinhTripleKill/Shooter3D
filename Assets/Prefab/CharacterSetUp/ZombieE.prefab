@@ -416,9 +416,6 @@ MonoBehaviour:
   maxHp: 0
   defense: 0
   currentHp: 0
-  expReward: 50
-  coinReward: 20
-  coinPrefab: {fileID: 6035555479930039954, guid: b4d28cfb71e4dea49862e7b5615807e2, type: 3}
 --- !u!136 &6449497479353676384
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -529,7 +526,7 @@ MonoBehaviour:
   atkDamage: 1
   atkCD: 1.5
   typeFace: 0
-  attackAngle: 90
+  attackAngle: 60
 --- !u!114 &-1498084230337109250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -591,6 +588,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7134394785105016132, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -5151492872390713093, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -5069531478518834764, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: -5017971254852617305, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -75.12895
@@ -611,13 +620,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: character-zombie
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1812433027226884373, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -30.000002
       objectReference: {fileID: 0}
+    - target: {fileID: 3250163066507786643, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788240856288092216, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 7604367576434143486, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -29.606
+      objectReference: {fileID: 0}
+    - target: {fileID: 8303906797054990637, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8891244130364874969, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -630,6 +655,10 @@ PrefabInstance:
     - target: {fileID: 8891244130364874969, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -34.909
+      objectReference: {fileID: 0}
+    - target: {fileID: 8908311948669537042, guid: bceef32bb8f2e524db4d44dfae44be5a, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

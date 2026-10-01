@@ -19,7 +19,11 @@ MonoBehaviour:
   rangeRadius: 8
   skillCostMana: 25
   skillBehaviourPrefab: {fileID: -7539789986821043711, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
+  skillSFXPrefab: {fileID: 2264942174675488685, guid: aacc438edfbc353479b6524ab0ba42a9, type: 3}
+  skillSFX: {fileID: 8300000, guid: f0bba60dd1813bd40af826dbaa99b983, type: 3}
   grenadePrefab: {fileID: 8504079749979510124, guid: 1f7988d5c84be0d4c852660ce496d73c, type: 3}
+  throwSFXPrefab: {fileID: 2264942174675488685, guid: c44136b441011c045a74c5ddf0f2c977, type: 3}
+  throwSFX: {fileID: 8300000, guid: ada4319dc7b507547bfefbeda133745b, type: 3}
   explosionPrefab: {fileID: 2195401069695916235, guid: 784b59333981b0f419b9afd90b3dc395, type: 3}
   moveSpeed: 8
   arriveDistance: 0.1
@@ -31,7 +35,7 @@ MonoBehaviour:
   speedRotZ: 90
   wallMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 3072
   wallBounceForce: 1
   wallUpwardForce: 0.2
   minimumBounceSpeed: 9

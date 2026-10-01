@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1459622134795468695}
   - component: {fileID: 7080515277655735225}
+  - component: {fileID: 8609450549125974473}
   m_Layer: 9
   m_Name: TargetM
   m_TagString: Untagged
@@ -80,6 +81,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TargetTraining
   maxHp: 50
+  defense: 0
   currentHp: 0
   targetMode: 1
   posA: {fileID: 4427091102409501820}
@@ -87,6 +89,26 @@ MonoBehaviour:
   speedMove: 10
   timeStop: 1
   canRevived: 1
+--- !u!114 &8609450549125974473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123426114100396432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b95d7f0c42f3f4fb23258008f9210e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  damagePrefab: {fileID: 5563899755096399413, guid: 5aa9061baba37fe49b5e8bc11a0bc091, type: 3}
+  popupPoint: {fileID: 1459622134795468695}
+  baseOffset: {x: 0, y: 1.8, z: 0}
+  randomX: 0.6
+  randomY: 0.4
+  randomZ: 0.6
+  enemyDamageColor: {r: 1, g: 1, b: 1, a: 1}
+  playerDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &2494856779600504513
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6980650993808816686}
   - component: {fileID: -7776158632489269649}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ShotGunV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2001898564207299753}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6654469947911093000}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,6 +162,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 5de2dc218e36f9a4fab92ee71178e1b6, type: 3}
       propertyPath: m_Name
       value: ShotGunM
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5de2dc218e36f9a4fab92ee71178e1b6, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

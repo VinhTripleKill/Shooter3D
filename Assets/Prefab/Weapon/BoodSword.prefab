@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2058450927181145320}
   - component: {fileID: 2674906715875407485}
   - component: {fileID: 5457231402988934519}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BoodSword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,6 +270,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 076695de40ad7a2419a4e5c3d05568d5, type: 3}
       propertyPath: m_Name
       value: weapon-sword
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 076695de40ad7a2419a4e5c3d05568d5, type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -19,6 +19,8 @@ MonoBehaviour:
   rangeRadius: 5
   skillCostMana: 15
   skillBehaviourPrefab: {fileID: 7192575363007486831, guid: e91af1b8f33bdcc4592a97485876e86a, type: 3}
+  skillSFXPrefab: {fileID: 2264942174675488685, guid: 7f700eaceaee68942ad409219c5a0d64, type: 3}
+  skillSFX: {fileID: 8300000, guid: a245ee5d75348c84a89ffb7992f1dc82, type: 3}
   dashDistance: 5
   timeDash: 0.2
   timeNextDash: 0.1

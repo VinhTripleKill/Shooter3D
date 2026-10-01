@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 605325420948660816}
   - component: {fileID: 3511081703388090120}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RifleV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 991539718905879777}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4240106496912741771}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,6 +162,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 7a97e592f0d163844ba19ec0249cd0e4, type: 3}
       propertyPath: m_Name
       value: RifleM
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7a97e592f0d163844ba19ec0249cd0e4, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6551238392589077143, guid: 7a97e592f0d163844ba19ec0249cd0e4, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

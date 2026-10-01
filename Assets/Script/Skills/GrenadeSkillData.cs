@@ -6,6 +6,21 @@ public class GrenadeSkillData : SkillData
     [Header("Grenade")]
     public GameObject grenadePrefab;
 
+    // =====================================================
+    // THROW SFX
+    // =====================================================
+
+    [Header("Throw SFX")]
+    [Tooltip("Prefab chứa AudioSource để phát âm thanh khi ném grenade.")]
+    public GameObject throwSFXPrefab;
+
+    [Tooltip("Âm thanh phát ngay khi thực hiện grenade.")]
+    public AudioClip throwSFX;
+
+    // =====================================================
+    // EXPLOSION
+    // =====================================================
+
     [Header("Explosion")]
     public GameObject explosionPrefab;
 
@@ -45,11 +60,11 @@ public class GrenadeSkillData : SkillData
     public float minimumBounceSpeed = 1f;
 
     [Header("Ground / Target")]
-    [Tooltip( "Layer dùng để tìm mặt đất tại vị trí target. " +"Target sẽ raycast thẳng xuống layer này.")]
+    [Tooltip("Layer dùng để tìm mặt đất tại vị trí target. Target sẽ raycast thẳng xuống layer này.")]
     public LayerMask groundMask;
 
     [Header("Explosion")]
-    [Tooltip( "Sau khoảng thời gian này grenade sẽ tự phát nổ " + "nếu chưa nổ trước đó." )]
+    [Tooltip("Sau khoảng thời gian này grenade sẽ tự phát nổ nếu chưa nổ trước đó.")]
     public float explodeDelay = 3f;
 
     [Header("Explosion Damage")]
